@@ -15,7 +15,7 @@ function Settings() {
             {/* Open settings button */}
             {!isOpen && (
                 <button
-                    className="p-3 text-green-400 fixed right-4 z-50"
+                    className="p-2 text-green-400 fixed right-4 z-50 rounded-lg backdrop-blur-sm shadow-lg"
                     onClick={() => setIsOpen(true)}
                 >
                     <SettingsIcon size={28} />
@@ -25,7 +25,7 @@ function Settings() {
             {/* Sliding settings drawer */}
             <aside
                 className={`fixed top-0 right-0 h-full w-72 sm:w-80 bg-black border-l border-green-500 flex flex-col
-        transform transition-transform duration-300 z-40
+        transform transition-transform duration-300 z-40 
         ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}
             >
                 {/* Header */}

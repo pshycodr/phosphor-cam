@@ -1,8 +1,7 @@
-
 function Header() {
     return (
         <>
-            <div className="m-4 flex flex-col justify-center items-start gap-1">
+            <div className="m-4 flex flex-col justify-center items-start gap-1 backdrop-blur-sm p-4 rounded-lg shadow-lg">
                 <h1 className="font-bold text-3xl">ASCII-IT</h1>
                 <div className="flex flex-row gap-4 text-xs md:text-sm ">
                     <span>FPS: 30</span>
@@ -14,4 +13,4 @@ function Header() {
     )
 }
 
-export default Header;
+export default Header
