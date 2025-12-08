@@ -24,3 +24,111 @@ body {
 ::-webkit-scrollbar-thumb:hover {
     background: #555;
 }
+
+/* Base range style */
+.settings-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  background: #111827;       /* dark track */
+  border-radius: 9999px;
+  outline: none;
+  cursor: pointer;
+  position: relative;
+}
+
+/* WebKit track */
+.settings-slider::-webkit-slider-runnable-track {
+  height: 4px;
+  background: #111827;
+  border-radius: 9999px;
+}
+
+/* WebKit thumb */
+.settings-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 16px;
+  width: 16px;
+  border-radius: 9999px;
+  background: #f9fafb;          /* white thumb */
+  border: 2px solid #22c55e;    /* neon green border */
+  box-shadow: 0 0 6px rgba(34, 197, 94, 0.7);
+  margin-top: -6px;             /* centers thumb on 4px track */
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+/* Firefox track */
+.settings-slider::-moz-range-track {
+  height: 4px;
+  background: #111827;
+  border-radius: 9999px;
+}
+
+/* Firefox thumb */
+.settings-slider::-moz-range-thumb {
+  height: 16px;
+  width: 16px;
+  border-radius: 9999px;
+  background: #f9fafb;
+  border: 2px solid #22c55e;
+  box-shadow: 0 0 6px rgba(34, 197, 94, 0.7);
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+/* Hover / active states */
+.settings-slider:hover::-webkit-slider-thumb,
+.settings-slider:hover::-moz-range-thumb {
+  transform: scale(1.05);
+  box-shadow: 0 0 10px rgba(34, 197, 94, 0.9);
+}
+
+.settings-slider:active::-webkit-slider-thumb,
+.settings-slider:active::-moz-range-thumb {
+  transform: scale(1.1);
+}
+
+.settings-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  background: #0d0d0d;
+  border-radius: 9999px;
+  cursor: pointer;
+  outline: none;
+}
+
+.settings-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 18px;
+  width: 18px;
+  background: #fff;
+  border: 2px solid #22c55e;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+  margin-top: -7px;
+}
+
+.settings-slider::-moz-range-thumb {
+  height: 18px;
+  width: 18px;
+  background: #fff;
+  border: 2px solid #22c55e;
+  border-radius: 50%;
+}
+
+.settings-toggle {
+  width: 22px;
+  height: 22px;
+  appearance: none;
+  border: 2px solid #22c55e;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.settings-toggle:checked {
+  background: #22c55e;
+  box-shadow: 0 0 8px rgba(34,197,94,0.9);
+}
