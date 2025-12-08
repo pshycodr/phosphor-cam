@@ -48,6 +48,7 @@ function Settings() {
                             type="range"
                             min={6}
                             max={24}
+                            step={1}
                             value={resolution}
                             onChange={e => setResolution(+e.target.value)}
                             className="settings-slider"
@@ -63,6 +64,7 @@ function Settings() {
                             type="range"
                             min={0.5}
                             max={3.0}
+                            step={0.1}
                             value={contrast}
                             onChange={e => setContrast(+e.target.value)}
                             className="settings-slider"
