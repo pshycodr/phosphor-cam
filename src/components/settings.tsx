@@ -1,14 +1,19 @@
 import { useState } from 'react'
 import { Settings as SettingsIcon, X } from 'lucide-react'
+import { AsciiSettings } from '../types/types'
 
-function Settings() {
+interface SettingsCompProps {
+    settings: AsciiSettings
+    onChange: (newSettings: AsciiSettings) => void
+}
+
+function Settings({ settings, onChange }: SettingsCompProps) {
     const [isOpen, setIsOpen] = useState(false)
-    const [brightness, setBrightness] = useState(50)
-    const [resolution, setResolution] = useState(50)
-    const [contrast, setContrast] = useState(50)
-    const [charSet, setCharSet] = useState('standard')
-    const [colorMode, setColorMode] = useState(false)
-    const [invertValues, setInvertValues] = useState(false)
+
+    const handleChange = (key: keyof AsciiSettings, value: number | string | boolean) => {
+        onChange({ ...settings, [key]: value })
+        console.log(settings)
+    }
 
     return (
         <>
@@ -46,11 +51,11 @@ function Settings() {
                         </div>
                         <input
                             type="range"
-                            min={6}
-                            max={24}
-                            step={1}
-                            value={resolution}
-                            onChange={e => setResolution(+e.target.value)}
+                            min={0.1}
+                            max={1}
+                            step={0.1}
+                            value={settings.resolution}
+                            onChange={e => handleChange('resolution', +e.target.value)}
                             className="settings-slider"
                         />
                     </section>
@@ -65,8 +70,8 @@ function Settings() {
                             min={0.5}
                             max={3.0}
                             step={0.1}
-                            value={contrast}
-                            onChange={e => setContrast(+e.target.value)}
+                            value={settings.contrast}
+                            onChange={e => handleChange('contrast', +e.target.value)}
                             className="settings-slider"
                         />
                     </section>
@@ -80,8 +85,8 @@ function Settings() {
                             type="range"
                             min={-100}
                             max={100}
-                            value={brightness}
-                            onChange={e => setBrightness(+e.target.value)}
+                            value={settings.brightness}
+                            onChange={e => handleChange('brightness', +e.target.value)}
                             className="settings-slider"
                         />
                     </section>
@@ -94,8 +99,8 @@ function Settings() {
                                 <button
                                     key={c}
                                     className={`py-2 rounded-sm border border-green-500 text-xs 
-                  ${charSet === c ? 'bg-green-600 text-black' : 'text-green-400'}`}
-                                    onClick={() => setCharSet(c)}
+                  ${settings.characterSet === c ? 'bg-green-600 text-black' : 'text-green-400'}`}
+                                    onClick={() => handleChange('characterSet', c)}
                                 >
                                     {c}
                                 </button>
@@ -109,8 +114,8 @@ function Settings() {
                             Color Mode
                             <input
                                 type="checkbox"
-                                checked={colorMode}
-                                onChange={() => setColorMode(!colorMode)}
+                                checked={settings.colorMode}
+                                onChange={() => handleChange('colorMode', !settings.colorMode)}
                                 className="settings-toggle"
                             />
                         </label>
@@ -118,8 +123,8 @@ function Settings() {
                             Invert Values
                             <input
                                 type="checkbox"
-                                checked={invertValues}
-                                onChange={() => setInvertValues(!invertValues)}
+                                checked={settings.invert}
+                                onChange={() => handleChange('invert', !settings.invert)}
                                 className="settings-toggle"
                             />
                         </label>
