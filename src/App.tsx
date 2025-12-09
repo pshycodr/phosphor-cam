@@ -1,9 +1,9 @@
-import { RefreshCw } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import AsciiView from './components/asciiView'
 import Header from './components/header'
 import Settings from './components/settings'
 import { AsciiSettings, CameraFacingMode } from './types/types'
+import CameraControls from './components/cameraControls'
 
 function App() {
     const DEFAULT_SETTIGNS: AsciiSettings = {
@@ -16,10 +16,10 @@ function App() {
         characterSet: 'standard',
     }
 
-    // const userVideoRef = useRef<MediaStream>(null)
     const [stream, setStream] = useState<MediaStream | null>(null)
     const [settings, setSettings] = useState<AsciiSettings>(DEFAULT_SETTIGNS)
     const [facingMode, setFacingMode] = useState<CameraFacingMode>('environment')
+    const [isRecording, setIsRecording] = useState(false)
 
     useEffect(() => {
         let active = true
@@ -68,33 +68,40 @@ function App() {
         setFacingMode(prev => (prev === 'user' ? 'environment' : 'user'))
     }
 
+    const takeSnapshot = () => {
+        console.log('Snapshot')
+        // TODO: hook with AsciiView snapshot logic
+    }
+
+    const copyToClipboard = () => {
+        console.log('Copy to clipboard')
+        // TODO: implement copy functionality
+    }
+
+    const toggleRecording = () => {
+        setIsRecording(prev => !prev)
+        // TODO: add media recorder logic
+    }
+
     return (
-        <>
-            <div className="h-screen w-screen flex flex-col justify-between ">
-                <div className="w-full flex flex-row justify-between items-center">
-                    <Header />
-                    <Settings settings={settings} onChange={setSettings} />
-                </div>
-
-                <div className="fixed h-full w-screen flex justify-center -z-10 items-center">
-                    <AsciiView settings={settings} stream={stream} />
-                </div>
-
-                <div>
-                    <button
-                        onClick={toggleCamera}
-                        className="fixed bottom-15 left-50 group flex flex-col items-center gap-2 focus:outline-none"
-                    >
-                        <div className="w-12 h-12 rounded-full border border-green-500/30 bg-black/40 backdrop-blur flex items-center justify-center group-hover:bg-green-900/30 group-hover:border-green-400 transition-all">
-                            <RefreshCw size={20} strokeWidth={1.5} className="text-white" />
-                        </div>
-                        <span className="text-[10px] tracking-widest font-bold opacity-70 group-hover:opacity-100">
-                            FLIP
-                        </span>
-                    </button>
-                </div>
+        <div className="h-screen w-screen flex flex-col justify-between">
+            <div className="w-full flex flex-row justify-between items-center">
+                <Header />
+                <Settings settings={settings} onChange={setSettings} />
             </div>
-        </>
+
+            <div className="fixed h-full w-screen flex justify-center -z-10 items-center">
+                <AsciiView settings={settings} stream={stream} />
+            </div>
+
+            <CameraControls
+                onFlip={toggleCamera}
+                onShot={takeSnapshot}
+                onCopy={copyToClipboard}
+                onToggleRecording={toggleRecording}
+                isRecording={isRecording}
+            />
+        </div>
     )
 }
 
