@@ -51,11 +51,11 @@ function Settings({ settings, onChange }: SettingsCompProps) {
                         </div>
                         <input
                             type="range"
-                            min={0.1}
-                            max={1}
-                            step={0.1}
-                            value={settings.resolution}
-                            onChange={e => handleChange('resolution', +e.target.value)}
+                            min={1}
+                            max={30}
+                            step={1}
+                            value={settings.fontSize}
+                            onChange={e => handleChange('fontSize', +e.target.value)}
                             className="settings-slider"
                         />
                     </section>

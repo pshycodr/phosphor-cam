@@ -19,3 +19,5 @@ export const CHAR_SETS: AsciiCharacterMap = {
     matrix: ' 01',
     edges: '  .,-_~:;=!*#$@',
 }
+
+export type CameraFacingMode = 'user' | 'environment'
