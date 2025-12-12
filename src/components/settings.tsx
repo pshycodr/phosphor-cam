@@ -51,7 +51,7 @@ function Settings({ settings, onChange }: SettingsCompProps) {
                         </div>
                         <input
                             type="range"
-                            min={1}
+                            min={6}
                             max={30}
                             step={1}
                             value={settings.fontSize}

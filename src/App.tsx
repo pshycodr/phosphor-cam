@@ -18,8 +18,8 @@ function App() {
 
     const [stream, setStream] = useState<MediaStream | null>(null)
     const [settings, setSettings] = useState<AsciiSettings>(DEFAULT_SETTIGNS)
-    const [facingMode, setFacingMode] = useState<CameraFacingMode>('environment')
-    const [isRecording, setIsRecording] = useState(false)
+    const [facingMode, setFacingMode] = useState<CameraFacingMode>('user')
+    const [isRecording, setIsRecording] = useState<boolean>(false)
 
     useEffect(() => {
         let active = true
