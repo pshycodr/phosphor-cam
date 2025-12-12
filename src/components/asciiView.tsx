@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { AsciiSettings, CHAR_SETS } from '../types/types'
+import { adjustColor, createBrightnessMap, getChar } from '../utils/asciiUtils'
 
 interface AsciiViewProps {
     settings: AsciiSettings
@@ -34,7 +35,7 @@ function AsciiView({ settings, stream }: AsciiViewProps) {
         const srcW = Math.floor(video.videoWidth / scale)
         const srcH = Math.floor(video.videoHeight / scale)
 
-        if (srcW === 0 || srcH === 0) {
+        if (srcW <= 0 || srcH <= 0) {
             animationIdRef.current = requestAnimationFrame(renderCanvas)
             return
         }
@@ -43,6 +44,13 @@ function AsciiView({ settings, stream }: AsciiViewProps) {
         if (!hiddenCanvasRef.current) {
             animationIdRef.current = requestAnimationFrame(renderCanvas)
             return
+        }
+
+        if (hiddenCanvasRef.current) {
+            if (hiddenCanvasRef.current.width !== srcW || hiddenCanvasRef.current.height !== srcH) {
+                hiddenCanvasRef.current.width = srcW
+                hiddenCanvasRef.current.height = srcH
+            }
         }
 
         const hiddenCanvas = hiddenCanvasRef.current
@@ -55,35 +63,60 @@ function AsciiView({ settings, stream }: AsciiViewProps) {
             return
         }
 
-        hiddenCtx.drawImage(video, 0, 0, srcW, srcH)
+        try {
+            hiddenCtx.drawImage(video, 0, 0, srcW, srcH)
+        } catch {
+            animationIdRef.current = requestAnimationFrame(renderCanvas)
+            return
+        }
 
-        const data = hiddenCtx.getImageData(0, 0, srcW, srcH).data
+        const pixels = hiddenCtx.getImageData(0, 0, srcW, srcH).data
+
+        const brightnessMap = createBrightnessMap(ramp)
+        const { contrast, brightness: brightnessOffset, colorMode, invert } = settings
 
         // draw ASCII on the visible canvas
         const fontSize = settings.fontSize || 10
         canvas.width = srcW * fontSize * 0.6
         canvas.height = srcH * fontSize
 
-        ctx.fillStyle = 'black'
         ctx.fillRect(0, 0, canvas.width, canvas.height)
+        ctx.font = `${fontSize}px 'Fira Code', monospace`
 
-        ctx.font = `${fontSize}px monospace`
-        ctx.fillStyle = '#00ff00'
+        ctx.fillStyle = invert ? '#00ff00' : '#000000'
+        if (!invert) ctx.fillStyle = '#000000'
+        ctx.textBaseline = 'top'
 
-        let i = 0
-        for (let y = 0; y < srcH; y++) {
-            for (let x = 0; x < srcW; x++) {
-                const r = data[i++]
-                const g = data[i++]
-                const b = data[i++]
-                i++
+        const pixelCount = srcW * srcH
 
-                const brightness = (r + g + b) / 3
-                const idx = Math.floor((brightness / 255) * (ramp.length - 1))
-                const char = ramp[idx]
+        // let i = 0
+        for (let i = 0; i < pixelCount; i++) {
+            const r = pixels[i * 4]
+            const g = pixels[i * 4 + 1]
+            const b = pixels[i * 4 + 2]
 
-                ctx.fillText(char, x * fontSize * 0.6, y * fontSize)
+            let l = 0.299 * r + 0.587 * g + 0.114 * b
+
+            // Adjust
+            if (contrast !== 1.0 || brightnessOffset !== 0) {
+                l = adjustColor(l, contrast, brightnessOffset)
             }
+
+            const char = getChar(l, brightnessMap, invert)
+
+            const x = (i % srcW) * settings.fontSize
+            const y = Math.floor(i / srcW) * settings.fontSize
+
+            // const brightness = (r + g + b) / 3
+            // const idx = Math.floor((brightness / 255) * (ramp.length - 1))
+
+            if (colorMode) {
+                ctx.fillStyle = `rgb(${r},${g},${b})`
+            } else {
+                ctx.fillStyle = invert ? '#000000' : '#00ff00'
+            }
+
+            ctx.fillText(char, x, y)
         }
 
         animationIdRef.current = requestAnimationFrame(renderCanvas)
