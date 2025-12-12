@@ -1,22 +1,31 @@
 import { useEffect, useRef } from 'react'
-import { AsciiSettings, CHAR_SETS } from '../types/types'
+import { AsciiSettings, CHAR_SETS, ProcessingStats } from '../types/types'
 import { adjustColor, createBrightnessMap, getChar } from '../utils/asciiUtils'
 
 interface AsciiViewProps {
     settings: AsciiSettings
     stream: MediaStream | null
+    onStatsUpdate: (status: ProcessingStats) => void
 }
 
-function AsciiView({ settings, stream }: AsciiViewProps) {
+function AsciiView({ settings, stream, onStatsUpdate }: AsciiViewProps) {
     const videoRef = useRef<HTMLVideoElement>(null)
     const canvasRef = useRef<HTMLCanvasElement>(null)
     const hiddenCanvasRef = useRef<HTMLCanvasElement>(null)
+    // const requestRef = useRef<number>(0);
+    const lastTimeRef = useRef<number>(0)
 
     const animationIdRef = useRef<number | null>(null)
 
     const ramp = CHAR_SETS[settings.characterSet]
 
-    const renderCanvas = () => {
+    const renderCanvas = (time: number) => {
+        // eslint-disable-next-line react-hooks/purity
+        const startRender = performance.now()
+        const delta = time - lastTimeRef.current
+        lastTimeRef.current = time
+        const fps = 1000 / delta
+
         const video = videoRef.current
         const canvas = canvasRef.current
         if (!canvas || !video) {
@@ -54,8 +63,6 @@ function AsciiView({ settings, stream }: AsciiViewProps) {
         }
 
         const hiddenCanvas = hiddenCanvasRef.current
-        hiddenCanvas.width = srcW
-        hiddenCanvas.height = srcH
         const hiddenCtx = hiddenCanvas.getContext('2d')
 
         if (!hiddenCtx) {
@@ -119,6 +126,13 @@ function AsciiView({ settings, stream }: AsciiViewProps) {
             ctx.fillText(char, x, y)
         }
 
+        // eslint-disable-next-line react-hooks/purity
+        const endRender = performance.now()
+
+        // eslint-disable-next-line react-hooks/purity
+        if (Math.random() > 0.95) {
+            onStatsUpdate({ fps, renderTime: endRender - startRender })
+        }
         animationIdRef.current = requestAnimationFrame(renderCanvas)
     }
 
@@ -131,7 +145,7 @@ function AsciiView({ settings, stream }: AsciiViewProps) {
                 video.srcObject = stream
                 await video.play()
 
-                renderCanvas()
+                animationIdRef.current = requestAnimationFrame(renderCanvas)
             } catch (error) {
                 console.log(error)
             }

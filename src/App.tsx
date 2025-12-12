@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import AsciiView from './components/asciiView'
 import Header from './components/header'
 import Settings from './components/settings'
-import { AsciiSettings, CameraFacingMode } from './types/types'
+import { AsciiSettings, CameraFacingMode, ProcessingStats } from './types/types'
 import CameraControls from './components/cameraControls'
 
 function App() {
@@ -20,6 +20,11 @@ function App() {
     const [settings, setSettings] = useState<AsciiSettings>(DEFAULT_SETTIGNS)
     const [facingMode, setFacingMode] = useState<CameraFacingMode>('user')
     const [isRecording, setIsRecording] = useState<boolean>(false)
+    const [stats, setStats] = useState<ProcessingStats>({ fps: 0, renderTime: 0 })
+    const [windowSize, setWindowSize] = useState({
+        width: window.innerWidth,
+        height: window.innerHeight,
+    })
 
     useEffect(() => {
         let active = true
@@ -55,12 +60,18 @@ function App() {
 
         start()
 
+        const handleResize = () => {
+            setWindowSize({ width: window.innerWidth, height: window.innerHeight })
+        }
+        window.addEventListener('resize', handleResize)
+
         return () => {
             active = false
             if (currentStream) {
                 currentStream.getTracks().forEach(t => t.stop())
             }
             setStream(null)
+            window.removeEventListener('resize', handleResize)
         }
     }, [facingMode])
 
@@ -86,12 +97,12 @@ function App() {
     return (
         <div className="h-screen w-screen flex flex-col justify-between">
             <div className="w-full flex flex-row justify-between items-center">
-                <Header />
+                <Header fps={stats.fps} renderTime={stats.renderTime} windowSize={windowSize} />
                 <Settings settings={settings} onChange={setSettings} />
             </div>
 
             <div className="fixed h-full w-screen flex justify-center -z-10 items-center">
-                <AsciiView settings={settings} stream={stream} />
+                <AsciiView settings={settings} stream={stream} onStatsUpdate={setStats} />
             </div>
 
             <CameraControls

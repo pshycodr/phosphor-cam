@@ -21,3 +21,8 @@ export const CHAR_SETS: AsciiCharacterMap = {
 }
 
 export type CameraFacingMode = 'user' | 'environment'
+
+export type ProcessingStats = {
+    fps: number
+    renderTime: number
+}
