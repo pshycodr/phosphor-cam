@@ -32,6 +32,7 @@ function App() {
     })
 
     const [flash, setFlash] = useState<boolean>(false)
+    const [clipboardSuccess, setClipboardSuccess] = useState<boolean>(false)
 
     const asciiRendererRef = useRef<AsciiRendererHandle>(null)
 
@@ -111,7 +112,20 @@ function App() {
     }, [])
 
     const copyToClipboard = useCallback(() => {
-        console.log('Copy to clipboard')
+        if (!asciiRendererRef.current) return
+
+        try {
+            const copyContent = asciiRendererRef.current.getAsciiText()
+
+            if (!copyContent) throw new Error()
+
+            navigator.clipboard.writeText(copyContent).then(() => {
+                setClipboardSuccess(true)
+                setTimeout(() => setClipboardSuccess(false), 2000)
+            })
+        } catch (error) {
+            console.log('Copy Failed:', error)
+        }
     }, [])
 
     const toggleRecording = useCallback(() => {
@@ -134,6 +148,13 @@ function App() {
             {/* Flash Effect */}
             {flash && (
                 <div className="absolute inset-0 bg-white z-50 animate-out fade-out duration-150 pointer-events-none" />
+            )}
+
+            {/* Clipboard Toast */}
+            {clipboardSuccess && (
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-black/80 border border-green-500 px-6 py-3 rounded text-green-400 font-bold backdrop-blur animate-in zoom-in duration-200">
+                    ASCII COPIED TO CLIPBOARD
+                </div>
             )}
 
             <div className="fixed h-full w-screen flex justify-center -z-10 items-center">

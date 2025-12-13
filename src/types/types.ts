@@ -29,6 +29,6 @@ export type ProcessingStats = {
 
 export interface AsciiRendererHandle {
     captureImage: () => Promise<string>
-    // getAsciiText: () => string;
+    getAsciiText: () => string
     getCanvas: () => HTMLCanvasElement | null
 }

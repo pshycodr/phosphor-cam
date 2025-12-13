@@ -94,7 +94,42 @@ const AsciiView = forwardRef<AsciiRendererHandle, AsciiViewProps>(
                 return tempCanvas.toDataURL('image/png')
             },
 
-            // getAsciiText:
+            getAsciiText: () => {
+                const video = videoRef.current
+                if (!video || video.readyState !== 4 || !video.videoWidth || !video.videoHeight)
+                    return ''
+                const tempCanvas = document.createElement('canvas')
+                const standardWidth = 150
+                const aspectRatio = video.videoHeight / video.videoWidth
+                const standardHeight = Math.max(1, Math.floor(standardWidth * aspectRatio * 0.55))
+
+                tempCanvas.width = standardWidth
+                tempCanvas.height = standardHeight
+
+                const tempCtx = tempCanvas.getContext('2d')
+                if (!tempCtx) return ''
+
+                tempCtx.drawImage(video, 0, 0, standardWidth, standardHeight)
+                const imageData = tempCtx.getImageData(0, 0, standardWidth, standardHeight)
+                const pixels = imageData.data
+
+                const brightnessMap = createBrightnessMap(ramp)
+
+                let copyContent = ''
+
+                for (let y = 0; y < standardHeight; y++) {
+                    for (let x = 0; x < standardWidth; x++) {
+                        const idx = (y * standardWidth + x) * 4
+                        const l = getLuminance(pixels[idx], pixels[idx + 1], pixels[idx + 2]) // R G B
+                        const adjL = adjustColor(l, settings.contrast, settings.brightness)
+                        const char = getChar(adjL, brightnessMap, settings.invert)
+
+                        copyContent += char
+                    }
+                    copyContent += '\n'
+                }
+                return copyContent
+            },
         }))
 
         const renderCanvas = useCallback(
