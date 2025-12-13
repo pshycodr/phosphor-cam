@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import AsciiView from './components/asciiView'
 import Header from './components/header'
 import Settings from './components/settings'
@@ -75,29 +75,32 @@ function App() {
         }
     }, [facingMode])
 
-    const toggleCamera = () => {
+    const toggleCamera = useCallback(() => {
         setFacingMode(prev => (prev === 'user' ? 'environment' : 'user'))
-    }
+    }, [])
 
-    const takeSnapshot = () => {
+    const takeSnapshot = useCallback(() => {
         console.log('Snapshot')
-        // TODO: hook with AsciiView snapshot logic
-    }
+    }, [])
 
-    const copyToClipboard = () => {
+    const copyToClipboard = useCallback(() => {
         console.log('Copy to clipboard')
-        // TODO: implement copy functionality
-    }
+    }, [])
 
-    const toggleRecording = () => {
+    const toggleRecording = useCallback(() => {
         setIsRecording(prev => !prev)
-        // TODO: add media recorder logic
-    }
+    }, [])
 
     return (
         <div className="h-screen w-screen flex flex-col justify-between">
             <div className="w-full flex flex-row justify-between items-center">
-                <Header fps={stats.fps} renderTime={stats.renderTime} windowSize={windowSize} />
+                <Header
+                    fps={stats.fps}
+                    renderTime={stats.renderTime}
+                    width={windowSize.width}
+                    height={windowSize.height}
+                />
+
                 <Settings settings={settings} onChange={setSettings} />
             </div>
 

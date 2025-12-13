@@ -1,4 +1,5 @@
 import { RefreshCw, Copy, Video } from 'lucide-react'
+import { memo } from 'react'
 
 type CameraControlsProps = {
     onFlip: () => void
@@ -95,4 +96,4 @@ const CameraControls = ({
     )
 }
 
-export default CameraControls
+export default memo(CameraControls)

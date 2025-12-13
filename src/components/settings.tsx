@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { memo, useState } from 'react'
 import { Settings as SettingsIcon, X } from 'lucide-react'
 import { AsciiSettings } from '../types/types'
 
@@ -140,4 +140,4 @@ function Settings({ settings, onChange }: SettingsCompProps) {
     )
 }
 
-export default Settings
+export default memo(Settings)

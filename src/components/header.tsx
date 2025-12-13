@@ -1,13 +1,12 @@
+import { memo } from 'react'
 import { ProcessingStats } from '../types/types'
 
 interface HeaderProps extends ProcessingStats {
-    windowSize: {
-        width: number
-        height: number
-    }
+    width: number
+    height: number
 }
 
-function Header({ fps, renderTime, windowSize }: HeaderProps) {
+function Header({ fps, renderTime, width, height }: HeaderProps) {
     return (
         <>
             <div className="m-4 flex flex-col justify-center items-start gap-1 backdrop-blur-sm p-4 rounded-lg shadow-lg">
@@ -16,7 +15,7 @@ function Header({ fps, renderTime, windowSize }: HeaderProps) {
                     <span>FPS: {Math.floor(fps)}</span>
                     <span>RENDER: {Math.floor(renderTime)}ms</span>
                     <span>
-                        RES: {windowSize.width} × {windowSize.height}
+                        RES: {width} × {height}
                     </span>
                 </div>
             </div>
@@ -24,4 +23,4 @@ function Header({ fps, renderTime, windowSize }: HeaderProps) {
     )
 }
 
-export default Header
+export default memo(Header)

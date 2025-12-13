@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { memo, useEffect, useRef } from 'react'
 import { AsciiSettings, CHAR_SETS, ProcessingStats } from '../types/types'
 import { adjustColor, createBrightnessMap, getChar } from '../utils/asciiUtils'
 
@@ -136,28 +136,23 @@ function AsciiView({ settings, stream, onStatsUpdate }: AsciiViewProps) {
     }
 
     useEffect(() => {
-        const initCamera = async () => {
-            try {
-                const video = videoRef.current
-                if (!video) return
+        if (!stream) return
 
-                video.srcObject = stream
-                await video.play()
+        const video = videoRef.current
+        if (!video) return
 
-                animationIdRef.current = requestAnimationFrame(renderCanvas)
-            } catch (error) {
-                console.log(error)
-            }
-        }
+        video.srcObject = stream
+        video.play()
 
-        initCamera()
+        animationIdRef.current = requestAnimationFrame(renderCanvas)
 
         return () => {
             if (animationIdRef.current !== null) {
                 cancelAnimationFrame(animationIdRef.current)
             }
         }
-    }, [stream, settings])
+    }, [stream])
+
     return (
         <>
             <div className="h-screen w-screen -z-10 flex justify-center items-center">
@@ -174,4 +169,4 @@ function AsciiView({ settings, stream, onStatsUpdate }: AsciiViewProps) {
     )
 }
 
-export default AsciiView
+export default memo(AsciiView)
