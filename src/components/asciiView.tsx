@@ -39,10 +39,10 @@ function AsciiView({ settings, stream, onStatsUpdate }: AsciiViewProps) {
             return
         }
 
-        const scale = settings.fontSize
+        const fontScale = settings.fontSize || 10
 
-        const srcW = Math.floor(video.videoWidth / scale)
-        const srcH = Math.floor(video.videoHeight / scale)
+        const srcW = Math.floor(video.videoWidth / fontScale)
+        const srcH = Math.floor(video.videoHeight / fontScale)
 
         if (srcW <= 0 || srcH <= 0) {
             animationIdRef.current = requestAnimationFrame(renderCanvas)
@@ -83,12 +83,11 @@ function AsciiView({ settings, stream, onStatsUpdate }: AsciiViewProps) {
         const { contrast, brightness: brightnessOffset, colorMode, invert } = settings
 
         // draw ASCII on the visible canvas
-        const fontSize = settings.fontSize || 10
-        canvas.width = srcW * fontSize * 0.6
-        canvas.height = srcH * fontSize
+        canvas.width = srcW * fontScale
+        canvas.height = srcH * fontScale
 
         ctx.fillRect(0, 0, canvas.width, canvas.height)
-        ctx.font = `${fontSize}px 'Fira Code', monospace`
+        ctx.font = `${fontScale}px 'Fira Code', monospace`
 
         ctx.fillStyle = invert ? '#00ff00' : '#000000'
         if (!invert) ctx.fillStyle = '#000000'
@@ -111,8 +110,8 @@ function AsciiView({ settings, stream, onStatsUpdate }: AsciiViewProps) {
 
             const char = getChar(l, brightnessMap, invert)
 
-            const x = (i % srcW) * settings.fontSize
-            const y = Math.floor(i / srcW) * settings.fontSize
+            const x = (i % srcW) * fontScale
+            const y = Math.floor(i / srcW) * fontScale
 
             // const brightness = (r + g + b) / 3
             // const idx = Math.floor((brightness / 255) * (ramp.length - 1))
