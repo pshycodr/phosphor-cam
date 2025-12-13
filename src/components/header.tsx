@@ -8,18 +8,24 @@ interface HeaderProps extends ProcessingStats {
 
 function Header({ fps, renderTime, width, height }: HeaderProps) {
     return (
-        <>
-            <div className="m-4 flex flex-col justify-center items-start gap-1 backdrop-blur-sm p-4 rounded-lg shadow-lg">
-                <h1 className="font-bold text-3xl">ASCII-IT</h1>
-                <div className="flex flex-row gap-4 text-xs md:text-sm ">
-                    <span>FPS: {Math.floor(fps)}</span>
-                    <span>RENDER: {Math.floor(renderTime)}ms</span>
-                    <span>
-                        RES: {width} × {height}
-                    </span>
-                </div>
+        <div className="m-4 flex flex-col items-start gap-3 rounded-lg bg-black/30 p-4 shadow-lg backdrop-blur-sm">
+            <div className="flex items-center gap-3">
+                <img
+                    src="/assets/logo.png"
+                    alt="Phosphor Cam Logo"
+                    className="h-15 w-15 object-contain"
+                />
+                <h1 className="text-3xl font-bold leading-none tracking-tight">PHOSPHOR CAM</h1>
             </div>
-        </>
+
+            <div className="flex gap-4 text-xs text-green-400 md:text-sm">
+                <span>FPS: {Math.floor(fps)}</span>
+                <span>RENDER: {Math.floor(renderTime)}ms</span>
+                <span>
+                    RES: {width} × {height}
+                </span>
+            </div>
+        </div>
     )
 }
 
