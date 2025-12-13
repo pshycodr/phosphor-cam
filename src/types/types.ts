@@ -26,3 +26,9 @@ export type ProcessingStats = {
     fps: number
     renderTime: number
 }
+
+export interface AsciiRendererHandle {
+    captureImage: () => Promise<string>
+    // getAsciiText: () => string;
+    getCanvas: () => HTMLCanvasElement | null
+}

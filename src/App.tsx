@@ -1,8 +1,13 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import AsciiView from './components/asciiView'
 import Header from './components/header'
 import Settings from './components/settings'
-import { AsciiSettings, CameraFacingMode, ProcessingStats } from './types/types'
+import {
+    AsciiRendererHandle,
+    AsciiSettings,
+    CameraFacingMode,
+    ProcessingStats,
+} from './types/types'
 import CameraControls from './components/cameraControls'
 
 function App() {
@@ -25,6 +30,10 @@ function App() {
         width: window.innerWidth,
         height: window.innerHeight,
     })
+
+    const [flash, setFlash] = useState<boolean>(false)
+
+    const asciiRendererRef = useRef<AsciiRendererHandle>(null)
 
     useEffect(() => {
         let active = true
@@ -79,8 +88,26 @@ function App() {
         setFacingMode(prev => (prev === 'user' ? 'environment' : 'user'))
     }, [])
 
-    const takeSnapshot = useCallback(() => {
-        console.log('Snapshot')
+    const takeSnapshot = useCallback(async () => {
+        if (!asciiRendererRef.current) return
+        setFlash(true)
+        setTimeout(() => setFlash(false), 200)
+
+        try {
+            const imageUrl = await asciiRendererRef.current.captureImage()
+            if (!imageUrl) {
+                setFlash(false)
+                return
+            }
+            const a = document.createElement('a')
+            a.href = imageUrl
+            a.download = `ascii-capture-${Date.now()}.png`
+            document.body.appendChild(a)
+            a.click()
+            document.body.removeChild(a)
+        } catch (error) {
+            console.error('Capture failed', error)
+        }
     }, [])
 
     const copyToClipboard = useCallback(() => {
@@ -104,8 +131,14 @@ function App() {
                 <Settings settings={settings} onChange={setSettings} />
             </div>
 
+            {/* Flash Effect */}
+            {flash && (
+                <div className="absolute inset-0 bg-white z-50 animate-out fade-out duration-150 pointer-events-none" />
+            )}
+
             <div className="fixed h-full w-screen flex justify-center -z-10 items-center">
                 <AsciiView
+                    ref={asciiRendererRef}
                     settings={settings}
                     stream={stream}
                     onStatsUpdate={setStats}
