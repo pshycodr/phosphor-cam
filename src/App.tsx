@@ -105,7 +105,12 @@ function App() {
             </div>
 
             <div className="fixed h-full w-screen flex justify-center -z-10 items-center">
-                <AsciiView settings={settings} stream={stream} onStatsUpdate={setStats} />
+                <AsciiView
+                    settings={settings}
+                    stream={stream}
+                    onStatsUpdate={setStats}
+                    canvasSize={windowSize}
+                />
             </div>
 
             <CameraControls
