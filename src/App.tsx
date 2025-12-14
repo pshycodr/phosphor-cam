@@ -33,7 +33,7 @@ function App() {
 
     const [flash, setFlash] = useState<boolean>(false)
     const [clipboardSuccess, setClipboardSuccess] = useState<boolean>(false)
-    // const [recordingTime, setRecordingTime] = useState(0);
+    const [recordingTime, setRecordingTime] = useState(0)
 
     const asciiRendererRef = useRef<AsciiRendererHandle>(null)
     const mediaRecorderRef = useRef<MediaRecorder | null>(null)
@@ -173,7 +173,7 @@ function App() {
                     document.body.appendChild(a)
                     a.click()
                     document.body.removeChild(a)
-                    // setRecordingTime(0);
+                    setRecordingTime(0)
                 }
 
                 recorder.start()
@@ -181,14 +181,20 @@ function App() {
                 setIsRecording(true)
                 console.log('start')
 
-                // recordingTimerRef.current = window.setInterval(() => {
-                //     setRecordingTime(t => t + 1);
-                // }, 1000);
+                recordingTimerRef.current = window.setInterval(() => {
+                    setRecordingTime(t => t + 1)
+                }, 1000)
             } catch (error) {
                 console.error('Recording failed to start', error)
             }
         }
     }, [isRecording])
+
+    const formatTime = (seconds: number) => {
+        const mins = Math.floor(seconds / 60)
+        const secs = seconds % 60
+        return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
+    }
 
     return (
         <div className="h-screen w-screen flex flex-col justify-between">
@@ -231,6 +237,8 @@ function App() {
                 onCopy={copyToClipboard}
                 onToggleRecording={toggleRecording}
                 isRecording={isRecording}
+                formatTime={formatTime}
+                recordingTime={recordingTime}
             />
         </div>
     )
