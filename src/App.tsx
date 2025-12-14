@@ -33,8 +33,12 @@ function App() {
 
     const [flash, setFlash] = useState<boolean>(false)
     const [clipboardSuccess, setClipboardSuccess] = useState<boolean>(false)
+    const [recordingTime, setRecordingTime] = useState(0)
 
     const asciiRendererRef = useRef<AsciiRendererHandle>(null)
+    const mediaRecorderRef = useRef<MediaRecorder | null>(null)
+    const recordedChunksRef = useRef<Blob[]>([])
+    const recordingTimerRef = useRef<number | null>(null)
 
     useEffect(() => {
         let active = true
@@ -129,8 +133,68 @@ function App() {
     }, [])
 
     const toggleRecording = useCallback(() => {
-        setIsRecording(prev => !prev)
-    }, [])
+        if (isRecording) {
+            // stop recodring
+            if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+                mediaRecorderRef.current.stop()
+
+                if (recordingTimerRef.current) clearInterval(recordingTimerRef.current)
+            }
+            setIsRecording(false)
+        } else {
+            // start recodring
+            const canvas = asciiRendererRef.current?.getCanvas()
+            if (!canvas || !canvas.height || !canvas.width)
+                throw new Error('Error while start recording')
+
+            const videoBitsPerSecond = 2500000 // Default 2.5 Mbps
+
+            const stream = canvas.captureStream(30) // 30 fps
+
+            const options: MediaRecorderOptions = {
+                mimeType: 'video/webm;codecs=vp9',
+                videoBitsPerSecond,
+            }
+
+            try {
+                const recorder = new MediaRecorder(stream, options)
+                recordedChunksRef.current = []
+
+                recorder.ondataavailable = e => {
+                    if (e.data.size > 0) recordedChunksRef.current.push(e.data)
+                }
+
+                recorder.onstop = () => {
+                    const blob = new Blob(recordedChunksRef.current, { type: 'video/webm' })
+                    const url = URL.createObjectURL(blob)
+                    const a = document.createElement('a')
+                    a.href = url
+                    a.download = `ascii-video-${Date.now()}.webm`
+                    document.body.appendChild(a)
+                    a.click()
+                    document.body.removeChild(a)
+                    setRecordingTime(0)
+                }
+
+                recorder.start()
+                mediaRecorderRef.current = recorder
+                setIsRecording(true)
+                console.log('start')
+
+                recordingTimerRef.current = window.setInterval(() => {
+                    setRecordingTime(t => t + 1)
+                }, 1000)
+            } catch (error) {
+                console.error('Recording failed to start', error)
+            }
+        }
+    }, [isRecording])
+
+    const formatTime = (seconds: number) => {
+        const mins = Math.floor(seconds / 60)
+        const secs = seconds % 60
+        return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
+    }
 
     return (
         <div className="h-screen w-screen flex flex-col justify-between">
@@ -173,6 +237,8 @@ function App() {
                 onCopy={copyToClipboard}
                 onToggleRecording={toggleRecording}
                 isRecording={isRecording}
+                formatTime={formatTime}
+                recordingTime={recordingTime}
             />
         </div>
     )

@@ -7,7 +7,8 @@ type CameraControlsProps = {
     onCopy: () => void
     onToggleRecording: () => void
     isRecording: boolean
-    recordingLabel?: string
+    formatTime: (seconds: number) => string
+    recordingTime: number
 }
 
 const CameraControls = ({
@@ -16,7 +17,8 @@ const CameraControls = ({
     onCopy,
     onToggleRecording,
     isRecording,
-    recordingLabel,
+    formatTime,
+    recordingTime,
 }: CameraControlsProps) => {
     return (
         <div className="pointer-events-none fixed inset-x-0 bottom-0 flex justify-center pb-5 md:pb-8">
@@ -87,7 +89,7 @@ const CameraControls = ({
                                 isRecording ? 'text-red-400' : 'opacity-70 group-hover:opacity-100'
                             }`}
                         >
-                            {isRecording ? (recordingLabel ?? 'REC') : 'REC'}
+                            {isRecording ? formatTime(recordingTime) : 'REC'}
                         </span>
                     </button>
                 </div>
