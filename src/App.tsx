@@ -9,6 +9,7 @@ import {
     ProcessingStats,
 } from './types/types'
 import CameraControls from './components/cameraControls'
+import { MdCancel } from 'react-icons/md'
 
 function App() {
     const DEFAULT_SETTIGNS: AsciiSettings = {
@@ -34,6 +35,7 @@ function App() {
     const [flash, setFlash] = useState<boolean>(false)
     const [clipboardSuccess, setClipboardSuccess] = useState<boolean>(false)
     const [recordingTime, setRecordingTime] = useState(0)
+    const [error, setError] = useState<string | null>(null)
 
     const asciiRendererRef = useRef<AsciiRendererHandle>(null)
     const mediaRecorderRef = useRef<MediaRecorder | null>(null)
@@ -69,6 +71,7 @@ function App() {
                 setStream(video)
             } catch (err) {
                 console.error(err)
+                setError('Unable to access camera. Please ensure permissions are granted.')
             }
         }
 
@@ -129,6 +132,7 @@ function App() {
             })
         } catch (error) {
             console.log('Copy Failed:', error)
+            setError('Failed to Copy. Please try again')
         }
     }, [])
 
@@ -186,6 +190,7 @@ function App() {
                 }, 1000)
             } catch (error) {
                 console.error('Recording failed to start', error)
+                setError('Failed to start recording. Browser might not support this format.')
             }
         }
     }, [isRecording])
@@ -216,6 +221,24 @@ function App() {
             {clipboardSuccess && (
                 <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-black/80 border border-green-500 px-6 py-3 rounded text-green-400 font-bold backdrop-blur animate-in zoom-in duration-200">
                     ASCII COPIED TO CLIPBOARD
+                </div>
+            )}
+
+            {/* Error Toast */}
+            {error && (
+                <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-black/80 border border-red-500 px-6 py-4 rounded text-red-500 font-bold backdrop-blur animate-in zoom-in duration-200">
+                    <button
+                        onClick={() => setError(null)}
+                        className="absolute top-3 right-3 text-red-500 hover:text-red-400 text-xl leading-none"
+                        aria-label="Close error"
+                    >
+                        <MdCancel />
+                    </button>
+
+                    <div>
+                        <h1 className="text-4xl mb-4">SYSTEM ERROR</h1>
+                        <p>{error}</p>
+                    </div>
                 </div>
             )}
 
