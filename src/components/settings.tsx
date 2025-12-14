@@ -17,6 +17,12 @@ function Settings({ settings, onChange }: SettingsCompProps) {
         console.log(settings)
     }
 
+    const handleOverlayClick = (e: React.MouseEvent) => {
+        if (e.target === e.currentTarget) {
+            setIsOpen(false)
+        }
+    }
+
     return (
         <>
             {!isOpen && (
@@ -26,6 +32,10 @@ function Settings({ settings, onChange }: SettingsCompProps) {
                 >
                     <LuSettings2 size={24} />
                 </button>
+            )}
+
+            {isOpen && (
+                <div className="fixed inset-0 bg-transparent z-30" onClick={handleOverlayClick} />
             )}
 
             <aside
