@@ -197,31 +197,29 @@ function App() {
     }
 
     return (
-        <div className="h-screen w-screen flex flex-col justify-between">
-            <div className="w-full flex flex-row justify-between items-center">
-                <Header
-                    fps={stats.fps}
-                    renderTime={stats.renderTime}
-                    width={windowSize.width}
-                    height={windowSize.height}
-                />
+        <div className="h-screen w-screen overflow-hidden">
+            <Header
+                fps={stats.fps}
+                renderTime={stats.renderTime}
+                width={windowSize.width}
+                height={windowSize.height}
+            />
 
-                <Settings settings={settings} onChange={setSettings} />
-            </div>
+            <Settings settings={settings} onChange={setSettings} />
 
             {/* Flash Effect */}
             {flash && (
-                <div className="absolute inset-0 bg-white z-50 animate-out fade-out duration-150 pointer-events-none" />
+                <div className="fixed inset-0 bg-white z-50 animate-out fade-out duration-150 pointer-events-none" />
             )}
 
             {/* Clipboard Toast */}
             {clipboardSuccess && (
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-black/80 border border-green-500 px-6 py-3 rounded text-green-400 font-bold backdrop-blur animate-in zoom-in duration-200">
+                <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-black/80 border border-green-500 px-6 py-3 rounded text-green-400 font-bold backdrop-blur animate-in zoom-in duration-200">
                     ASCII COPIED TO CLIPBOARD
                 </div>
             )}
 
-            <div className="fixed h-full w-screen flex justify-center -z-10 items-center">
+            <div className="fixed inset-0 flex justify-center items-center">
                 <AsciiView
                     ref={asciiRendererRef}
                     settings={settings}
