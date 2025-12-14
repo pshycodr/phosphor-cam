@@ -1,5 +1,7 @@
 import { memo, useState } from 'react'
-import { Settings as SettingsIcon, X } from 'lucide-react'
+import { FaGithub, FaXTwitter } from 'react-icons/fa6'
+import { IoClose, IoGlobe } from 'react-icons/io5'
+import { LuSettings2 } from 'react-icons/lu'
 import { AsciiSettings } from '../types/types'
 
 interface SettingsCompProps {
@@ -17,37 +19,39 @@ function Settings({ settings, onChange }: SettingsCompProps) {
 
     return (
         <>
-            {/* Open settings button */}
             {!isOpen && (
                 <button
-                    className="p-2 text-green-400 fixed right-4 z-50 rounded-lg backdrop-blur-sm shadow-lg"
+                    className="p-3 text-green-400 fixed top-4 right-4 z-50 rounded-lg backdrop-blur-sm shadow-lg bg-black/40 border border-green-500/30 hover:bg-green-900/30 hover:border-green-400 transition-all"
                     onClick={() => setIsOpen(true)}
                 >
-                    <SettingsIcon size={28} />
+                    <LuSettings2 size={24} />
                 </button>
             )}
 
-            {/* Sliding settings drawer */}
             <aside
-                className={`fixed top-0 right-0 h-full w-72 sm:w-80 bg-black border-l border-green-500 flex flex-col
-        transform transition-transform duration-300 z-40 
+                className={`fixed top-0 right-0 h-full w-[60%] min-w-[280px] sm:w-96 bg-black border-l border-green-500 flex flex-col
+        transform transition-transform duration-300 z-40 shadow-2xl
         ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}
             >
-                {/* Header */}
-                <header className="flex items-center justify-between py-5 px-4 border-b border-green-600">
-                    <h2 className="font-bold text-xl text-green-400 tracking-wide">SETTINGS</h2>
-                    <button className="text-green-400" onClick={() => setIsOpen(false)}>
-                        <X size={28} />
+                <header className="flex items-center justify-between py-6 px-5 border-b border-green-600">
+                    <h2 className="font-bold text-2xl text-green-400 tracking-wide">SETTINGS</h2>
+                    <button
+                        className="text-green-400 p-2 hover:bg-green-900/30 rounded-lg transition-all"
+                        onClick={() => setIsOpen(false)}
+                    >
+                        <IoClose size={24} />
                     </button>
                 </header>
 
-                {/* Scrollable content */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-8 text-gray-200 text-sm">
-                    {/* Resolution */}
+                <div className="flex-1 overflow-y-auto p-5 space-y-6 text-gray-200 text-sm">
                     <section>
-                        <div className="flex justify-between text-green-400 text-xs mb-2">
-                            <span>RESOLUTION (FONT SIZE)</span>
-                            <span className="opacity-70">Hi Lo</span>
+                        <div className="flex justify-between text-green-400 text-xs font-semibold mb-1">
+                            <span>RESOLUTION</span>
+                            <span className="text-green-300">{settings.fontSize}px</span>
+                        </div>
+                        <div className="flex justify-between text-[10px] text-green-500/60 mb-2">
+                            <span>Low (6)</span>
+                            <span>High (30)</span>
                         </div>
                         <input
                             type="range"
@@ -60,11 +64,15 @@ function Settings({ settings, onChange }: SettingsCompProps) {
                         />
                     </section>
 
-                    {/* Contrast */}
                     <section>
-                        <label className="uppercase text-green-400 text-xs mb-2 block">
-                            CONTRAST
-                        </label>
+                        <div className="flex justify-between text-green-400 text-xs font-semibold mb-1">
+                            <span>CONTRAST</span>
+                            <span className="text-green-300">{settings.contrast.toFixed(1)}</span>
+                        </div>
+                        <div className="flex justify-between text-[10px] text-green-500/60 mb-2">
+                            <span>Low (0.5)</span>
+                            <span>High (3.0)</span>
+                        </div>
                         <input
                             type="range"
                             min={0.5}
@@ -76,11 +84,18 @@ function Settings({ settings, onChange }: SettingsCompProps) {
                         />
                     </section>
 
-                    {/* Brightness */}
                     <section>
-                        <label className="uppercase text-green-400 text-xs mb-2 block">
-                            BRIGHTNESS
-                        </label>
+                        <div className="flex justify-between text-green-400 text-xs font-semibold mb-1">
+                            <span>BRIGHTNESS</span>
+                            <span className="text-green-300">
+                                {settings.brightness > 0 ? '+' : ''}
+                                {settings.brightness}
+                            </span>
+                        </div>
+                        <div className="flex justify-between text-[10px] text-green-500/60 mb-2">
+                            <span>Dark (-100)</span>
+                            <span>Bright (+100)</span>
+                        </div>
                         <input
                             type="range"
                             min={-100}
@@ -91,15 +106,16 @@ function Settings({ settings, onChange }: SettingsCompProps) {
                         />
                     </section>
 
-                    {/* Character Set */}
                     <section>
-                        <p className="uppercase text-xs text-green-400 mb-3">Character Set</p>
-                        <div className="grid grid-cols-2 gap-2">
+                        <p className="uppercase text-xs text-green-400 font-semibold mb-3">
+                            Character Set
+                        </p>
+                        <div className="grid grid-cols-2 gap-3">
                             {['standard', 'simple', 'blocks', 'matrix', 'edges'].map(c => (
                                 <button
                                     key={c}
-                                    className={`py-2 rounded-sm border border-green-500 text-xs 
-                  ${settings.characterSet === c ? 'bg-green-600 text-black' : 'text-green-400'}`}
+                                    className={`py-3 rounded-md border border-green-500 text-xs uppercase font-semibold transition-all
+                  ${settings.characterSet === c ? 'bg-green-600 text-black' : 'text-green-400 hover:bg-green-900/20'}`}
                                     onClick={() => handleChange('characterSet', c)}
                                 >
                                     {c}
@@ -108,10 +124,9 @@ function Settings({ settings, onChange }: SettingsCompProps) {
                         </div>
                     </section>
 
-                    {/* Toggles */}
-                    <section className="space-y-3">
-                        <label className="flex justify-between items-center text-green-400">
-                            Color Mode
+                    <section className="space-y-4 pt-2">
+                        <label className="flex justify-between items-center text-green-400 py-2 cursor-pointer">
+                            <span className="text-sm font-medium">Color Mode</span>
                             <input
                                 type="checkbox"
                                 checked={settings.colorMode}
@@ -119,8 +134,8 @@ function Settings({ settings, onChange }: SettingsCompProps) {
                                 className="settings-toggle"
                             />
                         </label>
-                        <label className="flex justify-between items-center text-green-400">
-                            Invert Values
+                        <label className="flex justify-between items-center text-green-400 py-2 cursor-pointer">
+                            <span className="text-sm font-medium">Invert Values</span>
                             <input
                                 type="checkbox"
                                 checked={settings.invert}
@@ -131,9 +146,37 @@ function Settings({ settings, onChange }: SettingsCompProps) {
                     </section>
                 </div>
 
-                {/* Footer */}
-                <footer className="text-center py-3 text-xs text-green-600 border-t border-green-600">
-                    ascii-it v1.0
+                <footer className="py-4 px-5 border-t border-green-600">
+                    <div className="flex items-center justify-center gap-6 mb-3">
+                        <a
+                            href="https://github.com/pshycodr/phosphor-cam"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-2 text-green-400 hover:bg-green-900/30 rounded-lg transition-all"
+                            aria-label="GitHub"
+                        >
+                            <FaGithub size={20} />
+                        </a>
+                        <a
+                            href="https://x.com/the_Aroy"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-2 text-green-400 hover:bg-green-900/30 rounded-lg transition-all"
+                            aria-label="Twitter"
+                        >
+                            <FaXTwitter size={20} />
+                        </a>
+                        <a
+                            href="https://pshycodr.me"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-2 text-green-400 hover:bg-green-900/30 rounded-lg transition-all"
+                            aria-label="Website"
+                        >
+                            <IoGlobe size={20} />
+                        </a>
+                    </div>
+                    <div className="text-center text-xs text-green-600">phosphor-cam v1.0</div>
                 </footer>
             </aside>
         </>
