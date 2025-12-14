@@ -8,21 +8,34 @@ interface HeaderProps extends ProcessingStats {
 
 function Header({ fps, renderTime, width, height }: HeaderProps) {
     return (
-        <div className="m-4 flex flex-col items-start gap-3 rounded-lg bg-black/30 p-4 shadow-lg backdrop-blur-sm">
-            <div className="flex items-center gap-3">
+        <div className="fixed top-4 left-4  flex flex-col gap-2 max-w-[calc(100vw-100px)]">
+            <div className="flex items-center gap-2 rounded-lg bg-black/40 px-3 py-2 backdrop-blur-sm border border-green-500/30 shadow-lg">
                 <img
                     src="/assets/logo.png"
                     alt="Phosphor Cam Logo"
-                    className="h-15 w-15 object-contain"
+                    className="h-8 w-8 object-contain"
                 />
-                <h1 className="text-3xl font-bold leading-none tracking-tight">PHOSPHOR CAM</h1>
+                <h1 className="text-lg md:text-xl font-bold leading-none tracking-tight text-green-400">
+                    PHOSPHOR CAM
+                </h1>
             </div>
 
-            <div className="flex gap-4 text-xs text-green-400 md:text-sm">
-                <span>FPS: {Math.floor(fps)}</span>
-                <span>RENDER: {Math.floor(renderTime)}ms</span>
-                <span>
-                    RES: {width} × {height}
+            <div className="flex gap-3 text-[10px] md:text-xs font-mono text-green-400 bg-black/40 px-3 py-2 rounded-lg backdrop-blur-sm border border-green-500/30 shadow-lg">
+                <span className="flex items-center gap-1">
+                    <span className="opacity-60">FPS:</span>
+                    <span className="font-semibold">{Math.floor(fps)}</span>
+                </span>
+                <span className="text-green-600">|</span>
+                <span className="flex items-center gap-1">
+                    <span className="opacity-60">RENDER:</span>
+                    <span className="font-semibold">{Math.floor(renderTime)}ms</span>
+                </span>
+                <span className="text-green-600">|</span>
+                <span className="flex items-center gap-1">
+                    <span className="opacity-60">RES:</span>
+                    <span className="font-semibold">
+                        {width} × {height}
+                    </span>
                 </span>
             </div>
         </div>
