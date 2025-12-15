@@ -52,7 +52,7 @@
 ```bash
 # Clone the repository
 git clone https://github.com/pshycodr/phosphor-cam.git
-cd phosphor
+cd phosphor-cam
 
 # Install dependencies
 npm install
