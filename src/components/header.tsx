@@ -11,7 +11,7 @@ function Header({ fps, renderTime, width, height }: HeaderProps) {
         <div className="fixed top-4 left-4 z-10  flex flex-col gap-2 max-w-[calc(100vw-100px)]">
             <div className="flex items-center gap-2 rounded-lg bg-black/40 px-3 py-2 backdrop-blur-sm border border-green-500/30 shadow-lg">
                 <img
-                    src="/assets/logo.png"
+                    src="/assets/logo.webp"
                     alt="Phosphor Cam Logo"
                     className="h-8 w-8 object-contain"
                 />
