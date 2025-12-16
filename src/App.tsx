@@ -10,6 +10,7 @@ import {
 } from './types/types'
 import CameraControls from './components/cameraControls'
 import { MdCancel } from 'react-icons/md'
+import { getSupportedMediaRecorderMimeType } from './utils/mediaRecorder'
 
 function App() {
     const DEFAULT_SETTIGNS: AsciiSettings = {
@@ -156,24 +157,9 @@ function App() {
             const stream = canvas.captureStream(30) // 30 fps
 
             try {
-                // Detect supported codec
-                // Safari support https://stackoverflow.com/a/66914924
-                // Firefox & Chrome https://stackoverflow.com/a/50881710
-                let mimeType: string | null = null
-                if (MediaRecorder.isTypeSupported('video/webm;codecs=vp9')) {
-                    mimeType = 'video/webm;codecs=vp9' // Chrome/chromium based
-                } else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp8')) {
-                    mimeType = 'video/webm;codecs=vp8' // Firefox
-                } else if (MediaRecorder.isTypeSupported('video/mp4;codecs=avc1')) {
-                    mimeType = 'video/mp4;codecs=avc1' // Safari
-                } else if (MediaRecorder.isTypeSupported('video/webm')) {
-                    mimeType = 'video/webm' // fallback webm
-                } else if (MediaRecorder.isTypeSupported('video/mp4')) {
-                    mimeType = 'video/mp4' // fallback mp4
-                }
-
+                const mimeType = getSupportedMediaRecorderMimeType()
                 if (!mimeType) {
-                    throw new Error('No MediaRecorder supported video codec found on this browser')
+                    throw new Error('No supported video codec found')
                 }
 
                 const options: MediaRecorderOptions = {
