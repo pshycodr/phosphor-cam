@@ -10,6 +10,7 @@ import {
 } from './types/types'
 import CameraControls from './components/cameraControls'
 import { MdCancel } from 'react-icons/md'
+import { getSupportedMediaRecorderMimeType } from './utils/mediaRecorder'
 
 function App() {
     const DEFAULT_SETTIGNS: AsciiSettings = {
@@ -155,12 +156,17 @@ function App() {
 
             const stream = canvas.captureStream(30) // 30 fps
 
-            const options: MediaRecorderOptions = {
-                mimeType: 'video/webm;codecs=vp9',
-                videoBitsPerSecond,
-            }
-
             try {
+                const mimeType = getSupportedMediaRecorderMimeType()
+                if (!mimeType) {
+                    throw new Error('No supported video codec found')
+                }
+
+                const options: MediaRecorderOptions = {
+                    mimeType,
+                    videoBitsPerSecond,
+                }
+
                 const recorder = new MediaRecorder(stream, options)
                 recordedChunksRef.current = []
 
