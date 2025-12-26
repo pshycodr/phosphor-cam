@@ -16,12 +16,12 @@ self.addEventListener('install', e => {
                 }
 
                 const optionalAssets = [
-                    '/assets/logo.png',
-                    '/assets/favicon.png',
+                    '/assets/logo.webp',
+                    '/assets/favicon.webp',
                     '/assets/favicon.webp',
 
-                    '/assets/icons/icon-192x192.png',
-                    '/assets/icons/icon-512x512.png',
+                    '/icons/icon-192x192.webp',
+                    '/icons/icon-512x512.webp',
                 ]
 
                 await Promise.allSettled(
