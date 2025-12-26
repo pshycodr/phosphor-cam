@@ -62,3 +62,43 @@ self.addEventListener('activate', event => {
             }),
     )
 })
+
+self.addEventListener('fetch', event => {
+    const { request } = event
+    const url = new URL(request.url)
+
+    // console.log(request)
+
+    if (request.method !== 'GET') return
+
+    if (url.protocol === 'chrome-extension:' || url.protocol === 'moz-extension:') {
+        return
+    }
+
+    if (
+        url.origin === 'https://fonts.googleapis.com' ||
+        url.origin === 'https://fonts.gstatic.com'
+    ) {
+        event.respondWith(
+            caches.match(request).then(cacheResponse => {
+                if (cacheResponse) return cacheResponse
+
+                return fetch(request)
+                    .then(res => {
+                        // console.log(res);
+
+                        if (res.status !== 200) return res
+
+                        const resClone = res.clone()
+                        caches.open(CACHE_NAME).then(cache => {
+                            cache.put(request, resClone)
+                        })
+                    })
+                    .catch(() => {
+                        console.warn('[SW] Font failed to load, continuing anyway')
+                        return new Response('', { status: 200 })
+                    })
+            }),
+        )
+    }
+})
