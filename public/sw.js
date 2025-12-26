@@ -14,17 +14,17 @@ self.addEventListener('install', e => {
                 const optionalAssets = [
                     '/assets/logo.webp',
                     '/assets/favicon.webp',
-                    '/assets/favicon.webp',
-
                     '/icons/icon-192x192.webp',
                     '/icons/icon-512x512.webp',
                 ]
 
                 await Promise.allSettled(
-                    optionalAssets.map(url => {
-                        cache.add(url).catch(err => {
+                    optionalAssets.map(async url => {
+                        try {
+                            return await cache.add(url)
+                        } catch (err) {
                             console.warn(`failed to cache ${url}: `, err)
-                        })
+                        }
                     }),
                 )
             })
@@ -41,11 +41,9 @@ self.addEventListener('activate', event => {
             .keys()
             .then(cacheNames => {
                 return Promise.all(
-                    cacheNames.forEach(cacheName => {
-                        if (cacheName !== CACHE_NAME) {
-                            return caches.delete(cacheName)
-                        }
-                    }),
+                    cacheNames
+                        .filter(cacheName => cacheName !== CACHE_NAME)
+                        .map(cacheName => caches.delete(cacheName)),
                 )
             })
             .then(() => {
@@ -107,7 +105,7 @@ self.addEventListener('fetch', event => {
                         return res
                     })
                     .catch(() => {
-                        console.warn('[SW] Font failed to load, continuing anyway')
+                        console.warn('[SW] Request failed to load')
 
                         if (request.mode === 'navigate') {
                             return caches.match('/index.html').then(res => {
@@ -115,7 +113,6 @@ self.addEventListener('fetch', event => {
                                     return res
                                 }
 
-                                // Last fallback
                                 return new Response('Offline - Please reload when connected', {
                                     status: 503,
                                     statusText: 'Service Unavailable',
@@ -150,12 +147,11 @@ self.addEventListener('message', event => {
 
     if (event.data && event.data.type === 'GET_CACHE_STATUS') {
         event.waitUntil(
-            caches.open(CACHE_NAME).then(cache => {
-                return cache.keys().then(keys => {
-                    event.ports[0].postMessage({
-                        cached: keys.length,
-                        cacheKeys: keys.map(req => req.url),
-                    })
+            caches.open(CACHE_NAME).then(async cache => {
+                const keys = await cache.keys()
+                event.ports[0].postMessage({
+                    cached: keys.length,
+                    cacheKeys: keys.map(req => req.url),
                 })
             }),
         )
