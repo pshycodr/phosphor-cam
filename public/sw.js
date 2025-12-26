@@ -5,15 +5,11 @@ self.addEventListener('install', e => {
         caches
             .open(CACHE_NAME)
             .then(async cache => {
-                console.log('[SW] log-1 ', cache)
-
                 const impAssets = ['/', '/index.html', '/manifest.json']
 
                 try {
                     await cache.addAll(impAssets)
-                } catch (error) {
-                    console.log('faild to add impAssets: ', error)
-                }
+                } catch (error) {}
 
                 const optionalAssets = [
                     '/assets/logo.webp',
@@ -26,8 +22,6 @@ self.addEventListener('install', e => {
 
                 await Promise.allSettled(
                     optionalAssets.map(url => {
-                        console.log('[SW] log-2 ', url)
-
                         cache.add(url).catch(err => {
                             console.warn(`failed to cache ${url}: `, err)
                         })
@@ -46,18 +40,15 @@ self.addEventListener('activate', event => {
         caches
             .keys()
             .then(cacheNames => {
-                console.log('[SW] cache names: ', cacheNames)
                 return Promise.all(
                     cacheNames.forEach(cacheName => {
                         if (cacheName !== CACHE_NAME) {
-                            console.log('[SW] Deleting old cache: ', cacheName)
                             return caches.delete(cacheName)
                         }
                     }),
                 )
             })
             .then(() => {
-                console.log('[SW] Activation complete - taking control')
                 return self.clients.claim()
             }),
     )
@@ -66,8 +57,6 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
     const { request } = event
     const url = new URL(request.url)
-
-    // console.log(request)
 
     if (request.method !== 'GET') return
 
@@ -85,8 +74,6 @@ self.addEventListener('fetch', event => {
 
                 return fetch(request)
                     .then(res => {
-                        // console.log(res);
-
                         if (res.status === 200) {
                             const resClone = res.clone()
                             caches.open(CACHE_NAME).then(cache => {
@@ -109,8 +96,6 @@ self.addEventListener('fetch', event => {
 
                 return fetch(request)
                     .then(res => {
-                        // console.log(res);
-
                         if (!res || res.status !== 200 || res.type === 'error') {
                             return res
                         }
@@ -149,29 +134,19 @@ self.addEventListener('fetch', event => {
 })
 
 self.addEventListener('message', event => {
-    console.log('[SW] Message received:', event.data)
-
     if (event.data && event.data.type === 'SKIP_WAITING') {
-        console.log('[SW] Skipping waiting...')
         self.skipWaiting()
     }
 
     if (event.data && event.data.type === 'CLEAR_CACHE') {
-        console.log('[SW] Clearing all caches...')
         event.waitUntil(
-            caches
-                .keys()
-                .then(cacheNames => {
-                    return Promise.all(
-                        cacheNames.map(cacheName => {
-                            console.log('[SW] Deleting cache:', cacheName)
-                            return caches.delete(cacheName)
-                        }),
-                    )
-                })
-                .then(() => {
-                    console.log('[SW] All caches cleared')
-                }),
+            caches.keys().then(cacheNames => {
+                return Promise.all(
+                    cacheNames.map(cacheName => {
+                        return caches.delete(cacheName)
+                    }),
+                )
+            }),
         )
     }
 
