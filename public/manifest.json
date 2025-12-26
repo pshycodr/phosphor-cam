@@ -1,0 +1,43 @@
+{
+  "id": "/",
+  "name": "Phosphor Cam - ASCII Art Camera",
+  "short_name": "Phosphor Cam",
+  "description": "Real-time ASCII art camera with Matrix effects",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#00ff00",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/icons/icon-192x192.webp",
+      "sizes": "192x192",
+      "type": "image/webp",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512x512.webp",
+      "sizes": "512x512",
+      "type": "image/webp",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512x512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": [
+    "photo",
+    "utilities",
+    "entertainment"
+  ],
+  "screenshots": [
+    {
+      "src": "/demo/blocks-color.png",
+      "sizes": "1280x720",
+      "type": "image/png"
+    }
+  ]
+}
