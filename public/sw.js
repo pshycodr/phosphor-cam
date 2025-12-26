@@ -40,3 +40,25 @@ self.addEventListener('install', e => {
             }),
     )
 })
+
+self.addEventListener('activate', event => {
+    event.waitUntil(
+        caches
+            .keys()
+            .then(cacheNames => {
+                console.log('[SW] cache names: ', cacheNames)
+                return Promise.all(
+                    cacheNames.forEach(cacheName => {
+                        if (cacheName !== CACHE_NAME) {
+                            console.log('[SW] Deleting old cache: ', cacheName)
+                            return caches.delete(cacheName)
+                        }
+                    }),
+                )
+            })
+            .then(() => {
+                console.log('[SW] Activation complete - taking control')
+                return self.clients.claim()
+            }),
+    )
+})
