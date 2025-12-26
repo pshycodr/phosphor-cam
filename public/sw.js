@@ -147,3 +147,44 @@ self.addEventListener('fetch', event => {
         )
     }
 })
+
+self.addEventListener('message', event => {
+    console.log('[SW] Message received:', event.data)
+
+    if (event.data && event.data.type === 'SKIP_WAITING') {
+        console.log('[SW] Skipping waiting...')
+        self.skipWaiting()
+    }
+
+    if (event.data && event.data.type === 'CLEAR_CACHE') {
+        console.log('[SW] Clearing all caches...')
+        event.waitUntil(
+            caches
+                .keys()
+                .then(cacheNames => {
+                    return Promise.all(
+                        cacheNames.map(cacheName => {
+                            console.log('[SW] Deleting cache:', cacheName)
+                            return caches.delete(cacheName)
+                        }),
+                    )
+                })
+                .then(() => {
+                    console.log('[SW] All caches cleared')
+                }),
+        )
+    }
+
+    if (event.data && event.data.type === 'GET_CACHE_STATUS') {
+        event.waitUntil(
+            caches.open(CACHE_NAME).then(cache => {
+                return cache.keys().then(keys => {
+                    event.ports[0].postMessage({
+                        cached: keys.length,
+                        cacheKeys: keys.map(req => req.url),
+                    })
+                })
+            }),
+        )
+    }
+})
