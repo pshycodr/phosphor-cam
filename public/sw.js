@@ -87,12 +87,14 @@ self.addEventListener('fetch', event => {
                     .then(res => {
                         // console.log(res);
 
-                        if (res.status !== 200) return res
+                        if (res.status === 200) {
+                            const resClone = res.clone()
+                            caches.open(CACHE_NAME).then(cache => {
+                                cache.put(request, resClone)
+                            })
+                        }
 
-                        const resClone = res.clone()
-                        caches.open(CACHE_NAME).then(cache => {
-                            cache.put(request, resClone)
-                        })
+                        return res
                     })
                     .catch(() => {
                         console.warn('[SW] Font failed to load, continuing anyway')
