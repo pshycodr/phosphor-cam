@@ -1,4 +1,4 @@
-const CACHE_NAME = 'phosphor-cam-v1.0.1'
+const CACHE_NAME = 'phosphor-cam-v1.0.5'
 
 self.addEventListener('install', e => {
     e.waitUntil(
@@ -99,6 +99,49 @@ self.addEventListener('fetch', event => {
                     .catch(() => {
                         console.warn('[SW] Font failed to load, continuing anyway')
                         return new Response('', { status: 200 })
+                    })
+            }),
+        )
+    } else {
+        event.respondWith(
+            caches.match(request).then(cacheResponse => {
+                if (cacheResponse) return cacheResponse
+
+                return fetch(request)
+                    .then(res => {
+                        // console.log(res);
+
+                        if (!res || res.status !== 200 || res.type === 'error') {
+                            return res
+                        }
+
+                        const resClone = res.clone()
+                        caches.open(CACHE_NAME).then(cache => {
+                            cache.put(request, resClone)
+                        })
+                        return res
+                    })
+                    .catch(() => {
+                        console.warn('[SW] Font failed to load, continuing anyway')
+
+                        if (request.mode === 'navigate') {
+                            return caches.match('/index.html').then(res => {
+                                if (res) {
+                                    return res
+                                }
+
+                                // Last fallback
+                                return new Response('Offline - Please reload when connected', {
+                                    status: 503,
+                                    statusText: 'Service Unavailable',
+                                    headers: new Headers({
+                                        'Content-Type': 'text/plain',
+                                    }),
+                                })
+                            })
+                        }
+
+                        throw err
                     })
             }),
         )
