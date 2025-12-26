@@ -1,4 +1,4 @@
-const CACHE_NAME = 'phosphor-cam-v1.0.5'
+const CACHE_NAME = 'phosphor-cam-v1.0.1'
 
 self.addEventListener('install', e => {
     e.waitUntil(
@@ -125,8 +125,6 @@ self.addEventListener('fetch', event => {
                                 })
                             })
                         }
-
-                        throw err
                     })
             }),
         )
