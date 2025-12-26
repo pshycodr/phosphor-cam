@@ -20,8 +20,8 @@ self.addEventListener('install', e => {
                     '/assets/favicon.png',
                     '/assets/favicon.webp',
 
-                    '/assets/icons/icon-192x192.webp',
-                    '/assets/icons/icon-512x512.webp',
+                    '/assets/icons/icon-192x192.png',
+                    '/assets/icons/icon-512x512.png',
                 ]
 
                 await Promise.allSettled(
