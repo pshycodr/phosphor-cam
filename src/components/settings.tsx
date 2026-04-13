@@ -214,7 +214,7 @@ function Settings({ settings, onChange }: SettingsCompProps) {
                                 label: 'GitHub',
                             },
                             { href: 'https://x.com/the_Aroy', Icon: FaXTwitter, label: 'Twitter' },
-                            { href: 'https://pshycodr.me', Icon: IoGlobe, label: 'Website' },
+                            { href: 'https://anishroy.dev', Icon: IoGlobe, label: 'Website' },
                         ].map(({ href, Icon, label }) => (
                             <a
                                 key={href}
