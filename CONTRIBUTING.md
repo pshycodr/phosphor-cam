@@ -59,6 +59,7 @@ src/
 ### Submitting Pull Requests
 
 1. **Create a branch** from `main`
+
    ```bash
    git checkout -b feature/your-feature-name
    ```
@@ -69,6 +70,7 @@ src/
    - Test thoroughly on multiple browsers
 
 3. **Commit with clear messages**
+
    ```bash
    git commit -m "Add: new character set for ASCII rendering"
    ```

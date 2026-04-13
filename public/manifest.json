@@ -28,11 +28,7 @@
       "purpose": "maskable"
     }
   ],
-  "categories": [
-    "photo",
-    "utilities",
-    "entertainment"
-  ],
+  "categories": ["photo", "utilities", "entertainment"],
   "screenshots": [
     {
       "src": "/demo/blocks-color.png",

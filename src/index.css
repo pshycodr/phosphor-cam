@@ -1,28 +1,28 @@
-@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap");
 @import "tailwindcss";
 
 body {
-    font-family: 'Fira Code', monospace;
-    background-color: #121212;
-    color: #00ff00;
-    overflow: hidden;
+  font-family: "Fira Code", monospace;
+  background-color: #121212;
+  color: #00ff00;
+  overflow: hidden;
 }
 
 ::-webkit-scrollbar {
-    width: 6px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
-    background: #111;
+  background: #111;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #333;
-    border-radius: 3px;
+  background: #333;
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #555;
+  background: #555;
 }
 
 /* Base range style */
@@ -31,7 +31,7 @@ body {
   appearance: none;
   width: 100%;
   height: 4px;
-  background: #111827;       /* dark track */
+  background: #111827; /* dark track */
   border-radius: 9999px;
   outline: none;
   cursor: pointer;
@@ -52,11 +52,13 @@ body {
   height: 16px;
   width: 16px;
   border-radius: 9999px;
-  background: #f9fafb;          /* white thumb */
-  border: 2px solid #22c55e;    /* neon green border */
+  background: #f9fafb; /* white thumb */
+  border: 2px solid #22c55e; /* neon green border */
   box-shadow: 0 0 6px rgba(34, 197, 94, 0.7);
-  margin-top: -6px;             /* centers thumb on 4px track */
-  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  margin-top: -6px; /* centers thumb on 4px track */
+  transition:
+    transform 0.1s ease,
+    box-shadow 0.1s ease;
 }
 
 /* Firefox track */
@@ -74,7 +76,9 @@ body {
   background: #f9fafb;
   border: 2px solid #22c55e;
   box-shadow: 0 0 6px rgba(34, 197, 94, 0.7);
-  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  transition:
+    transform 0.1s ease,
+    box-shadow 0.1s ease;
 }
 
 /* Hover / active states */
@@ -130,5 +134,5 @@ body {
 
 .settings-toggle:checked {
   background: #22c55e;
-  box-shadow: 0 0 8px rgba(34,197,94,0.9);
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.9);
 }
