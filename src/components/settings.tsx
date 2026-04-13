@@ -131,7 +131,7 @@ function Settings({ settings, onChange }: SettingsCompProps) {
 
       {isOpen && !activeSlider && (
         <div
-          className="fixed inset-0 z-30 bg-transparent"
+          className="fixed inset-0 z-30 bg-black/40"
           onClick={(e) => e.target === e.currentTarget && setIsOpen(false)}
         />
       )}
@@ -141,21 +141,23 @@ function Settings({ settings, onChange }: SettingsCompProps) {
           className="pointer-events-none fixed z-50"
           style={{
             left: `${sliderPosition.x}px`,
-            top: `${sliderPosition.y - 50}px`,
+            top: `${sliderPosition.y - 80}px`,
             transform: "translateX(-50%)",
           }}
         >
-          <div className="rounded-lg bg-green-600 px-4 py-2 text-lg font-bold text-black shadow-xl">
+          <div className="rounded-lg bg-green-600 px-5 py-2 text-xl font-bold text-black shadow-xl">
             {formatValue(activeSlider, sliderValue)}
           </div>
         </div>
       )}
 
       <aside
-        className={`fixed top-0 right-0 z-40 flex h-full w-[60%] min-w-[280px] transform flex-col border-l border-green-500 bg-black shadow-2xl transition-transform duration-300 sm:w-96 ${isOpen ? "translate-x-0" : "translate-x-full"} ${activeSlider ? "pointer-events-none opacity-0" : "opacity-100"}`}
+        className={`fixed inset-0 z-40 flex h-full w-full transform flex-col bg-black shadow-2xl transition-transform duration-300 sm:right-0 sm:left-auto sm:w-96 ${
+          isOpen ? "translate-x-0" : "translate-x-full"
+        } ${activeSlider ? "pointer-events-none opacity-0" : "opacity-100"}`}
       >
         <header className="flex items-center justify-between border-b border-green-600 px-5 py-6">
-          <h2 className="text-2xl font-bold tracking-wide text-green-400">
+          <h2 className="text-xl font-bold tracking-wide text-green-400">
             SETTINGS
           </h2>
           <button
@@ -166,7 +168,7 @@ function Settings({ settings, onChange }: SettingsCompProps) {
           </button>
         </header>
 
-        <div className="flex-1 space-y-6 overflow-y-auto p-5 text-sm text-gray-200">
+        <div className="flex-1 space-y-8 overflow-y-auto p-5 pb-24 text-sm text-gray-200">
           {(
             Object.keys(SLIDER_CONFIGS) as Array<keyof typeof SLIDER_CONFIGS>
           ).map(renderSlider)}
@@ -176,20 +178,30 @@ function Settings({ settings, onChange }: SettingsCompProps) {
               Character Set
             </p>
 
-            <div className="flex gap-2 overflow-x-auto pb-2">
-              {CHARACTER_SETS.map((set) => (
-                <button
-                  key={set}
-                  onClick={() => handleChange("characterSet", set)}
-                  className={`rounded-md border px-4 py-3 text-[12px] whitespace-nowrap transition-all ${
-                    settings.characterSet === set
-                      ? "border-green-400 bg-green-600 text-black"
-                      : "border-green-500 font-semibold text-green-400 hover:bg-green-900/20"
-                  }`}
-                >
-                  {set}
-                </button>
-              ))}
+            <div className="scrollbar-hide flex snap-x snap-mandatory gap-3 overflow-x-auto px-1 pb-3">
+              {CHARACTER_SETS.map((set) => {
+                const isActive = settings.characterSet === set;
+
+                return (
+                  <button
+                    key={set}
+                    onClick={() => handleChange("characterSet", set)}
+                    className={`min-w-[110px] shrink-0 snap-start rounded-lg border px-3 py-3 text-left transition-all ${
+                      isActive
+                        ? "border-green-400 bg-green-600 text-black"
+                        : "border-green-500 text-green-400 hover:bg-green-900/20"
+                    }`}
+                  >
+                    <div className="mb-1 text-[11px] font-semibold uppercase">
+                      {set}
+                    </div>
+
+                    <div className="truncate font-mono text-[11px] leading-tight opacity-80">
+                      {CHAR_SETS[set].slice(0, 14)}
+                    </div>
+                  </button>
+                );
+              })}
             </div>
 
             <div className="mt-3 rounded-md border border-green-500 bg-black/40 p-3">
@@ -197,7 +209,7 @@ function Settings({ settings, onChange }: SettingsCompProps) {
                 Preview
               </div>
 
-              <div className="font-mono text-xs leading-tight break-all text-green-300">
+              <div className="font-mono text-xs leading-tight break-words whitespace-pre-wrap text-green-300">
                 {CHAR_SETS[settings.characterSet]}
               </div>
             </div>
@@ -210,7 +222,7 @@ function Settings({ settings, onChange }: SettingsCompProps) {
             ].map(({ key, label }) => (
               <label
                 key={key}
-                className="flex cursor-pointer items-center justify-between py-2 text-green-400"
+                className="flex cursor-pointer items-center justify-between py-3 text-green-400"
               >
                 <span className="text-sm font-medium">{label}</span>
                 <input
@@ -230,7 +242,7 @@ function Settings({ settings, onChange }: SettingsCompProps) {
         </div>
 
         <footer className="border-t border-green-600 px-5 py-4">
-          <div className="mb-3 flex items-center justify-center gap-6">
+          <div className="mb-3 flex items-center justify-center gap-8">
             {[
               {
                 href: "https://github.com/pshycodr/phosphor-cam",
@@ -253,7 +265,7 @@ function Settings({ settings, onChange }: SettingsCompProps) {
                 href={href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-lg p-2 text-green-400 transition-all hover:bg-green-900/30"
+                className="rounded-lg p-3 text-green-400 transition-all hover:bg-green-900/30"
                 aria-label={label}
               >
                 <Icon size={20} />
