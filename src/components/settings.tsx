@@ -3,7 +3,7 @@ import { FaGithub, FaXTwitter } from 'react-icons/fa6'
 import { IoClose, IoGlobe } from 'react-icons/io5'
 import { LuSettings2 } from 'react-icons/lu'
 import { CHARACTER_SETS } from '../constants/characterSets'
-import { AsciiSettings } from '../types/types'
+import { AsciiSettings, CHAR_SETS } from '../types/types'
 
 interface SettingsCompProps {
     settings: AsciiSettings
@@ -152,17 +152,30 @@ function Settings({ settings, onChange }: SettingsCompProps) {
                         <p className="uppercase text-xs text-green-400 font-semibold mb-3">
                             Character Set
                         </p>
-                        <div className="grid grid-cols-2 gap-3">
-                            {CHARACTER_SETS.map(c => (
+
+                        <div className="flex gap-2 overflow-x-auto pb-2">
+                            {CHARACTER_SETS.map(set => (
                                 <button
-                                    key={c}
-                                    className={`py-3 rounded-md border border-green-500 text-xs uppercase font-semibold transition-all
-                  ${settings.characterSet === c ? 'bg-green-600 text-black' : 'text-green-400 hover:bg-green-900/20'}`}
-                                    onClick={() => handleChange('characterSet', c)}
+                                    key={set}
+                                    onClick={() => handleChange('characterSet', set)}
+                                    className={`px-4 py-3 text-[12px]  rounded-md border whitespace-nowrap transition-all
+                ${
+                    settings.characterSet === set
+                        ? 'bg-green-600 text-black border-green-400'
+                        : 'border-green-500 text-green-400 hover:bg-green-900/20 font-semibold'
+                }`}
                                 >
-                                    {c}
+                                    {set}
                                 </button>
                             ))}
+                        </div>
+
+                        <div className="mt-3 p-3 border border-green-500 rounded-md bg-black/40">
+                            <div className="text-[10px] text-green-500 mb-1 uppercase">Preview</div>
+
+                            <div className="font-mono text-xs leading-tight text-green-300 break-all">
+                                {CHAR_SETS[settings.characterSet]}
+                            </div>
                         </div>
                     </section>
 
