@@ -98,7 +98,9 @@ const AsciiView = forwardRef<AsciiRendererHandle, AsciiViewProps>(
                 const video = videoRef.current
                 if (!video || video.readyState !== 4 || !video.videoWidth || !video.videoHeight)
                     return ''
+
                 const tempCanvas = document.createElement('canvas')
+
                 const standardWidth = 150
                 const aspectRatio = video.videoHeight / video.videoWidth
                 const standardHeight = Math.max(1, Math.floor(standardWidth * aspectRatio * 0.55))
@@ -110,25 +112,33 @@ const AsciiView = forwardRef<AsciiRendererHandle, AsciiViewProps>(
                 if (!tempCtx) return ''
 
                 tempCtx.drawImage(video, 0, 0, standardWidth, standardHeight)
+
                 const imageData = tempCtx.getImageData(0, 0, standardWidth, standardHeight)
                 const pixels = imageData.data
 
                 const brightnessMap = createBrightnessMap(ramp)
 
-                let copyContent = ''
+                // preallocate buffer
+                const totalChars = standardWidth * standardHeight + standardHeight
+                const buffer = new Array<string>(totalChars)
+
+                let i = 0
 
                 for (let y = 0; y < standardHeight; y++) {
                     for (let x = 0; x < standardWidth; x++) {
                         const idx = (y * standardWidth + x) * 4
-                        const l = getLuminance(pixels[idx], pixels[idx + 1], pixels[idx + 2]) // R G B
-                        const adjL = adjustColor(l, settings.contrast, settings.brightness)
-                        const char = getChar(adjL, brightnessMap, settings.invert)
 
-                        copyContent += char
+                        const l = getLuminance(pixels[idx], pixels[idx + 1], pixels[idx + 2])
+
+                        const adjL = adjustColor(l, settings.contrast, settings.brightness)
+
+                        buffer[i++] = getChar(adjL, brightnessMap, settings.invert)
                     }
-                    copyContent += '\n'
+
+                    buffer[i++] = '\n'
                 }
-                return copyContent
+
+                return buffer.join('')
             },
         }))
 
