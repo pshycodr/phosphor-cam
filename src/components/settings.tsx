@@ -2,6 +2,7 @@ import { memo, useState } from 'react'
 import { FaGithub, FaXTwitter } from 'react-icons/fa6'
 import { IoClose, IoGlobe } from 'react-icons/io5'
 import { LuSettings2 } from 'react-icons/lu'
+import { CHARACTER_SETS } from '../constants/characterSets'
 import { AsciiSettings } from '../types/types'
 
 interface SettingsCompProps {
@@ -22,8 +23,6 @@ const SLIDER_CONFIGS = {
         range: 'Dark (-100) - Bright (+100)',
     },
 }
-
-const CHARACTER_SETS = ['standard', 'simple', 'blocks', 'matrix', 'edges']
 
 function Settings({ settings, onChange }: SettingsCompProps) {
     const [isOpen, setIsOpen] = useState(false)

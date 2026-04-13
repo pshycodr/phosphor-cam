@@ -18,6 +18,23 @@ export const CHAR_SETS: AsciiCharacterMap = {
     blocks: ' ░▒▓█',
     matrix: ' 01',
     edges: '  .,-_~:;=!*#$@',
+    dense: ' .`^",:;Il!i~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$',
+    lines: ' ─│┌┐└┘├┤┬┴┼',
+    heavyLines: ' ═║╔╗╚╝╠╣╦╩╬',
+    invertedBlocks: ' █▓▒░ ',
+    braille: ' ⠁⠃⠇⡇⣇⣧⣷⣿',
+    dots: ' .•◦●◉',
+    circles: ' .oO◌◎●',
+    spark: " .`'^*✦✧✶✹",
+    tech: ' .:+=xX$#',
+    digital: ' .:-=+*#%@',
+    alphabetic: ' .abcdefghijklmnopqrstuvwxyz',
+    upperAlpha: ' .ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+    numeric: ' 0123456789',
+    mixed: ' .:-=+*#%@abcdefghijklmnopqrstuvwxyz',
+    arrows: ' .<>^v',
+    binaryDense: ' 01#@',
+    runic: ' .ᚠᚢᚦᚨᚱᚲᚷᚹ',
 }
 
 export type CameraFacingMode = 'user' | 'environment'
