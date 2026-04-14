@@ -1,63 +1,55 @@
-const CACHE_NAME = "phosphor-cam-v1.0.1";
+const CACHE_NAME = "phosphor-cam-v1.0.2";
 
-self.addEventListener("install", (e) => {
-  e.waitUntil(
-    caches
-      .open(CACHE_NAME)
-      .then(async (cache) => {
-        const impAssets = ["/", "/index.html", "/manifest.json"];
+const CORE_ASSETS = ["/", "/index.html", "/manifest.json"];
 
-        try {
-          await cache.addAll(impAssets);
-        } catch (error) {}
+const OPTIONAL_ASSETS = [
+  "/assets/logo.webp",
+  "/assets/favicon.webp",
+  "/icons/icon-192x192.webp",
+  "/icons/icon-512x512.webp",
+];
 
-        const optionalAssets = [
-          "/assets/logo.webp",
-          "/assets/favicon.webp",
-          "/icons/icon-192x192.webp",
-          "/icons/icon-512x512.webp",
-        ];
+// ---------------- INSTALL ----------------
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+    (async () => {
+      const cache = await caches.open(CACHE_NAME);
 
-        await Promise.allSettled(
-          optionalAssets.map(async (url) => {
-            try {
-              return await cache.add(url);
-            } catch (err) {
-              console.warn(`failed to cache ${url}: `, err);
-            }
-          })
-        );
-      })
-      .then(() => self.skipWaiting())
-      .catch((err) => {
-        console.log("failed to install cache: ", err);
-      })
+      await Promise.all(CORE_ASSETS.map((url) => cache.add(url)));
+
+      await Promise.allSettled(OPTIONAL_ASSETS.map((url) => cache.add(url)));
+
+      await self.skipWaiting();
+    })()
   );
 });
 
+// ---------------- ACTIVATE ----------------
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches
-      .keys()
-      .then((cacheNames) => {
-        return Promise.all(
-          cacheNames
-            .filter((cacheName) => cacheName !== CACHE_NAME)
-            .map((cacheName) => caches.delete(cacheName))
-        );
-      })
-      .then(() => {
-        return self.clients.claim();
-      })
+    (async () => {
+      const keys = await caches.keys();
+
+      await Promise.all(
+        keys
+          .filter((key) => key !== CACHE_NAME)
+          .map((key) => caches.delete(key))
+      );
+
+      await self.clients.claim();
+    })()
   );
 });
 
+// ---------------- FETCH ----------------
 self.addEventListener("fetch", (event) => {
-  const { request } = event;
-  const url = new URL(request.url);
+  const request = event.request;
 
   if (request.method !== "GET") return;
 
+  const url = new URL(request.url);
+
+  // Skip extensions
   if (
     url.protocol === "chrome-extension:" ||
     url.protocol === "moz-extension:"
@@ -65,98 +57,117 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
+  // Handle navigation requests (HTML)
+  if (request.mode === "navigate" || request.destination === "document") {
+    event.respondWith(networkFirst(request));
+    return;
+  }
+
+  // Fonts (cache-first)
   if (
     url.origin === "https://fonts.googleapis.com" ||
     url.origin === "https://fonts.gstatic.com"
   ) {
-    event.respondWith(
-      caches.match(request).then((cacheResponse) => {
-        if (cacheResponse) return cacheResponse;
-
-        return fetch(request)
-          .then((res) => {
-            if (res.status === 200) {
-              const resClone = res.clone();
-              caches.open(CACHE_NAME).then((cache) => {
-                cache.put(request, resClone);
-              });
-            }
-
-            return res;
-          })
-          .catch(() => {
-            console.warn("[SW] Font failed to load, continuing anyway");
-            return new Response("", { status: 200 });
-          });
-      })
-    );
-  } else {
-    event.respondWith(
-      caches.match(request).then((cacheResponse) => {
-        if (cacheResponse) return cacheResponse;
-
-        return fetch(request)
-          .then((res) => {
-            if (!res || res.status !== 200 || res.type === "error") {
-              return res;
-            }
-
-            const resClone = res.clone();
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(request, resClone);
-            });
-            return res;
-          })
-          .catch(() => {
-            console.warn("[SW] Request failed to load");
-
-            if (request.mode === "navigate") {
-              return caches.match("/index.html").then((res) => {
-                if (res) {
-                  return res;
-                }
-
-                return new Response("Offline - Please reload when connected", {
-                  status: 503,
-                  statusText: "Service Unavailable",
-                  headers: new Headers({
-                    "Content-Type": "text/plain",
-                  }),
-                });
-              });
-            }
-          });
-      })
-    );
+    event.respondWith(cacheFirst(request));
+    return;
   }
+
+  event.respondWith(staleWhileRevalidate(request));
 });
 
+// Cache First
+async function cacheFirst(request) {
+  const cache = await caches.open(CACHE_NAME);
+  const cached = await cache.match(request);
+
+  if (cached) return cached;
+
+  try {
+    const res = await fetch(request);
+
+    if (res && res.ok) {
+      await cache.put(request, res.clone());
+    }
+
+    return res;
+  } catch {
+    return new Response("", { status: 200 });
+  }
+}
+
+// Network First (for HTML/navigation)
+async function networkFirst(request) {
+  const cache = await caches.open(CACHE_NAME);
+
+  try {
+    const res = await fetch(request);
+
+    if (res && res.ok) {
+      await cache.put(request, res.clone());
+    }
+
+    return res;
+  } catch {
+    const cached = await cache.match(request);
+    if (cached) return cached;
+
+    const fallback = await cache.match("/index.html");
+    if (fallback) return fallback;
+
+    return new Response("Offline", { status: 503 });
+  }
+}
+
+async function staleWhileRevalidate(request) {
+  const cache = await caches.open(CACHE_NAME);
+  const cached = await cache.match(request);
+
+  try {
+    const networkPromise = fetch(request).then((res) => {
+      if (res && res.ok) {
+        cache.put(request, res.clone());
+      }
+      return res;
+    });
+
+    if (cached) return cached;
+
+    const network = await networkPromise;
+    if (network) return network;
+
+    return new Response("Offline", { status: 503 });
+  } catch {
+    return cached || new Response("Offline", { status: 503 });
+  }
+}
+
+// ---------------- MESSAGE ----------------
 self.addEventListener("message", (event) => {
-  if (event.data && event.data.type === "SKIP_WAITING") {
+  const { type } = event.data || {};
+
+  if (type === "SKIP_WAITING") {
     self.skipWaiting();
   }
 
-  if (event.data && event.data.type === "CLEAR_CACHE") {
+  if (type === "CLEAR_CACHE") {
     event.waitUntil(
-      caches.keys().then((cacheNames) => {
-        return Promise.all(
-          cacheNames.map((cacheName) => {
-            return caches.delete(cacheName);
-          })
-        );
-      })
+      caches
+        .keys()
+        .then((keys) => Promise.all(keys.map((key) => caches.delete(key))))
     );
   }
 
-  if (event.data && event.data.type === "GET_CACHE_STATUS") {
+  if (type === "GET_CACHE_STATUS") {
     event.waitUntil(
-      caches.open(CACHE_NAME).then(async (cache) => {
+      (async () => {
+        const cache = await caches.open(CACHE_NAME);
         const keys = await cache.keys();
-        event.ports[0].postMessage({
+
+        event.ports[0]?.postMessage({
           cached: keys.length,
-          cacheKeys: keys.map((req) => req.url),
+          cacheKeys: keys.map((r) => r.url),
         });
-      })
+      })()
     );
   }
 });
