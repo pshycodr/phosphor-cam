@@ -1,6 +1,6 @@
 import { memo, useState } from "react";
 
-import { Check,Copy, RefreshCw } from "lucide-react";
+import { Check, Copy, RefreshCw } from "lucide-react";
 
 type CameraControlsProps = {
   onFlip: () => void;

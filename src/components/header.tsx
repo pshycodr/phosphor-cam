@@ -1,13 +1,16 @@
 import { memo } from "react";
 
-import { ProcessingStats } from "../types/types";
+import { useStatsStore } from "../store/statsStore";
 
-interface HeaderProps extends ProcessingStats {
+interface HeaderProps {
   width: number;
   height: number;
 }
 
-function Header({ fps, renderTime, width, height }: HeaderProps) {
+function Header({ width, height }: HeaderProps) {
+  const fps = useStatsStore((s) => s.fps);
+  const renderTime = useStatsStore((s) => s.renderTime);
+
   return (
     <div className="fixed top-4 left-4 z-10 flex max-w-[calc(100vw-100px)] flex-col gap-2">
       <div className="flex items-center gap-2 rounded-lg border border-green-500/30 bg-black/40 px-3 py-2 shadow-lg backdrop-blur-sm">

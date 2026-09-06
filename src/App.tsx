@@ -1,51 +1,35 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { MdCancel } from "react-icons/md";
 
-import AsciiView from "./components/asciiView";
-import CameraControls from "./components/cameraControls";
-import Header from "./components/header";
-import Settings from "./components/settings";
-import {
-  AsciiRendererHandle,
-  AsciiSettings,
-  CameraFacingMode,
-  ProcessingStats,
-} from "./types/types";
+import CameraControls from "@/components/cameraControls";
+import Header from "@/components/header";
+import Settings from "@/components/settings";
+import type { CameraFacingMode } from "@/types";
+
+import Viewport, { type ViewportHandle } from "./components/viewport";
 import { getSupportedMediaRecorderMimeType } from "./utils/mediaRecorder";
 
 function App() {
-  const DEFAULT_SETTIGNS: AsciiSettings = {
-    resolution: 0.2,
-    fontSize: 10,
-    contrast: 1.2,
-    brightness: 0,
-    colorMode: false,
-    invert: false,
-    characterSet: "standard",
-  };
-
   const [stream, setStream] = useState<MediaStream | null>(null);
-  const [settings, setSettings] = useState<AsciiSettings>(DEFAULT_SETTIGNS);
   const [facingMode, setFacingMode] = useState<CameraFacingMode>("user");
-  const [isRecording, setIsRecording] = useState<boolean>(false);
-  const [stats, setStats] = useState<ProcessingStats>({
-    fps: 0,
-    renderTime: 0,
-  });
+  const [isRecording, setIsRecording] = useState(false);
   const [windowSize, setWindowSize] = useState({
     width: window.innerWidth,
     height: window.innerHeight,
   });
-
-  const [flash, setFlash] = useState<boolean>(false);
-  const [clipboardSuccess, setClipboardSuccess] = useState<boolean>(false);
+  const [flash, setFlash] = useState(false);
+  const [clipboardSuccess, setClipboardSuccess] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
-  const asciiRendererRef = useRef<AsciiRendererHandle>(null);
+  // Only one ref into the render layer now, instead of a ref threaded
+  // through AsciiView into whichever renderer happened to be mounted.
+  const viewportRef = useRef<ViewportHandle>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const recordedChunksRef = useRef<Blob[]>([]);
   const recordingTimerRef = useRef<number | null>(null);
+
+  console.log(process.env.NODE_ENV);
 
   useEffect(() => {
     let active = true;
@@ -53,25 +37,18 @@ function App() {
 
     const start = async () => {
       try {
-        if (currentStream) {
-          currentStream.getTracks().forEach((t) => t.stop());
-        }
-
-        const constraints: MediaStreamConstraints = {
+        const video = await navigator.mediaDevices.getUserMedia({
           video: {
             height: { ideal: 1080 },
             width: { ideal: 1920 },
             facingMode,
           },
           audio: false,
-        };
-
-        const video = await navigator.mediaDevices.getUserMedia(constraints);
+        });
         if (!active) {
           video.getTracks().forEach((t) => t.stop());
           return;
         }
-
         currentStream = video;
         setStream(video);
       } catch (err) {
@@ -81,22 +58,15 @@ function App() {
         );
       }
     };
-
     start();
 
-    const handleResize = () => {
-      setWindowSize({
-        width: window.innerWidth,
-        height: window.innerHeight,
-      });
-    };
+    const handleResize = () =>
+      setWindowSize({ width: window.innerWidth, height: window.innerHeight });
     window.addEventListener("resize", handleResize);
 
     return () => {
       active = false;
-      if (currentStream) {
-        currentStream.getTracks().forEach((t) => t.stop());
-      }
+      currentStream?.getTracks().forEach((t) => t.stop());
       setStream(null);
       window.removeEventListener("resize", handleResize);
     };
@@ -107,113 +77,101 @@ function App() {
   }, []);
 
   const takeSnapshot = useCallback(async () => {
-    if (!asciiRendererRef.current) return;
+    if (!viewportRef.current) return;
     setFlash(true);
     setTimeout(() => setFlash(false), 200);
 
     try {
-      const imageUrl = await asciiRendererRef.current.captureImage();
-      if (!imageUrl) {
-        setFlash(false);
-        return;
-      }
+      const imageUrl = await viewportRef.current.captureImage();
       const a = document.createElement("a");
       a.href = imageUrl;
       a.download = `ascii-capture-${Date.now()}.png`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-    } catch (error) {
-      console.error("Capture failed", error);
+    } catch (err) {
+      console.error("Capture failed", err);
+      setError("Capture isn't supported for this render mode yet.");
     }
   }, []);
 
   const copyToClipboard = useCallback(() => {
-    if (!asciiRendererRef.current) return;
-
+    if (!viewportRef.current) return;
     try {
-      const copyContent = asciiRendererRef.current.getAsciiText();
-
+      const copyContent = viewportRef.current.getAsciiText();
       if (!copyContent) throw new Error();
-
       navigator.clipboard.writeText(copyContent).then(() => {
         setClipboardSuccess(true);
         setTimeout(() => setClipboardSuccess(false), 2000);
       });
-    } catch (error) {
-      console.log("Copy Failed:", error);
+    } catch (err) {
+      console.log("Copy Failed:", err);
       setError("Failed to Copy. Please try again");
     }
   }, []);
 
   const toggleRecording = useCallback(() => {
     if (isRecording) {
-      // stop recodring
       if (
         mediaRecorderRef.current &&
         mediaRecorderRef.current.state !== "inactive"
       ) {
         mediaRecorderRef.current.stop();
-
         if (recordingTimerRef.current) clearInterval(recordingTimerRef.current);
       }
       setIsRecording(false);
-    } else {
-      // start recodring
-      const canvas = asciiRendererRef.current?.getCanvas();
-      if (!canvas || !canvas.height || !canvas.width)
-        throw new Error("Error while start recording");
+      return;
+    }
 
-      const videoBitsPerSecond = 2500000; // Default 2.5 Mbps
+    const canvas = viewportRef.current?.getCanvas();
+    if (!canvas || !canvas.width || !canvas.height) {
+      setError("Renderer not ready for recording.");
+      return;
+    }
 
-      const stream = canvas.captureStream(30); // 30 fps
+    const videoBitsPerSecond = 2_500_000;
+    const canvasStream = canvas.captureStream(30);
 
-      try {
-        const mimeType = getSupportedMediaRecorderMimeType();
-        if (!mimeType) {
-          throw new Error("No supported video codec found");
-        }
+    try {
+      const mimeType = getSupportedMediaRecorderMimeType();
+      if (!mimeType) throw new Error("No supported video codec found");
 
-        const options: MediaRecorderOptions = {
-          mimeType,
-          videoBitsPerSecond,
-        };
+      const recorder = new MediaRecorder(canvasStream, {
+        mimeType,
+        videoBitsPerSecond,
+      });
+      recordedChunksRef.current = [];
 
-        const recorder = new MediaRecorder(stream, options);
-        recordedChunksRef.current = [];
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) recordedChunksRef.current.push(e.data);
+      };
 
-        recorder.ondataavailable = (e) => {
-          if (e.data.size > 0) recordedChunksRef.current.push(e.data);
-        };
+      recorder.onstop = () => {
+        const blob = new Blob(recordedChunksRef.current, {
+          type: "video/webm",
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `ascii-video-${Date.now()}.webm`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setRecordingTime(0);
+      };
 
-        recorder.onstop = () => {
-          const blob = new Blob(recordedChunksRef.current, {
-            type: "video/webm",
-          });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          a.href = url;
-          a.download = `ascii-video-${Date.now()}.webm`;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          setRecordingTime(0);
-        };
+      recorder.start();
+      mediaRecorderRef.current = recorder;
+      setIsRecording(true);
 
-        recorder.start();
-        mediaRecorderRef.current = recorder;
-        setIsRecording(true);
-        console.log("start");
-
-        recordingTimerRef.current = window.setInterval(() => {
-          setRecordingTime((t) => t + 1);
-        }, 1000);
-      } catch (error) {
-        console.error("Recording failed to start", error);
-        setError(
-          "Failed to start recording. Browser might not support this format."
-        );
-      }
+      recordingTimerRef.current = window.setInterval(() => {
+        setRecordingTime((t) => t + 1);
+      }, 1000);
+    } catch (err) {
+      console.error("Recording failed to start", err);
+      setError(
+        "Failed to start recording. Browser might not support this format."
+      );
     }
   }, [isRecording]);
 
@@ -225,28 +183,20 @@ function App() {
 
   return (
     <div className="h-screen w-screen overflow-hidden">
-      <Header
-        fps={stats.fps}
-        renderTime={stats.renderTime}
-        width={windowSize.width}
-        height={windowSize.height}
-      />
+      {/* No settings/stats props - Header and Settings read straight from their stores */}
+      <Header width={windowSize.width} height={windowSize.height} />
+      <Settings />
 
-      <Settings settings={settings} onChange={setSettings} />
-
-      {/* Flash Effect */}
       {flash && (
         <div className="animate-out fade-out pointer-events-none fixed inset-0 z-50 bg-white duration-150" />
       )}
 
-      {/* Clipboard Toast */}
       {clipboardSuccess && (
         <div className="animate-in zoom-in fixed top-1/2 left-1/2 z-50 -translate-x-1/2 -translate-y-1/2 rounded border border-green-500 bg-black/80 px-6 py-3 font-bold text-green-400 backdrop-blur duration-200">
           ASCII COPIED TO CLIPBOARD
         </div>
       )}
 
-      {/* Error Toast */}
       {error && (
         <div className="animate-in zoom-in fixed top-1/2 left-1/2 z-50 -translate-x-1/2 -translate-y-1/2 rounded border border-red-500 bg-black/80 px-6 py-4 font-bold text-red-500 backdrop-blur duration-200">
           <button
@@ -256,7 +206,6 @@ function App() {
           >
             <MdCancel />
           </button>
-
           <div>
             <h1 className="mb-4 text-4xl">SYSTEM ERROR</h1>
             <p>{error}</p>
@@ -264,15 +213,7 @@ function App() {
         </div>
       )}
 
-      <div className="fixed inset-0 flex items-center justify-center">
-        <AsciiView
-          ref={asciiRendererRef}
-          settings={settings}
-          stream={stream}
-          onStatsUpdate={setStats}
-          canvasSize={windowSize}
-        />
-      </div>
+      <Viewport ref={viewportRef} stream={stream} canvasSize={windowSize} />
 
       <CameraControls
         onFlip={toggleCamera}
