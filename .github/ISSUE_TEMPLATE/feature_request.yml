@@ -1,0 +1,65 @@
+name: Feature Request
+description: Suggest an idea or enhancement for Phosphor Cam
+title: "[Feature]: "
+labels:
+  - enhancement
+  - triage
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the suggestion.
+
+        Please search existing issues first:
+        https://github.com/pshycodr/phosphor-cam/issues
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which area does this relate to?
+      options:
+        - New render mode (ASCII / Dither / Halftone / Lines / Voxel / other)
+        - Visual effects (bloom, glow, scanlines, etc.)
+        - Pre-filters (edge detection, posterize, etc.)
+        - Capture & export (photo / video / clipboard)
+        - Settings & UI
+        - Image / video upload (editor mode)
+        - Performance
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: Describe the use case or pain point.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution (optional)
+      description: >
+        Describe how you would like to see this implemented. If it's a new
+        render mode or effect, feel free to include references or examples.
+    validations:
+      required: false
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered (optional)
+      description: Other ways to solve the problem, if any.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched existing issues and this has not already been requested.
+          required: true

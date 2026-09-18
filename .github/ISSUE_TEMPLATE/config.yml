@@ -1,0 +1,20 @@
+blank_issues_enabled: false
+
+contact_links:
+  - name: 💬 Questions & Discussions
+    url: https://github.com/pshycodr/phosphor-cam/discussions
+    about: >
+      Ask questions, get help running the app, discuss render modes or
+      effects, or start a feature discussion before opening an issue.
+
+  - name: 💡 Feature Ideas
+    url: https://github.com/pshycodr/phosphor-cam/discussions/categories/ideas
+    about: >
+      Have an idea for a new render mode, effect, or feature? Share it and
+      discuss possible implementations before it becomes an issue.
+
+  - name: 🙋 Q&A
+    url: https://github.com/pshycodr/phosphor-cam/discussions/categories/q-a
+    about: >
+      Need help using, building, or contributing to Phosphor Cam? Ask the
+      community here.

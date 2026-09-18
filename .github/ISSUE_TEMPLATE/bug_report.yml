@@ -1,0 +1,126 @@
+name: Bug Report
+description: Report a problem with Phosphor Cam
+title: "[Bug]: "
+labels:
+  - bug
+  - triage
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug.
+
+        Before submitting, please search existing issues:
+        https://github.com/pshycodr/phosphor-cam/issues
+
+  - type: dropdown
+    id: render-mode
+    attributes:
+      label: Affected render mode
+      description: Which renderer were you using when this happened?
+      options:
+        - ASCII
+        - Dither
+        - Halftone
+        - Lines
+        - Voxel
+        - Not render-mode specific / general
+    validations:
+      required: true
+
+  - type: dropdown
+    id: feature-area
+    attributes:
+      label: Where did this happen?
+      options:
+        - Live camera feed
+        - Photo capture (download)
+        - Video recording
+        - Copy ASCII to clipboard
+        - Settings panel
+        - Camera flip / facing mode
+        - Other (specify in description)
+    validations:
+      required: true
+
+  - type: input
+    id: browser
+    attributes:
+      label: Browser & version
+      description: >
+        e.g. "Chrome 128 on macOS 14" or "Safari 17 on iOS 17.5".
+        Check via your browser's "About" page if unsure.
+      placeholder: "Chrome 128 on Windows 11"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: device-type
+    attributes:
+      label: Device type
+      options:
+        - Desktop
+        - Mobile (iOS)
+        - Mobile (Android)
+        - Tablet
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Describe the bug and what you expected instead.
+      placeholder: >
+        Switching to Voxel mode while recording freezes the canvas and the
+        download button stops responding.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Numbered steps, kept as minimal as possible.
+      placeholder: |
+        1. Open the app and allow camera access
+        2. Switch render mode to Voxel
+        3. Press the record button
+        4. Wait ~5 seconds and press stop
+    validations:
+      required: true
+
+  - type: textarea
+    id: console-errors
+    attributes:
+      label: Browser console errors (if any)
+      description: >
+        Open DevTools (F12) → Console tab, and paste any red error output here.
+      render: shell
+    validations:
+      required: false
+
+  - type: textarea
+    id: media
+    attributes:
+      label: Screenshot or screen recording
+      description: >
+        Drag and drop an image or video here — this helps a lot for
+        rendering/visual issues.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched existing issues and this has not already been reported.
+          required: true
+
+        - label: I granted camera permission and the browser shows a live preview normally.
+          required: true
+
+        - label: I tried reproducing this in another browser, if possible.
+          required: false
