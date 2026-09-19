@@ -11,6 +11,10 @@ const DEFAULT_SETTINGS: AsciiSettings = {
   invert: false,
   characterSet: "standard",
   renderMode: "ascii",
+  color: {
+    foreground: "#00ff00",
+    background: "#000000",
+  },
 };
 
 interface SettingsStore {

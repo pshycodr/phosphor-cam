@@ -9,6 +9,10 @@ export interface AsciiSettings {
   invert: boolean;
   characterSet: "standard" | "simple" | "blocks" | "matrix" | "edges";
   renderMode: RenderMode;
+  color: {
+    foreground: string;
+    background: string;
+  };
 }
 
 export interface AsciiCharacterMap {
