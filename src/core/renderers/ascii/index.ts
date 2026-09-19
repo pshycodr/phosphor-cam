@@ -2,22 +2,15 @@ import { CHAR_SETS } from "@/constants/characterSets";
 import { type RendererFactory } from "@/types";
 import {
   adjustColor,
-  createBrightnessMap,
+  drawTintedGlyph,
+  getBrightnessMap,
   getChar,
   getLuminance,
+  getTintedAtlas,
+  getWhiteAtlas,
 } from "@/utils/asciiUtils";
 
 export const createAsciiRenderer: RendererFactory = (canvas) => {
-  const brightnessMapCache = new Map<string, string[]>();
-  const getBrightnessMap = (ramp: string) => {
-    let map = brightnessMapCache.get(ramp);
-    if (!map) {
-      map = createBrightnessMap(ramp);
-      brightnessMapCache.set(ramp, map);
-    }
-    return map;
-  };
-
   return {
     render(imageData, ctx, settings, cellSize) {
       const { width: srcW, height: srcH, data: pixels } = imageData;
@@ -28,33 +21,65 @@ export const createAsciiRenderer: RendererFactory = (canvas) => {
       canvas.height = srcH * cellSize;
 
       const { foreground, background } = settings.color;
-
       const bgColor = settings.invert ? foreground : background;
       const fgColor = settings.invert ? background : foreground;
 
       ctx.fillStyle = bgColor;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.font = `${cellSize}px 'Fira Code', monospace`;
-      ctx.textBaseline = "top";
 
       const pixelCount = srcW * srcH;
-      for (let i = 0; i < pixelCount; i++) {
-        const r = pixels[i * 4];
-        const g = pixels[i * 4 + 1];
-        const b = pixels[i * 4 + 2];
 
-        let l = getLuminance(r, g, b);
-        if (settings.contrast !== 1 || settings.brightness !== 0) {
-          l = adjustColor(l, settings.contrast, settings.brightness);
+      if (settings.colorMode) {
+        const whiteAtlas = getWhiteAtlas(ramp, cellSize);
+
+        for (let i = 0; i < pixelCount; i++) {
+          const r = pixels[i * 4];
+          const g = pixels[i * 4 + 1];
+          const b = pixels[i * 4 + 2];
+
+          let l = getLuminance(r, g, b);
+          if (settings.contrast !== 1 || settings.brightness !== 0) {
+            l = adjustColor(l, settings.contrast, settings.brightness);
+          }
+
+          const char = getChar(l, brightnessMap, settings.invert);
+          const x = (i % srcW) * cellSize;
+          const y = Math.floor(i / srcW) * cellSize;
+
+          drawTintedGlyph(ctx, whiteAtlas, char, r, g, b, x, y, cellSize);
         }
+      } else {
+        const atlas = getTintedAtlas(ramp, cellSize, fgColor);
 
-        const char = getChar(l, brightnessMap, settings.invert);
-        const x = (i % srcW) * cellSize;
-        const y = Math.floor(i / srcW) * cellSize;
+        for (let i = 0; i < pixelCount; i++) {
+          const r = pixels[i * 4];
+          const g = pixels[i * 4 + 1];
+          const b = pixels[i * 4 + 2];
 
-        ctx.fillStyle = settings.colorMode ? `rgb(${r},${g},${b})` : fgColor;
+          let l = getLuminance(r, g, b);
+          if (settings.contrast !== 1 || settings.brightness !== 0) {
+            l = adjustColor(l, settings.contrast, settings.brightness);
+          }
 
-        ctx.fillText(char, x, y);
+          const char = getChar(l, brightnessMap, settings.invert);
+          const col = atlas.columnOf.get(char);
+          if (col === undefined) continue;
+
+          const x = (i % srcW) * cellSize;
+          const y = Math.floor(i / srcW) * cellSize;
+
+          ctx.drawImage(
+            atlas.canvas,
+            col * cellSize,
+            0,
+            cellSize,
+            cellSize,
+            x,
+            y,
+            cellSize,
+            cellSize
+          );
+        }
       }
     },
 
