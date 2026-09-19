@@ -9,6 +9,7 @@
     "start": "vite start",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "typecheck": "tsc --noEmit",
     "preview": "vite preview",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md,mdx,css}\"",
     "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,md,mdx,css}\"",
