@@ -1,10 +1,12 @@
 import { memo, useState } from "react";
 import { IoClose } from "react-icons/io5";
-import { LuSettings2 } from "react-icons/lu";
+import { LuArrowLeftRight,LuSettings2 } from "react-icons/lu";
 
 import { CHAR_SETS, CHARACTER_SETS } from "@/constants/characterSets";
 import { useSettingsStore } from "@/store/settingsStore";
 import type { AsciiSettings } from "@/types";
+
+import { ColorSwitch } from "./ColorSwitch";
 
 const SLIDER_CONFIGS = {
   fontSize: { min: 2, max: 30, step: 1, label: "RESOLUTION" },
@@ -13,6 +15,15 @@ const SLIDER_CONFIGS = {
 } as const;
 
 const RENDER_MODES = [{ key: "ascii", label: "ASCII" }] as const;
+
+const COLOR_PRESETS = [
+  { name: "Matrix", foreground: "#00ff00", background: "#000000" },
+  { name: "Amber", foreground: "#ffb000", background: "#000000" },
+  { name: "Cyan", foreground: "#00e5ff", background: "#000000" },
+  { name: "Paper", foreground: "#f5f5f0", background: "#1a1a1a" },
+  { name: "Neon Pink", foreground: "#ff2e88", background: "#0a0014" },
+  { name: "Blood", foreground: "#ff1a1a", background: "#0a0000" },
+] as const;
 
 function Settings() {
   const [isOpen, setIsOpen] = useState(false);
@@ -25,6 +36,26 @@ function Settings() {
     value: number | string | boolean
   ) => {
     updateSettings({ [key]: value } as Partial<AsciiSettings>);
+  };
+
+  const handleColorChange = (
+    key: "foreground" | "background",
+    value: string
+  ) => {
+    updateSettings({ color: { ...settings.color, [key]: value } });
+  };
+
+  const applyPreset = (foreground: string, background: string) => {
+    updateSettings({ color: { foreground, background } });
+  };
+
+  const swapColors = () => {
+    updateSettings({
+      color: {
+        foreground: settings.color.background,
+        background: settings.color.foreground,
+      },
+    });
   };
 
   const formatValue = (key: keyof typeof SLIDER_CONFIGS, value: number) => {
@@ -140,6 +171,61 @@ function Settings() {
                 </div>
               </section>
             )}
+
+            <section>
+              <div className="mb-3 flex items-center justify-between">
+                <p className="text-xs font-semibold text-green-400 uppercase">
+                  Colors
+                </p>
+                <button
+                  onClick={swapColors}
+                  disabled={settings.colorMode}
+                  className="flex items-center gap-1 rounded-md border border-green-500/40 px-2 py-1 text-[10px] font-semibold tracking-wide text-green-400 uppercase hover:bg-green-900/20 disabled:cursor-not-allowed disabled:opacity-40"
+                  aria-label="Swap foreground and background colors"
+                >
+                  <LuArrowLeftRight size={12} />
+                  Swap
+                </button>
+              </div>
+
+              <div
+                className={`space-y-2 ${settings.colorMode ? "opacity-50" : ""}`}
+              >
+                <ColorSwitch
+                  label="Foreground"
+                  value={settings.color.foreground}
+                  disabled={settings.colorMode}
+                  onChange={(v) => handleColorChange("foreground", v)}
+                />
+                <ColorSwitch
+                  label="Background"
+                  value={settings.color.background}
+                  disabled={settings.colorMode}
+                  onChange={(v) => handleColorChange("background", v)}
+                />
+              </div>
+
+              <div className="mt-3 flex flex-wrap gap-2">
+                {COLOR_PRESETS.map((preset) => (
+                  <button
+                    key={preset.name}
+                    onClick={() =>
+                      applyPreset(preset.foreground, preset.background)
+                    }
+                    disabled={settings.colorMode}
+                    title={preset.name}
+                    className="group relative h-9 w-9 shrink-0 overflow-hidden rounded-full border-2 border-green-500/30 transition-all hover:scale-110 hover:border-green-400 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100"
+                    style={{ backgroundColor: preset.background }}
+                    aria-label={`Apply ${preset.name} color preset`}
+                  >
+                    <span
+                      className="absolute inset-y-0 right-0 w-1/2"
+                      style={{ backgroundColor: preset.foreground }}
+                    />
+                  </button>
+                ))}
+              </div>
+            </section>
 
             <section className="space-y-4 pt-2">
               <label className="flex cursor-pointer items-center justify-between py-3 text-green-400">

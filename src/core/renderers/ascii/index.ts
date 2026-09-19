@@ -27,7 +27,12 @@ export const createAsciiRenderer: RendererFactory = (canvas) => {
       canvas.width = srcW * cellSize;
       canvas.height = srcH * cellSize;
 
-      ctx.fillStyle = "#000000";
+      const { foreground, background } = settings.color;
+
+      const bgColor = settings.invert ? foreground : background;
+      const fgColor = settings.invert ? background : foreground;
+
+      ctx.fillStyle = bgColor;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.font = `${cellSize}px 'Fira Code', monospace`;
       ctx.textBaseline = "top";
@@ -47,11 +52,7 @@ export const createAsciiRenderer: RendererFactory = (canvas) => {
         const x = (i % srcW) * cellSize;
         const y = Math.floor(i / srcW) * cellSize;
 
-        ctx.fillStyle = settings.colorMode
-          ? `rgb(${r},${g},${b})`
-          : settings.invert
-            ? "#000000"
-            : "#00ff00";
+        ctx.fillStyle = settings.colorMode ? `rgb(${r},${g},${b})` : fgColor;
 
         ctx.fillText(char, x, y);
       }
@@ -82,7 +83,11 @@ export const createAsciiRenderer: RendererFactory = (canvas) => {
       const outCtx = outCanvas.getContext("2d", { alpha: false });
       if (!outCtx) throw new Error("Canvas initialization failed");
 
-      outCtx.fillStyle = "#000000";
+      const { foreground, background } = settings.color;
+      const bgColor = settings.invert ? foreground : background;
+      const fgColor = settings.invert ? background : foreground;
+
+      outCtx.fillStyle = bgColor;
       outCtx.fillRect(0, 0, outCanvas.width, outCanvas.height);
       outCtx.font = `${hiResFont}px 'Fira Code', monospace`;
       outCtx.textBaseline = "top";
@@ -102,11 +107,7 @@ export const createAsciiRenderer: RendererFactory = (canvas) => {
         const x = (i % charsX) * hiResFont;
         const y = Math.floor(i / charsX) * hiResFont;
 
-        outCtx.fillStyle = settings.colorMode
-          ? `rgb(${r},${g},${b})`
-          : settings.invert
-            ? "#000000"
-            : "#00ff00";
+        outCtx.fillStyle = settings.colorMode ? `rgb(${r},${g},${b})` : fgColor;
 
         outCtx.fillText(char, x, y);
       }
