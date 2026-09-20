@@ -1,4 +1,4 @@
-export type RenderMode = "ascii";
+export type RenderMode = "ascii" | "dither";
 
 export interface AsciiSettings {
   resolution: number;
