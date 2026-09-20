@@ -1,6 +1,7 @@
-import { memo, useLayoutEffect, useRef, useState } from "react";
+import { memo } from "react";
 import { LuChevronDown } from "react-icons/lu";
 
+import Collapse from "./Collapse";
 import type { SectionId } from "./contants";
 
 interface AccordionSectionProps {
@@ -22,57 +23,43 @@ const Accordion = ({
   onToggle,
   children,
 }: AccordionSectionProps) => {
-  const contentRef = useRef<HTMLDivElement>(null);
-  const [maxHeight, setMaxHeight] = useState(0);
-
-  useLayoutEffect(() => {
-    const node = contentRef.current;
-    if (!node) return;
-
-    const measure = () => setMaxHeight(node.scrollHeight);
-    measure();
-
-    const observer = new ResizeObserver(measure);
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, [isOpen, children]);
+  const triggerId = `settings-trigger-${id}`;
+  const panelId = `settings-section-${id}`;
 
   return (
     <div className="border-b border-green-500/15 last:border-b-0">
       <button
+        id={triggerId}
+        type="button"
         onClick={() => onToggle(id)}
         aria-expanded={isOpen}
-        aria-controls={`settings-section-${id}`}
-        className="flex w-full items-center justify-between gap-3 py-4 text-left"
+        aria-controls={panelId}
+        className="group flex min-h-14 w-full items-center justify-between gap-3 rounded-md py-3 text-left outline-none focus-visible:ring-2 focus-visible:ring-green-400/70"
       >
-        <span className="flex items-center gap-2.5 text-green-400">
+        <span className="flex items-center gap-2.5 text-green-400 transition-colors group-hover:text-green-300">
           {icon}
           <span className="text-sm font-semibold">{title}</span>
         </span>
+
         <span className="flex min-w-0 items-center gap-2">
           {badge && (
-            <span className="flex min-w-0 items-center gap-1.5 truncate text-xs text-green-500/60">
+            <span className="flex min-w-0 items-center gap-1.5 truncate text-xs text-green-500/70">
               {badge}
             </span>
           )}
           <LuChevronDown
             size={16}
-            className={`shrink-0 text-green-500/50 transition-transform duration-200 motion-reduce:transition-none ${
+            aria-hidden="true"
+            className={`shrink-0 text-green-500/60 transition-transform duration-200 motion-reduce:transition-none ${
               isOpen ? "rotate-180" : ""
             }`}
           />
         </span>
       </button>
 
-      <div
-        id={`settings-section-${id}`}
-        style={{ maxHeight: isOpen ? maxHeight : 0 }}
-        className="overflow-hidden transition-[max-height] duration-300 ease-out motion-reduce:transition-none"
-      >
-        <div ref={contentRef} className="space-y-5 pb-5">
-          {children}
-        </div>
-      </div>
+      <Collapse id={panelId} labelledBy={triggerId} open={isOpen}>
+        <div className="space-y-5 pt-1 pb-5">{children}</div>
+      </Collapse>
     </div>
   );
 };
