@@ -1,8 +1,8 @@
 <div align="center">
   <img src="public/assets/banner.png" alt="Project Logo" width="full">
-  
-  # Phosphor Cam
-  
+
+# Phosphor Cam
+
   <p align="center">
     <i>Transform your camera feed into real-time ASCII art</i>
   </p>
@@ -13,112 +13,178 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![React](https://img.shields.io/badge/React-20232A?logo=react&logoColor=61DAFB)](https://reactjs.org/)
-[![Vite](https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
-
-[![GitHub issues](https://img.shields.io/github/issues/pshycodr/phosphor-cam)](https://github.com/pshycodr/phosphor-cam/issues)
-[![GitHub pull requests](https://img.shields.io/github/issues-pr/pshycodr/phosphor-cam)](https://github.com/pshycodr/phosphor-cam/pulls)
-[![Last commit](https://img.shields.io/github/last-commit/pshycodr/phosphor-cam)](https://github.com/pshycodr/phosphor-cam/commits/main)
+[![CI](https://github.com/pshycodr/phosphor-cam/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/pshycodr/phosphor-cam/actions/workflows/ci.yml?query=branch%3Amain)
 
 </div>
 
 ---
 
-## ✨ Features
+## Overview
 
-- **Real-Time Rendering** – Live ASCII conversion with performance optimization (60+ FPS)
-- **High-Quality Capture** – Export 4K resolution ASCII art images
+Phosphor Cam converts a live camera stream into stylized text or dithered bitmap graphics on an HTML canvas. It runs entirely client-side: frames are read from the `MediaStream`, processed and drawn locally, and are never uploaded.
+
+Two render engines are available and can be switched at runtime without restarting the camera:
+
+| Engine     | Output                                                                        | Typical use                         |
+| ---------- | ----------------------------------------------------------------------------- | ----------------------------------- |
+| **ASCII**  | Characters mapped to pixel luminance, optionally tinted with the source color | Text-art portraits, copyable output |
+| **Dither** | Reduced-tone bitmap rendering with a retro, print-like texture                | Stylized stills and video           |
+
+## Table of contents
+
+- [Features](#features)
+- [Demo](#demo)
+- [Getting started](#getting-started)
+- [Usage](#usage)
+- [Configuration](#configuration)
+- [Architecture](#architecture)
+- [Tech stack](#tech-stack)
+- [Browser support](#browser-support)
+- [Contributing](#contributing)
+- [License](#license)
+
+## Features
+
+- **Real-Time Rendering**
+  - Two interchangeable render engines: ASCII and Dither
+  - Real-time processing with a target of 60 FPS on modern hardware
+  - Live FPS, render time and output resolution readout
+  - Five ASCII character sets: standard, simple, blocks, matrix and edges
+
+- **High-Quality Capture**
+  - Export 4K resolution ASCII art images
+  - Video recording capability
+
 - **Customizable Settings**
   - 5 character sets (standard, simple, blocks, matrix, edges)
   - Adjustable font size/resolution (6-30px)
   - Contrast and brightness controls
   - Color mode and invert options
+
 - **Camera Controls**
   - Front/back camera switching
   - High-quality snapshot export
   - ASCII text copy to clipboard
-  - Video recording capability
-- **Performance Monitoring** – Real-time FPS and render time display
 
-## 📸 Demo
+- **Performance Monitoring** - Real-time FPS and render time display
+
+## Demo
+
+### ASCII
 
 <div align="center">
-  <img src="public/demo/blocks-color.png" alt="ASCII Camera Demo 1" width="45%">
-  <img src="public/demo/standrad.png" alt="ASCII Camera Demo 2" width="45%">
+  <img src="public/demo/ascii/ascii-default.png" alt="ASCII engine using the blocks character set in color mode" width="45%">
+  <img src="public/demo/ascii/ascii-blocks.png" alt="ASCII engine using the standard character set" width="45%">
 </div>
 
-## 🚀 Quick Start
+### Dither
+
+<div align="center">
+  <img src="public/demo/dither/dither1.png" alt="ASCII engine using the blocks character set in color mode" width="45%">
+  <img src="public/demo/dither/dither-3.png" alt="ASCII engine using the standard character set" width="45%">
+</div>
+
+## Getting started
+
+### Prerequisites
+
+- Node.js 18 or later
+- A device with a camera
+- A secure context (HTTPS or `localhost`), required by browsers for camera access
+
+### Installation
 
 ```bash
-# Clone the repository
 git clone https://github.com/pshycodr/phosphor-cam.git
 cd phosphor-cam
-
-# Install dependencies
 npm install
+```
 
-# Start development server
+### Development
+
+```bash
 npm run dev
 ```
 
-Visit `http://localhost:5173` to see the app in action!
+The app is served at `http://localhost:5173`.
 
-## 📖 Usage
+### Production build
 
-1. **Grant Camera Access** – Allow browser to access your camera when prompted
-2. **Adjust Settings** – Click the settings icon (⚙️) to customize the ASCII effect
-3. **Capture Images** – Press the shutter button for high-quality exports
-4. **Switch Cameras** – Use the flip button (🔄) to toggle between front/back cameras
-5. **Record Video** (COMMING SOON) – Click the record button (📹) to start/stop video capture
+```bash
+npm run build
+npm run preview
+```
 
-## 🛠️ Tech Stack
+## Usage
 
-- **React 18** – UI framework
-- **TypeScript** – Type safety
-- **Vite** – Build tool
-- **Canvas API** – Real-time rendering
-- **MediaStream API** – Camera access
-- **Tailwind CSS** – Styling
-- **Lucide React** – Icons
+1. **Allow camera access** when the browser prompts.
+2. **Select a render engine** (ASCII or Dither) in the settings panel.
+3. **Tune the image** under Adjustments and Appearance. Changes apply to the live feed immediately.
+4. **Capture** a frame with the shutter button, or copy it as text with the copy button.
+5. **Switch cameras** with the flip button.
 
-## 🌐 Browser Support
+The settings panel appears as a bottom sheet on phones (swipe down or tap outside to close) and as a side panel on larger screens (press `Esc` to close).
 
-Requires a modern browser with support for:
+## Configuration
 
-- `getUserMedia` API
-- `Canvas 2D` rendering context
-- ES6+ JavaScript features
+| Setting                   | Range / options                         | Engine |
+| ------------------------- | --------------------------------------- | ------ |
+| Render engine             | ASCII, Dither                           | All    |
+| Character size            | 2 to 30 px                              | All    |
+| Contrast                  | 0.5x to 3.0x                            | All    |
+| Brightness                | -100 to +100                            | All    |
+| Character set             | standard, simple, blocks, matrix, edges | ASCII  |
+| Color mode                | On / off                                | All    |
+| Foreground and background | Any hex color, or one of six presets    | All    |
+| Invert                    | On / off                                | All    |
 
-✅ Chrome 90+ | ✅ Firefox 88+ | ✅ Safari 14+ | ✅ Edge 90+
+Character size controls how large each output cell is: larger values produce fewer, coarser cells, and smaller values produce finer detail at a higher processing cost.
 
-## 📝 License
+## Architecture
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+Rendering is decoupled from the UI. Each engine implements a common renderer interface and is registered by render mode, so adding an engine does not require changes to the frame loop or the interface.
 
-## 🤝 Contributing
+```
+src/
+├── components/     UI: viewport, camera controls, header, settings panel
+├── core/
+│   └── renderers/  Render engines and the registry that maps mode to engine
+├── hooks/          Camera source and frame loop
+├── store/          Settings and performance stats
+├── constants/      Character sets
+└── types/          Shared types
+```
 
-Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+Frame flow: the camera stream is read through `useCameraSource`, `useFrameLoop` schedules each frame, and the active renderer from the registry draws it to the canvas. Settings are read from the store on every frame, so changes take effect without recreating the renderer.
+
+## Tech stack
+
+- **React** and **TypeScript**
+- **Vite**
+- **Tailwind CSS**
+- **Canvas 2D API** for rendering
+- **MediaStream API** for camera access
+- **Lucide** and **React Icons** for iconography
+
+## Browser support
+
+Requires `getUserMedia`, Canvas 2D and ES2020+ support.
+
+| Chrome | Firefox | Safari | Edge |
+| ------ | ------- | ------ | ---- |
+| 90+    | 88+     | 14+    | 90+  |
+
+## Contributing
+
+Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request.
 
 1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+2. Create a feature branch: `git checkout -b feature/short-description`
+3. Commit your changes with a clear message
+4. Push the branch and open a pull request
 
-## ⭐ Show Your Support
+To report a defect or propose a feature, [open an issue](https://github.com/pshycodr/phosphor-cam/issues).
 
-If you found this project helpful, please consider giving it a star! It helps others discover the project.
+## License
 
-[![Star this repo](https://img.shields.io/github/stars/pshycodr/phosphor-cam?style=social)](https://github.com/pshycodr/phosphor-cam)
-
-## 📬 Contact
-
-Have questions or suggestions? Open an issue or reach out!
-
----
-
-<div align="center">
-  Made with ❤️ using React and Canvas API
-  
-  [Report Bug](https://github.com/pshycodr/phosphor-cam/issues) · [Request Feature](https://github.com/pshycodr/phosphor-cam/issues)
-</div>
+Released under the MIT License. See [LICENSE](LICENSE) for details.
