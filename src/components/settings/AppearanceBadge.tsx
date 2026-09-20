@@ -9,13 +9,17 @@ const AppearanceBadge = () => {
   if (colorMode) return <>Live camera color</>;
 
   return (
-    <span className="flex items-center gap-1">
+    <span
+      className="flex items-center gap-1"
+      role="img"
+      aria-label={`Foreground ${color.foreground}, background ${color.background}`}
+    >
       <span
-        className="h-3 w-3 rounded-full border border-green-500/40"
+        className="size-3.5 rounded-full border border-green-500/40"
         style={{ backgroundColor: color.foreground }}
       />
       <span
-        className="h-3 w-3 rounded-full border border-green-500/40"
+        className="size-3.5 rounded-full border border-green-500/40"
         style={{ backgroundColor: color.background }}
       />
     </span>
