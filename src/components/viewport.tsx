@@ -72,17 +72,28 @@ const Viewport = forwardRef<ViewportHandle, ViewportProps>(
     );
 
     return (
-      <div className="fixed inset-0 flex items-center justify-center">
-        <video ref={videoRef} style={{ display: "none" }} playsInline muted />
+      <div className="fixed inset-0 flex items-center justify-center overflow-hidden bg-black">
+        <video
+          ref={videoRef}
+          style={{ display: "none" }}
+          playsInline
+          muted
+          aria-hidden="true"
+        />
+
         <canvas
           ref={canvasRef}
           width={canvasSize.width}
           height={canvasSize.height}
-          className="-z-10 bg-transparent"
+          role="img"
+          aria-label="Live ASCII camera preview"
+          className="-z-10 max-h-full max-w-full bg-transparent"
         />
       </div>
     );
   }
 );
+
+Viewport.displayName = "Viewport";
 
 export default Viewport;
