@@ -7,52 +7,66 @@ interface HeaderProps {
   height: number;
 }
 
-const FPSValue = memo(() => {
+const FPSValue = memo(function FPSValue() {
   const fps = useStatsStore((s) => s.fps);
 
-  return <span className="font-semibold">{Math.floor(fps)}</span>;
+  return <span className="font-semibold tabular-nums">{Math.floor(fps)}</span>;
 });
 
-const RenderTimeValue = memo(() => {
+const RenderTimeValue = memo(function RenderTimeValue() {
   const renderTime = useStatsStore((s) => s.renderTime);
 
-  return <span className="font-semibold">{Math.floor(renderTime)}ms</span>;
+  return (
+    <span className="font-semibold tabular-nums">
+      {Math.floor(renderTime)}ms
+    </span>
+  );
 });
+
+const Divider = () => (
+  <span aria-hidden="true" className="h-3 w-px shrink-0 bg-green-500/40" />
+);
 
 function Header({ width, height }: HeaderProps) {
   return (
-    <div className="fixed top-4 left-4 z-10 flex max-w-[calc(100vw-100px)] flex-col gap-2">
+    <div className="pointer-events-none fixed top-[max(1rem,env(safe-area-inset-top))] left-[max(1rem,env(safe-area-inset-left))] z-10 flex max-w-[calc(100vw-5.5rem)] flex-col items-start gap-2 select-none">
       <div className="flex items-center gap-2 rounded-lg border border-green-500/30 bg-black/40 px-3 py-2 shadow-lg backdrop-blur-sm">
         <img
           src="/assets/logo.webp"
-          alt="Phosphor Cam Logo"
-          className="h-8 w-8 object-contain"
+          alt=""
+          width={32}
+          height={32}
+          draggable={false}
+          className="size-7 object-contain md:size-8"
         />
 
-        <h1 className="text-lg leading-none font-bold tracking-tight text-green-400 md:text-xl">
+        <h1 className="text-base leading-none font-bold tracking-tight whitespace-nowrap text-green-400 sm:text-lg md:text-xl">
           PHOSPHOR CAM
         </h1>
       </div>
 
-      <div className="flex gap-3 rounded-lg border border-green-500/30 bg-black/40 px-3 py-2 font-mono text-[10px] text-green-400 shadow-lg backdrop-blur-sm md:text-xs">
+      <div
+        className="flex flex-wrap items-center gap-x-2.5 gap-y-1 rounded-lg border border-green-500/30 bg-black/40 px-3 py-2 font-mono text-[10px] text-green-400 shadow-lg backdrop-blur-sm sm:gap-x-3 md:text-xs"
+        aria-label="Live stats"
+      >
         <span className="flex items-center gap-1">
-          <span className="opacity-60">FPS:</span>
+          <span className="opacity-60">FPS</span>
           <FPSValue />
         </span>
 
-        <span className="text-green-600">|</span>
+        <Divider />
 
         <span className="flex items-center gap-1">
-          <span className="opacity-60">RENDER:</span>
+          <span className="hidden opacity-60 sm:inline">RENDER</span>
           <RenderTimeValue />
         </span>
 
-        <span className="text-green-600">|</span>
+        <Divider />
 
-        <span className="flex items-center gap-1">
-          <span className="opacity-60">RES:</span>
-          <span className="font-semibold">
-            {width} × {height}
+        <span className="flex items-center gap-1 whitespace-nowrap">
+          <span className="hidden opacity-60 sm:inline">RES</span>
+          <span className="font-semibold tabular-nums">
+            {width}×{height}
           </span>
         </span>
       </div>
