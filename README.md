@@ -30,10 +30,29 @@ Two render engines are available and can be switched at runtime without restarti
 | **ASCII**  | Characters mapped to pixel luminance, optionally tinted with the source color | Text-art portraits, copyable output |
 | **Dither** | Reduced-tone bitmap rendering with a retro, print-like texture                | Stylized stills and video           |
 
+---
+
+## Demo
+
+### ASCII
+
+<div align="center">
+  <img src="public/demo/ascii/ascii-default.png" alt="ASCII engine using the blocks character set in color mode" width="45%">
+  <img src="public/demo/ascii/ascii-blocks.png" alt="ASCII engine using the standard character set" width="45%">
+</div>
+
+### Dither
+
+<div align="center">
+  <img src="public/demo/dither/dither1.png" alt="ASCII engine using the blocks character set in color mode" width="45%">
+  <img src="public/demo/dither/dither-3.png" alt="ASCII engine using the standard character set" width="45%">
+</div>
+
+---
+
 ## Table of contents
 
 - [Features](#features)
-- [Demo](#demo)
 - [Getting started](#getting-started)
 - [Usage](#usage)
 - [Configuration](#configuration)
@@ -68,21 +87,7 @@ Two render engines are available and can be switched at runtime without restarti
 
 - **Performance Monitoring** - Real-time FPS and render time display
 
-## Demo
-
-### ASCII
-
-<div align="center">
-  <img src="public/demo/ascii/ascii-default.png" alt="ASCII engine using the blocks character set in color mode" width="45%">
-  <img src="public/demo/ascii/ascii-blocks.png" alt="ASCII engine using the standard character set" width="45%">
-</div>
-
-### Dither
-
-<div align="center">
-  <img src="public/demo/dither/dither1.png" alt="ASCII engine using the blocks character set in color mode" width="45%">
-  <img src="public/demo/dither/dither-3.png" alt="ASCII engine using the standard character set" width="45%">
-</div>
+---
 
 ## Getting started
 
