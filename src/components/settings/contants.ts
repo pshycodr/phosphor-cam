@@ -1,10 +1,13 @@
 export const SLIDER_CONFIGS = {
-  fontSize: { min: 2, max: 30, step: 1, label: "Resolution" },
+  fontSize: { min: 2, max: 30, step: 1, label: "Character size" },
   contrast: { min: 0.5, max: 3.0, step: 0.1, label: "Contrast" },
   brightness: { min: -100, max: 100, step: 1, label: "Brightness" },
 } as const;
 
-export const RENDER_MODES = [{ key: "ascii", label: "ASCII" }] as const;
+export const RENDER_MODES = [
+  { key: "ascii", label: "ASCII" },
+  { key: "dither", label: "DITHER" },
+] as const;
 
 export const COLOR_PRESETS = [
   { name: "Matrix", foreground: "#00ff00", background: "#000000" },
