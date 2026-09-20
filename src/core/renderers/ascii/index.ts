@@ -2,12 +2,9 @@ import { CHAR_SETS } from "@/constants/characterSets";
 import { type RendererFactory } from "@/types";
 import {
   adjustColor,
-  drawTintedGlyph,
   getBrightnessMap,
   getChar,
   getLuminance,
-  getTintedAtlas,
-  getWhiteAtlas,
 } from "@/utils/asciiUtils";
 
 export const createAsciiRenderer: RendererFactory = (canvas) => {
@@ -26,60 +23,27 @@ export const createAsciiRenderer: RendererFactory = (canvas) => {
 
       ctx.fillStyle = bgColor;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.font = `${cellSize}px 'Fira Code', monospace`;
+      ctx.textBaseline = "top";
 
       const pixelCount = srcW * srcH;
+      for (let i = 0; i < pixelCount; i++) {
+        const r = pixels[i * 4];
+        const g = pixels[i * 4 + 1];
+        const b = pixels[i * 4 + 2];
 
-      if (settings.colorMode) {
-        const whiteAtlas = getWhiteAtlas(ramp, cellSize);
-
-        for (let i = 0; i < pixelCount; i++) {
-          const r = pixels[i * 4];
-          const g = pixels[i * 4 + 1];
-          const b = pixels[i * 4 + 2];
-
-          let l = getLuminance(r, g, b);
-          if (settings.contrast !== 1 || settings.brightness !== 0) {
-            l = adjustColor(l, settings.contrast, settings.brightness);
-          }
-
-          const char = getChar(l, brightnessMap, settings.invert);
-          const x = (i % srcW) * cellSize;
-          const y = Math.floor(i / srcW) * cellSize;
-
-          drawTintedGlyph(ctx, whiteAtlas, char, r, g, b, x, y, cellSize);
+        let l = getLuminance(r, g, b);
+        if (settings.contrast !== 1 || settings.brightness !== 0) {
+          l = adjustColor(l, settings.contrast, settings.brightness);
         }
-      } else {
-        const atlas = getTintedAtlas(ramp, cellSize, fgColor);
 
-        for (let i = 0; i < pixelCount; i++) {
-          const r = pixels[i * 4];
-          const g = pixels[i * 4 + 1];
-          const b = pixels[i * 4 + 2];
+        const char = getChar(l, brightnessMap, settings.invert);
+        const x = (i % srcW) * cellSize;
+        const y = Math.floor(i / srcW) * cellSize;
 
-          let l = getLuminance(r, g, b);
-          if (settings.contrast !== 1 || settings.brightness !== 0) {
-            l = adjustColor(l, settings.contrast, settings.brightness);
-          }
+        ctx.fillStyle = settings.colorMode ? `rgb(${r},${g},${b})` : fgColor;
 
-          const char = getChar(l, brightnessMap, settings.invert);
-          const col = atlas.columnOf.get(char);
-          if (col === undefined) continue;
-
-          const x = (i % srcW) * cellSize;
-          const y = Math.floor(i / srcW) * cellSize;
-
-          ctx.drawImage(
-            atlas.canvas,
-            col * cellSize,
-            0,
-            cellSize,
-            cellSize,
-            x,
-            y,
-            cellSize,
-            cellSize
-          );
-        }
+        ctx.fillText(char, x, y);
       }
     },
 
@@ -92,6 +56,10 @@ export const createAsciiRenderer: RendererFactory = (canvas) => {
       if (charsX <= 0 || charsY <= 0) {
         throw new Error("Invalid capture dimensions");
       }
+
+      const { foreground, background } = settings.color;
+      const bgColor = settings.invert ? foreground : background;
+      const fgColor = settings.invert ? background : foreground;
 
       const analysisCanvas = document.createElement("canvas");
       analysisCanvas.width = charsX;
@@ -107,10 +75,6 @@ export const createAsciiRenderer: RendererFactory = (canvas) => {
       outCanvas.height = charsY * hiResFont;
       const outCtx = outCanvas.getContext("2d", { alpha: false });
       if (!outCtx) throw new Error("Canvas initialization failed");
-
-      const { foreground, background } = settings.color;
-      const bgColor = settings.invert ? foreground : background;
-      const fgColor = settings.invert ? background : foreground;
 
       outCtx.fillStyle = bgColor;
       outCtx.fillRect(0, 0, outCanvas.width, outCanvas.height);
