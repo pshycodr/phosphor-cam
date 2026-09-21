@@ -25,10 +25,11 @@ Phosphor Cam converts a live camera stream into stylized text or dithered bitmap
 
 Two render engines are available and can be switched at runtime without restarting the camera:
 
-| Engine     | Output                                                                        | Typical use                         |
-| ---------- | ----------------------------------------------------------------------------- | ----------------------------------- |
-| **ASCII**  | Characters mapped to pixel luminance, optionally tinted with the source color | Text-art portraits, copyable output |
-| **Dither** | Reduced-tone bitmap rendering with a retro, print-like texture                | Stylized stills and video           |
+| Engine       | Output                                                                        | Typical use                         |
+| ------------ | ----------------------------------------------------------------------------- | ----------------------------------- |
+| **ASCII**    | Characters mapped to pixel luminance, optionally tinted with the source color | Text-art portraits, copyable output |
+| **Dither**   | Reduced-tone bitmap rendering with a retro, print-like texture                | Stylized stills and video           |
+| **Halftone** | Recreates an image as a grid of dots                                          | Stylized stills and video           |
 
 ---
 
@@ -46,6 +47,13 @@ Two render engines are available and can be switched at runtime without restarti
 <div align="center">
   <img src="public/demo/dither/dither1.png" alt="ASCII engine using the blocks character set in color mode" width="45%">
   <img src="public/demo/dither/dither-3.png" alt="ASCII engine using the standard character set" width="45%">
+</div>
+
+### Halftone
+
+<div align="center">
+  <img src="public/demo/halftone//halftone-1.png" alt="ASCII engine using the blocks character set in color mode" width="45%">
+  <img src="public/demo/halftone/halftone-2.png" alt="ASCII engine using the standard character set" width="45%">
 </div>
 
 ---
