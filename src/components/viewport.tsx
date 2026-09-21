@@ -33,7 +33,7 @@ const Viewport = forwardRef<ViewportHandle, ViewportProps>(
       rendererRef.current = RENDERERS[renderMode](canvas);
 
       return () => {
-        rendererRef.current?.destroy?.();
+        // rendererRef.current?.destroy?.();
         rendererRef.current = null;
       };
     }, [renderMode]);
