@@ -9,6 +9,8 @@ import {
 
 import { Check, Copy, RefreshCw } from "lucide-react";
 
+import { useSettingsStore } from "@/store/settingsStore";
+
 type CameraControlsProps = {
   onFlip: () => void;
   onShot: () => void;
@@ -95,6 +97,7 @@ const CameraControls = ({
   const copyTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
     undefined
   );
+  const renderMode = useSettingsStore((s) => s.settings.renderMode);
 
   useEffect(() => () => clearTimeout(copyTimer.current), []);
 
@@ -215,23 +218,25 @@ const CameraControls = ({
           </button>
         )}
 
-        <SideButton
-          ariaLabel="Copy ASCII text"
-          caption={isCopied ? "COPIED" : "COPY"}
-          captionClassName={isCopied ? "text-green-400" : IDLE_LABEL}
-          active={isCopied}
-          onClick={handleCopy}
-        >
-          {isCopied ? (
-            <Check
-              size={22}
-              strokeWidth={2.5}
-              className="animate-in fade-in zoom-in text-green-400 duration-200"
-            />
-          ) : (
-            <Copy size={22} strokeWidth={1.5} className="text-white" />
-          )}
-        </SideButton>
+        {renderMode === "ascii" && (
+          <SideButton
+            ariaLabel="Copy ASCII text"
+            caption={isCopied ? "COPIED" : "COPY"}
+            captionClassName={isCopied ? "text-green-400" : IDLE_LABEL}
+            active={isCopied}
+            onClick={handleCopy}
+          >
+            {isCopied ? (
+              <Check
+                size={22}
+                strokeWidth={2.5}
+                className="animate-in fade-in zoom-in text-green-400 duration-200"
+              />
+            ) : (
+              <Copy size={22} strokeWidth={1.5} className="text-white" />
+            )}
+          </SideButton>
+        )}
       </div>
     </div>
   );
