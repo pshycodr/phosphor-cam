@@ -1,10 +1,10 @@
 import { memo, useCallback, useState } from "react";
 import { LuArrowLeftRight, LuDices } from "react-icons/lu";
 
+import { COLOR_PRESETS } from "@/constants/settings";
 import { useSettingsStore } from "@/store/settingsStore";
 
 import ColorSwitch from "./ColorSwitch";
-import { COLOR_PRESETS } from "./contants";
 import ToggleRow from "./ToggleRow";
 
 /* ----------------------------- random colors ---------------------------- */

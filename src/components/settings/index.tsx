@@ -14,13 +14,13 @@ import {
   LuType,
 } from "react-icons/lu";
 
+import { type SectionId } from "@/constants/settings";
 import { useSettingsStore } from "@/store/settingsStore";
 
 import Accordion from "./Accordion";
 import AppearanceBadge from "./AppearanceBadge";
 import AppearanceMode from "./AppearanceMode";
 import CharacterSet from "./CharacterSet";
-import { type SectionId } from "./contants";
 import RenderMode from "./RenderMode";
 import AdjustmentsContent from "./SliderRow";
 

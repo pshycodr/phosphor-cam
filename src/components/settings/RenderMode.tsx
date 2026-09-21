@@ -1,8 +1,7 @@
 import { memo } from "react";
 
+import { RENDER_MODES } from "@/constants/settings";
 import { useSettingsStore } from "@/store/settingsStore";
-
-import { RENDER_MODES } from "./contants";
 
 const RenderMode = () => {
   const renderMode = useSettingsStore((s) => s.settings.renderMode);

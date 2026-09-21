@@ -1,9 +1,8 @@
 import { memo, useId } from "react";
 
+import { SLIDER_CONFIGS } from "@/constants/settings";
 import { useSettingsStore } from "@/store/settingsStore";
 import type { AsciiSettings } from "@/types";
-
-import { SLIDER_CONFIGS } from "./contants";
 
 export type SliderKey = keyof typeof SLIDER_CONFIGS;
 

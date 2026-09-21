@@ -1,8 +1,9 @@
 import { memo } from "react";
 import { LuChevronDown } from "react-icons/lu";
 
+import type { SectionId } from "@/constants/settings";
+
 import Collapse from "./Collapse";
-import type { SectionId } from "./contants";
 
 interface AccordionSectionProps {
   id: SectionId;
