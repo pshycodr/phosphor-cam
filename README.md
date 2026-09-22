@@ -30,6 +30,7 @@ Two render engines are available and can be switched at runtime without restarti
 | **ASCII**    | Characters mapped to pixel luminance, optionally tinted with the source color | Text-art portraits, copyable output |
 | **Dither**   | Reduced-tone bitmap rendering with a retro, print-like texture                | Stylized stills and video           |
 | **Halftone** | Recreates an image as a grid of dots                                          | Stylized stills and video           |
+| **Voxel**    | Render with pixeled effect and 3D blocks                                      | Stylized stills and video           |
 
 ---
 
@@ -52,8 +53,15 @@ Two render engines are available and can be switched at runtime without restarti
 ### Halftone
 
 <div align="center">
-  <img src="public/demo/halftone//halftone-1.png" alt="ASCII engine using the blocks character set in color mode" width="45%">
+  <img src="public/demo/halftone/halftone-1.png" alt="ASCII engine using the blocks character set in color mode" width="45%">
   <img src="public/demo/halftone/halftone-2.png" alt="ASCII engine using the standard character set" width="45%">
+</div>
+
+### Voxel
+
+<div align="center">
+  <img src="public/demo/voxel/voxel-1.png" alt="ASCII engine using the blocks character set in color mode" width="45%">
+  <img src="public/demo/voxel/voxel-2.png" alt="ASCII engine using the standard character set" width="45%">
 </div>
 
 ---
