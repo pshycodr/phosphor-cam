@@ -31,6 +31,7 @@ Two render engines are available and can be switched at runtime without restarti
 | **Dither**   | Reduced-tone bitmap rendering with a retro, print-like texture                | Stylized stills and video           |
 | **Halftone** | Recreates an image as a grid of dots                                          | Stylized stills and video           |
 | **Voxel**    | Render with pixeled effect and 3D blocks                                      | Stylized stills and video           |
+| **Lines**    | Each row/column is one continuous ribbon                                      | Stylized stills and video           |
 
 ---
 
@@ -62,6 +63,13 @@ Two render engines are available and can be switched at runtime without restarti
 <div align="center">
   <img src="public/demo/voxel/voxel-1.png" alt="ASCII engine using the blocks character set in color mode" width="45%">
   <img src="public/demo/voxel/voxel-2.png" alt="ASCII engine using the standard character set" width="45%">
+</div>
+
+### Lines
+
+<div align="center">
+  <img src="public/demo/lines/lines-1.png" alt="ASCII engine using the blocks character set in color mode" width="45%">
+  <img src="public/demo/lines/lines-2.png" alt="ASCII engine using the standard character set" width="45%">
 </div>
 
 ---
