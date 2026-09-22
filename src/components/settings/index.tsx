@@ -22,6 +22,7 @@ import AppearanceBadge from "./AppearanceBadge";
 import AppearanceMode from "./AppearanceMode";
 import CaptureScale from "./CaptureScale";
 import CharacterSet from "./CharacterSet";
+import LinesDirectionPicker from "./LinesDirectionPicker";
 import RenderMode from "./RenderMode";
 import AdjustmentsContent from "./SliderRow";
 import ToggleRow from "./ToggleRow";
@@ -206,6 +207,8 @@ function Settings() {
                 onChange={toggleVoxel3DMode}
               />
             )}
+
+            {renderMode === "lines" && <LinesDirectionPicker />}
 
             <CaptureScale />
 

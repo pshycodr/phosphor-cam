@@ -1,4 +1,4 @@
-export type RenderMode = "ascii" | "dither" | "halftone" | "voxel";
+export type RenderMode = "ascii" | "dither" | "halftone" | "voxel" | "lines";
 
 export type RenderModeConfig = {
   [T in RenderMode]: {

@@ -11,6 +11,7 @@ export const RENDER_MODES = [
   { key: "dither", label: "DITHER" },
   { key: "halftone", label: "HALFTONE" },
   { key: "voxel", label: "VOXEL" },
+  { key: "lines", label: "LINES" },
 ] satisfies RenderModeConfig[];
 
 export const COLOR_PRESETS = [
