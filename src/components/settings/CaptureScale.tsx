@@ -1,4 +1,4 @@
-import { type ChangeEvent,memo, useCallback, useMemo } from "react";
+import { type ChangeEvent, memo, useCallback, useMemo } from "react";
 import { IoWarningOutline } from "react-icons/io5";
 
 import { useSettingsStore } from "@/store/settingsStore";
