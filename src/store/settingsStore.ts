@@ -17,6 +17,7 @@ const DEFAULT_SETTINGS: AsciiSettings = {
   },
   voxel3d: true,
   captureScale: 4,
+  lineDirection: "horizontal",
 };
 
 interface SettingsStore {
