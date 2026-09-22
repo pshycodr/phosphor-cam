@@ -10,6 +10,7 @@ export const RENDER_MODES = [
   { key: "ascii", label: "ASCII" },
   { key: "dither", label: "DITHER" },
   { key: "halftone", label: "HALFTONE" },
+  { key: "voxel", label: "VOXEL" },
 ] satisfies RenderModeConfig[];
 
 export const COLOR_PRESETS = [
