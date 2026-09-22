@@ -1,6 +1,7 @@
 import type { RenderMode } from "./settings";
 
 export interface AsciiSettings {
+  voxel3d: boolean;
   resolution: number;
   fontSize: number;
   contrast: number;

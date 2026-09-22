@@ -15,6 +15,7 @@ const DEFAULT_SETTINGS: AsciiSettings = {
     foreground: "#00ff00",
     background: "#000000",
   },
+  voxel3d: true,
 };
 
 interface SettingsStore {

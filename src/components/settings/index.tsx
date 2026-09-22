@@ -23,6 +23,7 @@ import AppearanceMode from "./AppearanceMode";
 import CharacterSet from "./CharacterSet";
 import RenderMode from "./RenderMode";
 import AdjustmentsContent from "./SliderRow";
+import ToggleRow from "./ToggleRow";
 
 // Character set badge
 const CharacterSetBadge = memo(() => {
@@ -82,9 +83,19 @@ function Settings() {
   );
 
   const renderMode = useSettingsStore((s) => s.settings.renderMode);
+  const voxel3D = useSettingsStore((s) => s.settings.voxel3d);
+  const updateSettings = useSettingsStore((s) => s.updateSettings);
 
   const fabRef = useRef<HTMLButtonElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
+
+  const toggleVoxel3DMode = useCallback(
+    () =>
+      updateSettings({
+        voxel3d: !useSettingsStore.getState().settings.voxel3d,
+      }),
+    [updateSettings]
+  );
 
   const open = useCallback(() => {
     setIsOpen(true);
@@ -186,6 +197,15 @@ function Settings() {
             isOpen={openSection === "adjustments"}
             onToggle={toggleSection}
           >
+            {renderMode === "voxel" && (
+              <ToggleRow
+                label="Voxel 3D Mode"
+                description=""
+                checked={voxel3D}
+                onChange={toggleVoxel3DMode}
+              />
+            )}
+
             <AdjustmentsContent />
           </Accordion>
 
