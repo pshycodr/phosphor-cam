@@ -14,6 +14,7 @@ export interface AsciiSettings {
     foreground: string;
     background: string;
   };
+  captureScale: number;
 }
 
 export interface AsciiCharacterMap {

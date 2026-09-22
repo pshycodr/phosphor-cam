@@ -20,6 +20,7 @@ import { useSettingsStore } from "@/store/settingsStore";
 import Accordion from "./Accordion";
 import AppearanceBadge from "./AppearanceBadge";
 import AppearanceMode from "./AppearanceMode";
+import CaptureScale from "./CaptureScale";
 import CharacterSet from "./CharacterSet";
 import RenderMode from "./RenderMode";
 import AdjustmentsContent from "./SliderRow";
@@ -205,6 +206,8 @@ function Settings() {
                 onChange={toggleVoxel3DMode}
               />
             )}
+
+            <CaptureScale />
 
             <AdjustmentsContent />
           </Accordion>

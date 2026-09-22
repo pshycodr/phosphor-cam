@@ -161,7 +161,7 @@ export const createDitherRenderer: RendererFactory = (canvas) => {
     },
 
     captureImage(frame, settings, outputSize) {
-      const scaleFactor = 4;
+      const scaleFactor = settings.captureScale;
       const blockSize = settings.fontSize;
 
       const gridW = Math.floor(outputSize.width / blockSize);

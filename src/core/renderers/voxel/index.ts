@@ -204,7 +204,7 @@ export const createVoxelRenderer: RendererFactory = (canvas) => {
     },
 
     captureImage(frame, settings, outputSize) {
-      const scaleFactor = 15;
+      const scaleFactor = settings.captureScale;
       const cellSize = settings.fontSize * scaleFactor;
       const gridW = Math.floor(outputSize.width / settings.fontSize);
       const gridH = Math.floor(outputSize.height / settings.fontSize);

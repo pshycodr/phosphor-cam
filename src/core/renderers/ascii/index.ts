@@ -48,7 +48,7 @@ export const createAsciiRenderer: RendererFactory = (canvas) => {
     },
 
     captureImage(frame, settings, outputSize) {
-      const scaleFactor = 4;
+      const scaleFactor = settings.captureScale;
       const fontSize = settings.fontSize;
 
       const charsX = Math.floor(outputSize.width / fontSize);
