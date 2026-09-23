@@ -56,5 +56,7 @@ export const getChar = (
  * Converts RGB to Grayscale Luminance
  */
 export const getLuminance = (r: number, g: number, b: number): number => {
-  return 0.299 * r + 0.587 * g + 0.114 * b;
+  const GLYPH_GAMMA = 0.72;
+  const l = 0.299 * r + 0.587 * g + 0.114 * b;
+  return 255 * Math.pow(Math.max(0, Math.min(255, l)) / 255, GLYPH_GAMMA);
 };
