@@ -227,8 +227,8 @@ function Settings() {
             isOpen={openSection === "capture"}
             onToggle={toggleSection}
           >
-            <CaptureScale />
             <Codec />
+            <CaptureScale />
           </Accordion>
 
           <Accordion
