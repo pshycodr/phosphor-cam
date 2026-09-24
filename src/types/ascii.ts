@@ -1,4 +1,12 @@
+import type { EffectKey } from "./effects";
 import type { RenderMode } from "./settings";
+
+export interface EffectProps {
+  enabled: boolean;
+  intensity: number;
+}
+
+export type EffectsSettings = Record<EffectKey, EffectProps>;
 
 export type Codecs = "png" | "jpeg" | "webp";
 
@@ -18,6 +26,7 @@ export interface AsciiSettings {
   };
   captureScale: number;
   lineDirection: "horizontal" | "vertical";
+  effects: EffectsSettings;
   captureCodec: Codecs;
 }
 
