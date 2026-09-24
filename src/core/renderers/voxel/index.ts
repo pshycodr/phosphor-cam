@@ -205,6 +205,7 @@ export const createVoxelRenderer: RendererFactory = (canvas) => {
 
     captureImage(frame, settings, outputSize) {
       const scaleFactor = settings.captureScale;
+      const codec = settings.captureCodec;
       const cellSize = settings.fontSize * scaleFactor;
       const gridW = Math.floor(outputSize.width / settings.fontSize);
       const gridH = Math.floor(outputSize.height / settings.fontSize);
@@ -268,7 +269,7 @@ export const createVoxelRenderer: RendererFactory = (canvas) => {
         tempCtx.drawImage(lowCanvas, 0, 0, gridW, gridH, 0, 0, width, height);
       }
 
-      return tempCanvas.toDataURL("image/png");
+      return tempCanvas.toDataURL(`image/${codec}`);
     },
   };
 };

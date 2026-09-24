@@ -50,6 +50,7 @@ export const createAsciiRenderer: RendererFactory = (canvas) => {
     captureImage(frame, settings, outputSize) {
       const scaleFactor = settings.captureScale;
       const fontSize = settings.fontSize;
+      const codec = settings.captureCodec;
 
       const charsX = Math.floor(outputSize.width / fontSize);
       const charsY = Math.floor(outputSize.height / fontSize);
@@ -101,7 +102,7 @@ export const createAsciiRenderer: RendererFactory = (canvas) => {
         outCtx.fillText(char, x, y);
       }
 
-      return outCanvas.toDataURL("image/png");
+      return outCanvas.toDataURL(`image/${codec}`);
     },
 
     getAsciiText(frame, settings) {

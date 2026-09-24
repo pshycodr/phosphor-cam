@@ -18,6 +18,7 @@ const DEFAULT_SETTINGS: AsciiSettings = {
   voxel3d: true,
   captureScale: 4,
   lineDirection: "horizontal",
+  captureCodec: "png",
 };
 
 interface SettingsStore {
@@ -27,6 +28,7 @@ interface SettingsStore {
 
 export const useSettingsStore = create<SettingsStore>((set) => ({
   settings: DEFAULT_SETTINGS,
+
   updateSettings: (patch) =>
     set((state) => ({ settings: { ...state.settings, ...patch } })),
 }));

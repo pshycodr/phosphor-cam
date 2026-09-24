@@ -163,6 +163,7 @@ export const createDitherRenderer: RendererFactory = (canvas) => {
     captureImage(frame, settings, outputSize) {
       const scaleFactor = settings.captureScale;
       const blockSize = settings.fontSize;
+      const codec = settings.captureCodec;
 
       const gridW = Math.floor(outputSize.width / blockSize);
       const gridH = Math.floor(outputSize.height / blockSize);
@@ -270,7 +271,7 @@ export const createDitherRenderer: RendererFactory = (canvas) => {
         }
       }
 
-      return tempCanvas.toDataURL("image/png");
+      return tempCanvas.toDataURL(`image/${codec}`);
     },
   };
 };

@@ -115,6 +115,7 @@ export const createHalftoneRenderer: RendererFactory = (canvas) => {
 
     captureImage(frame, settings, outputSize) {
       const scaleFactor = settings.captureScale;
+      const codec = settings.captureCodec;
       const gridW = Math.floor(outputSize.width / settings.fontSize);
       const gridH = Math.floor(outputSize.height / settings.fontSize);
       if (gridW <= 0 || gridH <= 0) {
@@ -195,7 +196,7 @@ export const createHalftoneRenderer: RendererFactory = (canvas) => {
         }
       }
 
-      return outCanvas.toDataURL("image/png");
+      return outCanvas.toDataURL(`image/${codec}`);
     },
   };
 };

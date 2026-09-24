@@ -8,6 +8,7 @@ import {
 } from "react";
 import { IoClose } from "react-icons/io5";
 import {
+  LuCamera,
   LuPalette,
   LuSettings2,
   LuSlidersHorizontal,
@@ -22,6 +23,7 @@ import AppearanceBadge from "./AppearanceBadge";
 import AppearanceMode from "./AppearanceMode";
 import CaptureScale from "./CaptureScale";
 import CharacterSet from "./CharacterSet";
+import Codec from "./Codec";
 import LinesDirectionPicker from "./LinesDirectionPicker";
 import RenderMode from "./RenderMode";
 import AdjustmentsContent from "./SliderRow";
@@ -31,6 +33,17 @@ import ToggleRow from "./ToggleRow";
 const CharacterSetBadge = memo(() => {
   const characterSet = useSettingsStore((s) => s.settings.characterSet);
   return <span className="capitalize">{characterSet}</span>;
+});
+
+const CaptureBadge = memo(() => {
+  const codec = useSettingsStore((s) => s.settings.captureCodec);
+  const scale = useSettingsStore((s) => s.settings.captureScale);
+
+  return (
+    <span>
+      {scale}X, {codec}
+    </span>
+  );
 });
 
 // Adjustments badge
@@ -192,6 +205,18 @@ function Settings() {
           <RenderMode />
 
           <Accordion
+            id="capture"
+            icon={<LuCamera size={16} />}
+            title="Capture"
+            badge={<CaptureBadge />}
+            isOpen={openSection === "capture"}
+            onToggle={toggleSection}
+          >
+            <CaptureScale />
+            <Codec />
+          </Accordion>
+
+          <Accordion
             id="adjustments"
             icon={<LuSlidersHorizontal size={16} />}
             title="Adjustments"
@@ -209,8 +234,6 @@ function Settings() {
             )}
 
             {renderMode === "lines" && <LinesDirectionPicker />}
-
-            <CaptureScale />
 
             <AdjustmentsContent />
           </Accordion>

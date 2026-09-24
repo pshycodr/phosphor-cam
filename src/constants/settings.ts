@@ -23,4 +23,8 @@ export const COLOR_PRESETS = [
   { name: "Blood", foreground: "#ff1a1a", background: "#0a0000" },
 ] as const satisfies readonly ColorPreset[];
 
-export type SectionId = "adjustments" | "characterSet" | "appearance";
+export type SectionId =
+  | "adjustments"
+  | "characterSet"
+  | "appearance"
+  | "capture";

@@ -161,6 +161,7 @@ export const createLinesRenderer: RendererFactory = (canvas) => {
 
     captureImage(frame, settings, outputSize) {
       const scaleFactor = 4;
+      const codec = settings.captureCodec;
       const cellSize = settings.fontSize * scaleFactor;
       const gridW = Math.floor(outputSize.width / settings.fontSize);
       const gridH = Math.floor(outputSize.height / settings.fontSize);
@@ -184,7 +185,7 @@ export const createLinesRenderer: RendererFactory = (canvas) => {
 
       drawScanlines(tempCtx, pixels, gridW, gridH, cellSize, settings);
 
-      return tempCanvas.toDataURL("image/png");
+      return tempCanvas.toDataURL(`image/${codec}`);
     },
   };
 };
