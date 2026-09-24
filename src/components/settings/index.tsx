@@ -12,6 +12,7 @@ import {
   LuPalette,
   LuSettings2,
   LuSlidersHorizontal,
+  LuSparkles,
   LuType,
 } from "react-icons/lu";
 
@@ -24,6 +25,7 @@ import AppearanceMode from "./AppearanceMode";
 import CaptureScale from "./CaptureScale";
 import CharacterSet from "./CharacterSet";
 import Codec from "./Codec";
+import EffectsPanel from "./EffectsPanel";
 import LinesDirectionPicker from "./LinesDirectionPicker";
 import RenderMode from "./RenderMode";
 import AdjustmentsContent from "./SliderRow";
@@ -50,6 +52,19 @@ const CaptureBadge = memo(() => {
 const AdjustmentsBadge = memo(() => {
   const fontSize = useSettingsStore((s) => s.settings.fontSize);
   return <>{fontSize}px</>;
+});
+
+// Effects badge
+const EffectsBadge = memo(() => {
+  const effects = useSettingsStore((s) => s.settings.effects);
+
+  const activeCount = Object.values(effects).filter(
+    (effect) => effect.enabled
+  ).length;
+
+  const totalCount = Object.keys(effects).length;
+
+  return <>{activeCount > 0 ? `${activeCount}/${totalCount} active` : "Off"}</>;
 });
 
 const CLOSE_DRAG_PX = 80;
@@ -236,6 +251,17 @@ function Settings() {
             {renderMode === "lines" && <LinesDirectionPicker />}
 
             <AdjustmentsContent />
+          </Accordion>
+
+          <Accordion
+            id="effects"
+            icon={<LuSparkles size={16} />}
+            title="Effects"
+            badge={<EffectsBadge />}
+            isOpen={openSection === "effects"}
+            onToggle={toggleSection}
+          >
+            <EffectsPanel />
           </Accordion>
 
           {renderMode === "ascii" && (

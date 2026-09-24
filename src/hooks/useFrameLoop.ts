@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 
 import { downsampleFrame } from "@/core/pipeline/downsample";
+import { runEffectPipeline } from "@/core/pipeline/effects";
 import { useSettingsStore } from "@/store/settingsStore";
 import { useStatsStore } from "@/store/statsStore";
 import type { FrameSource, RendererInstance } from "@/types";
@@ -56,6 +57,8 @@ export function useFrameLoop({
       if (!ctx) return;
 
       renderer.render(imageData, ctx, settings, cellSize);
+
+      runEffectPipeline(canvas, ctx, settings);
 
       const renderTime = performance.now() - start;
 

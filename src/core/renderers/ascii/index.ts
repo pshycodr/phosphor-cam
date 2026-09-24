@@ -1,4 +1,5 @@
 import { CHAR_SETS } from "@/constants/characterSets";
+import { runEffectPipeline } from "@/core/pipeline/effects";
 import { type RendererFactory } from "@/types";
 import {
   adjustColor,
@@ -101,6 +102,8 @@ export const createAsciiRenderer: RendererFactory = (canvas) => {
 
         outCtx.fillText(char, x, y);
       }
+
+      runEffectPipeline(outCanvas, outCtx, settings);
 
       return outCanvas.toDataURL(`image/${codec}`);
     },

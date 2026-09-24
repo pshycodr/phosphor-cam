@@ -1,3 +1,4 @@
+import { runEffectPipeline } from "@/core/pipeline/effects";
 import type { AsciiSettings, RendererFactory } from "@/types";
 import {
   adjustPixel,
@@ -223,15 +224,15 @@ export const createVoxelRenderer: RendererFactory = (canvas) => {
 
       const width = gridW * cellSize;
       const height = gridH * cellSize;
-      const tempCanvas = document.createElement("canvas");
-      tempCanvas.width = width;
-      tempCanvas.height = height;
-      const tempCtx = tempCanvas.getContext("2d", { alpha: false });
-      if (!tempCtx) throw new Error("Canvas init failed");
+      const outCanvas = document.createElement("canvas");
+      outCanvas.width = width;
+      outCanvas.height = height;
+      const outCtx = outCanvas.getContext("2d", { alpha: false });
+      if (!outCtx) throw new Error("Canvas init failed");
 
       if (settings.voxel3d) {
         render3D(
-          tempCtx,
+          outCtx,
           pixels,
           gridW,
           gridH,
@@ -265,11 +266,12 @@ export const createVoxelRenderer: RendererFactory = (canvas) => {
         );
         lowCtx.putImageData(imgData, 0, 0);
 
-        tempCtx.imageSmoothingEnabled = false;
-        tempCtx.drawImage(lowCanvas, 0, 0, gridW, gridH, 0, 0, width, height);
+        outCtx.imageSmoothingEnabled = false;
+        outCtx.drawImage(lowCanvas, 0, 0, gridW, gridH, 0, 0, width, height);
       }
+      runEffectPipeline(outCanvas, outCtx, settings);
 
-      return tempCanvas.toDataURL(`image/${codec}`);
+      return outCanvas.toDataURL(`image/${codec}`);
     },
   };
 };

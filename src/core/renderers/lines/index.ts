@@ -1,3 +1,4 @@
+import { runEffectPipeline } from "@/core/pipeline/effects";
 import type { AsciiSettings, RendererFactory } from "@/types";
 import { sample, traceSmoothPath } from "@/utils/liensutils";
 
@@ -177,15 +178,17 @@ export const createLinesRenderer: RendererFactory = (canvas) => {
       analysisCtx.drawImage(frame, 0, 0, gridW, gridH);
       const pixels = analysisCtx.getImageData(0, 0, gridW, gridH).data;
 
-      const tempCanvas = document.createElement("canvas");
-      tempCanvas.width = gridW * cellSize;
-      tempCanvas.height = gridH * cellSize;
-      const tempCtx = tempCanvas.getContext("2d", { alpha: false });
-      if (!tempCtx) throw new Error("Canvas init failed");
+      const outCanvas = document.createElement("canvas");
+      outCanvas.width = gridW * cellSize;
+      outCanvas.height = gridH * cellSize;
+      const outCtx = outCanvas.getContext("2d", { alpha: false });
+      if (!outCtx) throw new Error("Canvas init failed");
 
-      drawScanlines(tempCtx, pixels, gridW, gridH, cellSize, settings);
+      drawScanlines(outCtx, pixels, gridW, gridH, cellSize, settings);
 
-      return tempCanvas.toDataURL(`image/${codec}`);
+      runEffectPipeline(outCanvas, outCtx, settings);
+
+      return outCanvas.toDataURL(`image/${codec}`);
     },
   };
 };

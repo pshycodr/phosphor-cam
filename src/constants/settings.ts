@@ -27,4 +27,5 @@ export type SectionId =
   | "adjustments"
   | "characterSet"
   | "appearance"
+  | "effects"
   | "capture";

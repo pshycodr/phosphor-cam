@@ -1,3 +1,4 @@
+import { runEffectPipeline } from "@/core/pipeline/effects";
 import { type RendererFactory } from "@/types";
 import { adjustColor, getLuminance } from "@/utils/asciiUtils";
 import {
@@ -177,11 +178,11 @@ export const createDitherRenderer: RendererFactory = (canvas) => {
         blockSize: blockSize * scaleFactor,
       };
 
-      const tempCanvas = document.createElement("canvas");
-      tempCanvas.width = imageSpecs.width;
-      tempCanvas.height = imageSpecs.height;
-      const tempCtx = tempCanvas.getContext("2d", { alpha: false });
-      if (!tempCtx) throw new Error("Canvas initialization failed");
+      const outCanvas = document.createElement("canvas");
+      outCanvas.width = imageSpecs.width;
+      outCanvas.height = imageSpecs.height;
+      const outCtx = outCanvas.getContext("2d", { alpha: false });
+      if (!outCtx) throw new Error("Canvas initialization failed");
 
       const analysisCanvas = document.createElement("canvas");
       analysisCanvas.width = gridW;
@@ -196,8 +197,8 @@ export const createDitherRenderer: RendererFactory = (canvas) => {
       const bgColor = settings.invert ? foreground : background;
       const fgColor = settings.invert ? background : foreground;
 
-      tempCtx.fillStyle = bgColor;
-      tempCtx.fillRect(0, 0, imageSpecs.width, imageSpecs.height);
+      outCtx.fillStyle = bgColor;
+      outCtx.fillRect(0, 0, imageSpecs.width, imageSpecs.height);
 
       const cellCount = gridW * gridH;
       const bs = imageSpecs.blockSize;
@@ -244,8 +245,8 @@ export const createDitherRenderer: RendererFactory = (canvas) => {
             g = 255 - g;
             b = 255 - b;
           }
-          tempCtx.fillStyle = getRgbString(packRgb(r, g, b));
-          tempCtx.fillRect(xPos, yPos, bs, bs);
+          outCtx.fillStyle = getRgbString(packRgb(r, g, b));
+          outCtx.fillRect(xPos, yPos, bs, bs);
         }
       } else {
         const lumBuf = new Float32Array(cellCount);
@@ -266,12 +267,14 @@ export const createDitherRenderer: RendererFactory = (canvas) => {
           const xPos = (i % gridW) * bs;
           const yPos = Math.floor(i / gridW) * bs;
           const on = out[i] === 255;
-          tempCtx.fillStyle = on ? fgColor : bgColor;
-          tempCtx.fillRect(xPos, yPos, bs, bs);
+          outCtx.fillStyle = on ? fgColor : bgColor;
+          outCtx.fillRect(xPos, yPos, bs, bs);
         }
       }
 
-      return tempCanvas.toDataURL(`image/${codec}`);
+      runEffectPipeline(outCanvas, outCtx, settings);
+
+      return outCanvas.toDataURL(`image/${codec}`);
     },
   };
 };

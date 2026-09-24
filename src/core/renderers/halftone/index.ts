@@ -1,3 +1,4 @@
+import { runEffectPipeline } from "@/core/pipeline/effects";
 import type { RendererFactory } from "@/types";
 import {
   blitSprite,
@@ -195,6 +196,8 @@ export const createHalftoneRenderer: RendererFactory = (canvas) => {
           }
         }
       }
+
+      runEffectPipeline(outCanvas, outCtx, settings);
 
       return outCanvas.toDataURL(`image/${codec}`);
     },
