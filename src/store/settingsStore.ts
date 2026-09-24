@@ -11,7 +11,6 @@ const EFFECT_DEFAULTS: EffectsSettings = {
   glow: { enabled: false, intensity: 0.5 },
   bloom: { enabled: false, intensity: 0.6 },
   halation: { enabled: false, intensity: 0.5 },
-  blur: { enabled: false, intensity: 0.4 },
   chromaticAberration: { enabled: false, intensity: 0.4 },
   vignette: { enabled: false, intensity: 0.5 },
   scanlines: { enabled: false, intensity: 0.5 },
