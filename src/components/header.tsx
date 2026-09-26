@@ -32,7 +32,7 @@ function Header({ width, height }: HeaderProps) {
     <div className="pointer-events-none fixed top-[max(1rem,env(safe-area-inset-top))] left-[max(1rem,env(safe-area-inset-left))] z-10 flex max-w-[calc(100vw-5.5rem)] flex-col items-start gap-2 select-none">
       <div className="flex items-center gap-2 rounded-lg border border-green-500/30 bg-black/40 px-3 py-2 shadow-lg backdrop-blur-sm">
         <img
-          src="/assets/logo.webp"
+          src="/assets/logo.png"
           alt=""
           width={32}
           height={32}
