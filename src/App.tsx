@@ -8,6 +8,7 @@ import type { CameraFacingMode } from "@/types";
 
 import Viewport, { type ViewportHandle } from "./components/viewport";
 import { getSupportedMediaRecorderMimeType } from "./utils/mediaRecorder";
+import { saveImage } from "./utils/saveImage";
 
 function App() {
   const [stream, setStream] = useState<MediaStream | null>(null);
@@ -83,12 +84,8 @@ function App() {
 
     try {
       const imageUrl = await viewportRef.current.captureImage();
-      const a = document.createElement("a");
-      a.href = imageUrl;
-      a.download = `ascii-capture-${Date.now()}.png`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+      const fileName = `ascii-capture-${Date.now()}.png`;
+      await saveImage(imageUrl, fileName);
     } catch (err) {
       console.error("Capture failed", err);
       setError("Capture isn't supported for this render mode yet.");
