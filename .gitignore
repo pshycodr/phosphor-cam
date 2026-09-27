@@ -25,3 +25,5 @@ dist-ssr
 
 .env
 archive
+*.jks
+*.keystore

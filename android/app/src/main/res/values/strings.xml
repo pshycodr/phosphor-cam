@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">phosphor-cam</string>
+    <string name="title_activity_main">phosphor-cam</string>
+    <string name="package_name">site.aroy.phosphor</string>
+    <string name="custom_url_scheme">site.aroy.phosphor</string>
+</resources>

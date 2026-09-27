@@ -6,6 +6,11 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "android:dev": "adb reverse tcp:5173 tcp:5173 && CAPACITOR_DEV_SERVER_URL=http://localhost:5173 bunx cap run android",
+    "android:sync": "bun run build && bunx cap sync android",
+    "android:run": "bun run android:sync && bunx cap run android",
+    "android:open": "bunx cap open android",
+    "android:release": "bun run android:sync && cd android && sh ./release-apk.sh",
     "start": "vite start",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
@@ -26,6 +31,11 @@
     ]
   },
   "dependencies": {
+    "@capacitor/android": "^8.5.2",
+    "@capacitor/core": "^8.5.2",
+    "@capacitor/filesystem": "^8.1.3",
+    "@capacitor/splash-screen": "^8.0.2",
+    "@capacitor/status-bar": "^8.0.3",
     "@tailwindcss/vite": "^4.2.2",
     "lucide-react": "^1.8.0",
     "react": "^19.2.5",
@@ -35,9 +45,11 @@
     "zustand": "^5.0.15"
   },
   "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^8.5.2",
     "@eslint/js": "^10.0.1",
     "@eslint/markdown": "^8.0.1",
-    "@types/node": "^25.6.0",
+    "@types/node": "^26.6.3",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
