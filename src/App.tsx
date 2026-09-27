@@ -9,6 +9,7 @@ import type { CameraFacingMode } from "@/types";
 import Viewport, { type ViewportHandle } from "./components/viewport";
 import { getSupportedMediaRecorderMimeType } from "./utils/mediaRecorder";
 import { saveImage } from "./utils/saveImage";
+import { saveVideo } from "./utils/saveVideo";
 
 function App() {
   const [stream, setStream] = useState<MediaStream | null>(null);
@@ -143,18 +144,23 @@ function App() {
         if (e.data.size > 0) recordedChunksRef.current.push(e.data);
       };
 
-      recorder.onstop = () => {
-        const blob = new Blob(recordedChunksRef.current, {
-          type: "video/webm",
-        });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `ascii-video-${Date.now()}.webm`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        setRecordingTime(0);
+      recorder.onstop = async () => {
+        try {
+          const blob = new Blob(recordedChunksRef.current, {
+            type: mimeType,
+          });
+
+          const extension = mimeType.includes("mp4") ? "mp4" : "webm";
+
+          const fileName = `ascii-video-${Date.now()}.${extension}`;
+
+          await saveVideo(blob, fileName);
+
+          setRecordingTime(0);
+        } catch (err) {
+          console.error("Failed to save recording:", err);
+          setError("Failed to save recording.");
+        }
       };
 
       recorder.start();
