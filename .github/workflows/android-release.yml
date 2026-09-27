@@ -51,6 +51,9 @@ jobs:
         run: |
           echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android/phosphor-cam-release.jks
 
+      - name: Make gradlew executable
+        run: chmod +x android/gradlew
+        
       - name: Build signed APK
         env:
           ANDROID_KEYSTORE_FILE: ${{ github.workspace }}/android/phosphor-cam-release.jks
