@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "android:dev": "adb reverse tcp:5173 tcp:5173 && CAPACITOR_DEV_SERVER_URL=http://localhost:5173 bunx cap run android",
     "android:sync": "bun run build && bunx cap sync android",
     "android:run": "bun run android:sync && bunx cap run android",
     "android:open": "bunx cap open android",

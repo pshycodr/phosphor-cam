@@ -1,5 +1,11 @@
 import type { CapacitorConfig } from "@capacitor/cli";
 
+declare const process: {
+  env: Record<string, string | undefined>;
+};
+
+const devServerUrl = process.env.CAPACITOR_DEV_SERVER_URL;
+
 const config: CapacitorConfig = {
   appId: "site.aroy.phosphorcam",
   appName: "Phosphor Cam",
@@ -16,6 +22,15 @@ const config: CapacitorConfig = {
       splashImmersive: true,
     },
   },
+
+  ...(devServerUrl
+    ? {
+        server: {
+          url: devServerUrl,
+          cleartext: true,
+        },
+      }
+    : {}),
 };
 
 export default config;
