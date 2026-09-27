@@ -14,7 +14,14 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![CI](https://github.com/pshycodr/phosphor-cam/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/pshycodr/phosphor-cam/actions/workflows/ci.yml?query=branch%3Amain)
+[![Android Release](https://img.shields.io/github/v/release/pshycodr/phosphor-cam?label=Android&logo=android&logoColor=white&color=3DDC84)](https://github.com/pshycodr/phosphor-cam/releases/latest)
 
+</div>
+
+<div align="center">
+  <a href="https://github.com/pshycodr/phosphor-cam/releases/latest">
+    <img src="https://img.shields.io/badge/Download-Latest%20APK-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Download latest APK">
+  </a>
 </div>
 
 ---
@@ -23,7 +30,7 @@
 
 Phosphor Cam converts a live camera stream into stylized text or dithered bitmap graphics on an HTML canvas. It runs entirely client-side: frames are read from the `MediaStream`, processed and drawn locally, and are never uploaded.
 
-Two render engines are available and can be switched at runtime without restarting the camera:
+Five render engines are available and can be switched at runtime without restarting the camera:
 
 | Engine       | Output                                                                        | Typical use                         |
 | ------------ | ----------------------------------------------------------------------------- | ----------------------------------- |
@@ -32,6 +39,24 @@ Two render engines are available and can be switched at runtime without restarti
 | **Halftone** | Recreates an image as a grid of dots                                          | Stylized stills and video           |
 | **Voxel**    | Render with pixeled effect and 3D blocks                                      | Stylized stills and video           |
 | **Lines**    | Each row/column is one continuous ribbon                                      | Stylized stills and video           |
+
+---
+
+## Get the app
+
+Phosphor Cam is available as a web app, a PWA, and a native Android app. The Android build ships from the same codebase, runs fully offline, and is signed and published automatically on every release.
+
+<div align="center">
+  <a href="https://github.com/pshycodr/phosphor-cam/releases/latest">
+    <img src="https://img.shields.io/badge/Download-Latest%20APK-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Download latest APK">
+  </a>
+</div>
+
+The link above always points to the latest release. Grab the `.apk` from the Assets section and install it directly — no Play Store, no account, no internet required after install.
+
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/2a65e638-02ca-4e85-801d-8f720e254a6a" alt="Phosphor Cam Android app" width="70%">
+</div>
 
 ---
 
@@ -76,11 +101,11 @@ Two render engines are available and can be switched at runtime without restarti
 
 ## Table of contents
 
+- [Get the app](#get-the-app)
 - [Features](#features)
 - [Getting started](#getting-started)
 - [Usage](#usage)
 - [Configuration](#configuration)
-- [Architecture](#architecture)
 - [Tech stack](#tech-stack)
 - [Browser support](#browser-support)
 - [Contributing](#contributing)
@@ -89,7 +114,7 @@ Two render engines are available and can be switched at runtime without restarti
 ## Features
 
 - **Real-Time Rendering**
-  - Two interchangeable render engines: ASCII and Dither
+  - Five interchangeable render engines: ASCII, Dither, Halftone, Voxel and Lines
   - Real-time processing with a target of 60 FPS on modern hardware
   - Live FPS, render time and output resolution readout
   - Five ASCII character sets: standard, simple, blocks, matrix and edges
@@ -109,7 +134,9 @@ Two render engines are available and can be switched at runtime without restarti
   - High-quality snapshot export
   - ASCII text copy to clipboard
 
-- **Performance Monitoring** - Real-time FPS and render time display
+- **Performance Monitoring** — Real-time FPS and render time display
+
+- **Android app** — Native, offline-first Android build, signed and published with every release
 
 ---
 
@@ -147,7 +174,7 @@ npm run preview
 ## Usage
 
 1. **Allow camera access** when the browser prompts.
-2. **Select a render engine** (ASCII or Dither) in the settings panel.
+2. **Select a render engine** (ASCII, Dither, Halftone, Voxel or Lines) in the settings panel.
 3. **Tune the image** under Adjustments and Appearance. Changes apply to the live feed immediately.
 4. **Capture** a frame with the shutter button, or copy it as text with the copy button.
 5. **Switch cameras** with the flip button.
@@ -158,7 +185,7 @@ The settings panel appears as a bottom sheet on phones (swipe down or tap outsid
 
 | Setting                   | Range / options                         | Engine |
 | ------------------------- | --------------------------------------- | ------ |
-| Render engine             | ASCII, Dither                           | All    |
+| Render engine             | ASCII, Dither, Halftone, Voxel, Lines   | All    |
 | Character size            | 2 to 30 px                              | All    |
 | Contrast                  | 0.5x to 3.0x                            | All    |
 | Brightness                | -100 to +100                            | All    |
@@ -169,23 +196,6 @@ The settings panel appears as a bottom sheet on phones (swipe down or tap outsid
 
 Character size controls how large each output cell is: larger values produce fewer, coarser cells, and smaller values produce finer detail at a higher processing cost.
 
-## Architecture
-
-Rendering is decoupled from the UI. Each engine implements a common renderer interface and is registered by render mode, so adding an engine does not require changes to the frame loop or the interface.
-
-```
-src/
-├── components/     UI: viewport, camera controls, header, settings panel
-├── core/
-│   └── renderers/  Render engines and the registry that maps mode to engine
-├── hooks/          Camera source and frame loop
-├── store/          Settings and performance stats
-├── constants/      Character sets
-└── types/          Shared types
-```
-
-Frame flow: the camera stream is read through `useCameraSource`, `useFrameLoop` schedules each frame, and the active renderer from the registry draws it to the canvas. Settings are read from the store on every frame, so changes take effect without recreating the renderer.
-
 ## Tech stack
 
 - **React** and **TypeScript**
@@ -193,6 +203,7 @@ Frame flow: the camera stream is read through `useCameraSource`, `useFrameLoop` 
 - **Tailwind CSS**
 - **Canvas 2D API** for rendering
 - **MediaStream API** for camera access
+- **Capacitor** for the Android build
 - **Lucide** and **React Icons** for iconography
 
 ## Browser support
