@@ -2,7 +2,7 @@ export function downsampleFrame(
   frame: CanvasImageSource,
   targetWidth: number,
   targetHeight: number,
-  scratch: HTMLCanvasElement
+  scratch: OffscreenCanvas
 ): ImageData | null {
   if (targetWidth <= 0 || targetHeight <= 0) return null;
 

@@ -93,10 +93,10 @@ function App() {
     }
   }, []);
 
-  const copyToClipboard = useCallback(() => {
+  const copyToClipboard = useCallback(async () => {
     if (!viewportRef.current) return;
     try {
-      const copyContent = viewportRef.current.getAsciiText();
+      const copyContent = await viewportRef.current.getAsciiText();
       if (!copyContent) throw new Error();
       navigator.clipboard.writeText(copyContent).then(() => {
         setClipboardSuccess(true);

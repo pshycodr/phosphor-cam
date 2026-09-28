@@ -1,14 +1,13 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 
-import { RENDERERS } from "@/core/renderers/registry";
 import { useCameraSource } from "@/hooks/useCameraSource";
-import { useFrameLoop } from "@/hooks/useFrameLoop";
 import { useSettingsStore } from "@/store/settingsStore";
-import type { RendererInstance } from "@/types";
+import { useStatsStore } from "@/store/statsStore";
+import { RenderWorkerController } from "@/worker/Renderworkercontroller";
 
 export interface ViewportHandle {
   captureImage: () => Promise<string>;
-  getAsciiText: () => string;
+  getAsciiText: () => Promise<string>;
   getCanvas: () => HTMLCanvasElement | null;
 }
 
@@ -19,26 +18,79 @@ interface ViewportProps {
 
 const Viewport = forwardRef<ViewportHandle, ViewportProps>(
   ({ stream, canvasSize }, ref) => {
-    const canvasRef = useRef<HTMLCanvasElement>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
     const videoRef = useRef<HTMLVideoElement>(null);
-    const rendererRef = useRef<RendererInstance | null>(null);
+    const canvasRef = useRef<HTMLCanvasElement | null>(null);
+    const controllerRef = useRef<RenderWorkerController | null>(null);
 
-    const renderMode = useSettingsStore((s) => s.settings.renderMode);
     const source = useCameraSource(stream, videoRef);
 
-    useEffect(() => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
+    const sourceRef = useRef(source);
 
-      rendererRef.current = RENDERERS[renderMode](canvas);
+    const sizeRef = useRef(canvasSize);
+    useEffect(() => {
+      sourceRef.current = source;
+    }, [source]);
+
+    useEffect(() => {
+      sizeRef.current = canvasSize;
+    }, [canvasSize]);
+
+    useEffect(() => {
+      const container = containerRef.current;
+
+      if (!container) return;
+
+      const canvas = document.createElement("canvas");
+      canvas.width = sizeRef.current.width;
+      canvas.height = sizeRef.current.height;
+      canvas.className = "-z-10 max-h-full max-w-full bg-transparent";
+      canvas.setAttribute("role", "img");
+      canvas.setAttribute("aria-label", "Live ASCII camera preview");
+      container.appendChild(canvas);
+      canvasRef.current = canvas;
+
+      const controller = new RenderWorkerController(canvas, {
+        onStats: (s) => useStatsStore.getState().setStats(s),
+      });
+      controllerRef.current = controller;
+
+      controller.resize(sizeRef.current.width, sizeRef.current.height);
+      controller.setSettings(useSettingsStore.getState().settings);
+      const unsubscribe = useSettingsStore.subscribe((state) => {
+        controller.setSettings(state.settings);
+      });
 
       return () => {
-        // rendererRef.current?.destroy?.();
-        rendererRef.current = null;
+        unsubscribe();
+        controller.destroy();
+        controllerRef.current = null;
+        canvas.remove();
+        canvasRef.current = null;
       };
-    }, [renderMode]);
+    }, [canvasSize]);
 
-    useFrameLoop({ canvasRef, rendererRef, source, canvasSize });
+    useEffect(() => {
+      controllerRef.current?.resize(canvasSize.width, canvasSize.height);
+    }, [canvasSize.width, canvasSize.height]);
+
+    useEffect(() => {
+      let raf = 0;
+      const tick = () => {
+        raf = requestAnimationFrame(tick);
+
+        const controller = controllerRef.current;
+        const src = sourceRef.current;
+
+        if (!controller || !src.isReady()) return;
+
+        const frame = src.getFrame();
+
+        if (frame) controller.sendFrame(frame);
+      };
+      raf = requestAnimationFrame(tick);
+      return () => cancelAnimationFrame(raf);
+    }, [source]);
 
     useImperativeHandle(
       ref,
@@ -46,29 +98,21 @@ const Viewport = forwardRef<ViewportHandle, ViewportProps>(
         getCanvas: () => canvasRef.current,
 
         captureImage: async () => {
-          const renderer = rendererRef.current;
-          const frame = source.getFrame();
-          if (!renderer?.captureImage || !frame) {
-            throw new Error("Capture not supported for this renderer");
-          }
-          return renderer.captureImage(
-            frame,
-            useSettingsStore.getState().settings,
-            canvasSize
-          );
+          const controller = controllerRef.current;
+          const frame = sourceRef.current.getFrame();
+          if (!controller || !frame)
+            throw new Error("Capture not available yet");
+          return controller.captureImage(frame, sizeRef.current);
         },
 
-        getAsciiText: () => {
-          const renderer = rendererRef.current;
-          const frame = source.getFrame();
-          if (!renderer?.getAsciiText || !frame) return "";
-          return renderer.getAsciiText(
-            frame,
-            useSettingsStore.getState().settings
-          );
+        getAsciiText: async () => {
+          const controller = controllerRef.current;
+          const frame = sourceRef.current.getFrame();
+          if (!controller || !frame) return "";
+          return controller.getAsciiText(frame);
         },
       }),
-      [source, canvasSize]
+      []
     );
 
     return (
@@ -80,15 +124,8 @@ const Viewport = forwardRef<ViewportHandle, ViewportProps>(
           muted
           aria-hidden="true"
         />
-
-        <canvas
-          ref={canvasRef}
-          width={canvasSize.width}
-          height={canvasSize.height}
-          role="img"
-          aria-label="Live ASCII camera preview"
-          className="-z-10 max-h-full max-w-full bg-transparent"
-        />
+        {/* Canvas is injected by the effect above */}
+        <div ref={containerRef} className="contents" />
       </div>
     );
   }
