@@ -1,0 +1,10 @@
+First Android release.
+
+- Native Android app, fully offline
+- Five render styles: ASCII, dither, halftone, lines and voxel
+- Video recording of the rendered output
+- Save captured images
+- Copy ASCII art to the clipboard
+- Firefox and Safari support
+- PWA support
+- Refactored rendering pipeline and state management

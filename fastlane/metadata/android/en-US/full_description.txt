@@ -1,0 +1,27 @@
+Phosphor Cam turns your live camera feed into ASCII art, dithering, halftone, lines and voxel visuals, in real time and entirely on your device.
+
+Point your camera at anything, pick a style, and watch the world get redrawn as text, dots, ribbons or pixel blocks. Switch styles on the fly without restarting the camera, and fine-tune the look until it feels right.
+
+<b>Five visual styles</b><br/>
+- ASCII: characters mapped to brightness, optionally tinted with the original colors<br/>
+- Dither: a retro, print-like bitmap look<br/>
+- Halftone: your image rebuilt as a grid of dots<br/>
+- Voxel: chunky pixels with a 3D block effect<br/>
+- Lines: every row drawn as one continuous ribbon
+
+<b>Make it yours</b><br/>
+- Several ASCII character sets, including blocks, matrix and edges<br/>
+- Adjustable cell size, contrast and brightness<br/>
+- Color mode, invert, and custom foreground and background colors<br/>
+- Live FPS and render time readout
+
+<b>Capture and share</b><br/>
+- Save high-resolution images of what you see<br/>
+- Record video of the rendered output<br/>
+- Copy the current ASCII art to your clipboard as text<br/>
+- Switch between front and back cameras
+
+<b>Private and offline</b><br/>
+Everything runs locally. Your camera feed is never uploaded, and the app needs no account, no server and no internet connection. It contains no ads and no trackers.
+
+Phosphor Cam is free and open source under the MIT license.
