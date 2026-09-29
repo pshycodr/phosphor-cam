@@ -10,8 +10,8 @@ import { applyVignette } from "./vignette";
 export interface EffectPipelineEntry {
   key: EffectKey;
   apply: (
-    canvas: HTMLCanvasElement,
-    ctx: CanvasRenderingContext2D,
+    canvas: OffscreenCanvas,
+    ctx: OffscreenCanvasRenderingContext2D,
     intensity: number
   ) => void;
 }
@@ -27,8 +27,8 @@ export const EFFECT_PIPELINE: EffectPipelineEntry[] = [
 ];
 
 export function runEffectPipeline(
-  canvas: HTMLCanvasElement,
-  ctx: CanvasRenderingContext2D,
+  canvas: OffscreenCanvas,
+  ctx: OffscreenCanvasRenderingContext2D,
   settings: AsciiSettings
 ): void {
   for (const { key, apply } of EFFECT_PIPELINE) {

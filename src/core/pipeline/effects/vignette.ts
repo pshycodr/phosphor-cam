@@ -1,7 +1,7 @@
 let vignetteCache: { key: string; gradient: CanvasGradient } | null = null;
 
 function getVignetteGradient(
-  ctx: CanvasRenderingContext2D,
+  ctx: OffscreenCanvasRenderingContext2D,
   w: number,
   h: number,
   strength: number
@@ -28,8 +28,8 @@ function getVignetteGradient(
 }
 
 export function applyVignette(
-  canvas: HTMLCanvasElement,
-  ctx: CanvasRenderingContext2D,
+  canvas: OffscreenCanvas,
+  ctx: OffscreenCanvasRenderingContext2D,
   intensity = 0.5
 ) {
   const strength = 0.15 + intensity * 0.55;

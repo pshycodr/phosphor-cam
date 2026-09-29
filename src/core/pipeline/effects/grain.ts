@@ -1,15 +1,13 @@
 const GRAIN_TILE_COUNT = 4;
 const GRAIN_TILE_SIZE = 128;
 
-let grainTiles: HTMLCanvasElement[] | null = null;
+let grainTiles: OffscreenCanvas[] | null = null;
 let grainFrame = 0;
 
-function buildGrainTiles(): HTMLCanvasElement[] {
-  const tiles: HTMLCanvasElement[] = [];
+function buildGrainTiles(): OffscreenCanvas[] {
+  const tiles: OffscreenCanvas[] = [];
   for (let t = 0; t < GRAIN_TILE_COUNT; t++) {
-    const tile = document.createElement("canvas");
-    tile.width = GRAIN_TILE_SIZE;
-    tile.height = GRAIN_TILE_SIZE;
+    const tile = new OffscreenCanvas(GRAIN_TILE_SIZE, GRAIN_TILE_SIZE);
     const tctx = tile.getContext("2d");
     if (tctx) {
       const img = tctx.createImageData(GRAIN_TILE_SIZE, GRAIN_TILE_SIZE);
@@ -28,8 +26,8 @@ function buildGrainTiles(): HTMLCanvasElement[] {
 }
 
 export function applyGrain(
-  canvas: HTMLCanvasElement,
-  ctx: CanvasRenderingContext2D,
+  canvas: OffscreenCanvas,
+  ctx: OffscreenCanvasRenderingContext2D,
   intensity = 0.4
 ) {
   if (!grainTiles) grainTiles = buildGrainTiles();
