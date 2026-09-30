@@ -1,4 +1,4 @@
-import { runEffectPipeline } from "@/core/pipeline/effects";
+import { runEffectPipeline } from "@/core/pipeline/effects"; // must be worker-safe
 import { type RendererFactory } from "@/types";
 import { adjustColor, getLuminance } from "@/utils/asciiUtils";
 import {
@@ -13,10 +13,6 @@ import {
 /**
  * Floyd-Steinberg Error-Diffusion Dithering
  *
- * Floyd-Steinberg dithering is an error-diffusion algorithm that converts
- * grayscale or color images into a limited set of output colors, commonly
- * black and white, while preserving the perceived brightness of the image.
- *
  * For each pixel, the algorithm:
  *
  * 1. Quantizes the current pixel to the nearest available output value.
@@ -27,16 +23,13 @@ import {
  *        Current   7/16 →
  *        3/16      5/16      1/16
  *
- * The distributed error modifies pixels that have not been processed yet.
- * This causes later pixels to compensate for errors introduced by earlier
- * quantization decisions.
+ * The distributed error modifies pixels that have not been processed yet,
+ * so later pixels compensate for earlier quantization decisions. The result
+ * uses only the available output values, but the spatial distribution of
+ * pixels creates the perception of intermediate shades.
  *
- * The result uses only the available output values, but the spatial
- * distribution of pixels creates the perception of intermediate shades.
- *
- * Floyd-Steinberg dithering is widely used for reducing color depth and
- * producing visually smoother images when the target output has fewer
- * available colors.
+ * WORKER-SAFE VERSION: runs on the main thread or inside the render worker.
+ * Changes vs. the original are marked "CHANGED".
  */
 export const createDitherRenderer: RendererFactory = (canvas) => {
   // Reusable buffers to avoid per-frame allocations
@@ -54,7 +47,8 @@ export const createDitherRenderer: RendererFactory = (canvas) => {
   let imageDataW = 0;
   let imageDataH = 0;
 
-  const scratch = document.createElement("canvas");
+  const scratch = new OffscreenCanvas(1, 1);
+  const scratchCtx = scratch.getContext("2d", { alpha: false });
 
   return {
     render(imageDataIn, ctx, settings, cellSize) {
@@ -151,7 +145,6 @@ export const createDitherRenderer: RendererFactory = (canvas) => {
         scratch.width = srcW;
         scratch.height = srcH;
       }
-      const scratchCtx = scratch.getContext("2d", { alpha: false });
       if (!scratchCtx) return;
       scratchCtx.putImageData(imageData, 0, 0);
 
@@ -161,7 +154,7 @@ export const createDitherRenderer: RendererFactory = (canvas) => {
       ctx.imageSmoothingEnabled = true;
     },
 
-    captureImage(frame, settings, outputSize) {
+    async captureImage(frame, settings, outputSize) {
       const scaleFactor = settings.captureScale;
       const blockSize = settings.fontSize;
       const codec = settings.captureCodec;
@@ -178,16 +171,17 @@ export const createDitherRenderer: RendererFactory = (canvas) => {
         blockSize: blockSize * scaleFactor,
       };
 
-      const outCanvas = document.createElement("canvas");
-      outCanvas.width = imageSpecs.width;
-      outCanvas.height = imageSpecs.height;
+      const outCanvas = new OffscreenCanvas(
+        imageSpecs.width,
+        imageSpecs.height
+      );
       const outCtx = outCanvas.getContext("2d", { alpha: false });
       if (!outCtx) throw new Error("Canvas initialization failed");
 
-      const analysisCanvas = document.createElement("canvas");
-      analysisCanvas.width = gridW;
-      analysisCanvas.height = gridH;
-      const analysisCtx = analysisCanvas.getContext("2d");
+      const analysisCanvas = new OffscreenCanvas(gridW, gridH);
+      const analysisCtx = analysisCanvas.getContext("2d", {
+        willReadFrequently: true,
+      });
       if (!analysisCtx) throw new Error("Canvas initialization failed");
 
       analysisCtx.drawImage(frame, 0, 0, gridW, gridH);
@@ -274,7 +268,7 @@ export const createDitherRenderer: RendererFactory = (canvas) => {
 
       runEffectPipeline(outCanvas, outCtx, settings);
 
-      return outCanvas.toDataURL(`image/${codec}`);
+      return outCanvas.convertToBlob({ type: `image/${codec}` });
     },
   };
 };
