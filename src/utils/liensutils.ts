@@ -1,7 +1,9 @@
+import type { Ctx2D } from "@/types";
+
 import { adjustColor } from "./asciiUtils";
 
 export const traceSmoothPath = (
-  ctx: CanvasRenderingContext2D,
+  ctx: Ctx2D,
   xs: number[],
   ys: number[],
   startNew: boolean
