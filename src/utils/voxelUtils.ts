@@ -1,3 +1,4 @@
+import type { Ctx2D } from "@/types";
 import { adjustColor } from "@/utils/asciiUtils";
 import { hexToRgb } from "@/utils/ditherUtils";
 
@@ -67,7 +68,7 @@ export type Palette = {
 };
 
 export type Atlas = {
-  canvas: HTMLCanvasElement;
+  canvas: OffscreenCanvas;
   sprite: number;
   count: number;
 };
@@ -167,7 +168,7 @@ export function adjustPixel(
 
 /** Paints one isometric-ish cube sprite (top/right/bottom faces + outline). */
 export function paintCube(
-  ctx: CanvasRenderingContext2D,
+  ctx: Ctx2D,
   x: number,
   y: number,
   size: number,
@@ -217,9 +218,7 @@ export function buildAtlas(
 ): Atlas {
   const sprite = Math.max(4, Math.round(size));
   const count = colors.length;
-  const canvas = document.createElement("canvas");
-  canvas.width = count * sprite;
-  canvas.height = sprite;
+  const canvas = new OffscreenCanvas(count * sprite, sprite);
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("voxel: atlas ctx");
   for (let c = 0; c < count; c++) {

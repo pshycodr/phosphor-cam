@@ -1,5 +1,5 @@
 import { runEffectPipeline } from "@/core/pipeline/effects";
-import type { AsciiSettings, RendererFactory } from "@/types";
+import type { AsciiSettings, Ctx2D, RendererFactory } from "@/types";
 import {
   adjustPixel,
   type Atlas,
@@ -81,11 +81,11 @@ export const createVoxelRenderer: RendererFactory = (canvas) => {
   let imageData: ImageData | null = null;
   let imageDataW = 0;
   let imageDataH = 0;
-  const scratch = document.createElement("canvas");
+  const scratch = new OffscreenCanvas(1, 1);
 
   /** Shared 3D-path drawing, used by both render() and captureImage(). */
   const render3D = (
-    ctx: CanvasRenderingContext2D,
+    ctx: Ctx2D,
     pixels: Uint8ClampedArray,
     srcW: number,
     srcH: number,
@@ -204,7 +204,7 @@ export const createVoxelRenderer: RendererFactory = (canvas) => {
       ctx.imageSmoothingEnabled = true;
     },
 
-    captureImage(frame, settings, outputSize) {
+    async captureImage(frame, settings, outputSize) {
       const scaleFactor = settings.captureScale;
       const codec = settings.captureCodec;
       const cellSize = settings.fontSize * scaleFactor;
@@ -214,19 +214,17 @@ export const createVoxelRenderer: RendererFactory = (canvas) => {
         throw new Error("Invalid capture dimensions");
       }
 
-      const analysisCanvas = document.createElement("canvas");
-      analysisCanvas.width = gridW;
-      analysisCanvas.height = gridH;
-      const analysisCtx = analysisCanvas.getContext("2d");
+      const analysisCanvas = new OffscreenCanvas(gridW, gridH);
+      const analysisCtx = analysisCanvas.getContext("2d", {
+        willReadFrequently: true,
+      });
       if (!analysisCtx) throw new Error("Canvas init failed");
       analysisCtx.drawImage(frame, 0, 0, gridW, gridH);
       const pixels = analysisCtx.getImageData(0, 0, gridW, gridH).data;
 
       const width = gridW * cellSize;
       const height = gridH * cellSize;
-      const outCanvas = document.createElement("canvas");
-      outCanvas.width = width;
-      outCanvas.height = height;
+      const outCanvas = new OffscreenCanvas(width, height);
       const outCtx = outCanvas.getContext("2d", { alpha: false });
       if (!outCtx) throw new Error("Canvas init failed");
 
@@ -241,9 +239,7 @@ export const createVoxelRenderer: RendererFactory = (canvas) => {
           settings.color.background
         );
       } else {
-        const lowCanvas = document.createElement("canvas");
-        lowCanvas.width = gridW;
-        lowCanvas.height = gridH;
+        const lowCanvas = new OffscreenCanvas(gridW, gridH);
         const lowCtx = lowCanvas.getContext("2d");
         if (!lowCtx) throw new Error("Canvas init failed");
 
@@ -271,7 +267,7 @@ export const createVoxelRenderer: RendererFactory = (canvas) => {
       }
       runEffectPipeline(outCanvas, outCtx, settings);
 
-      return outCanvas.toDataURL(`image/${codec}`);
+      return outCanvas.convertToBlob({ type: `image/${codec}` });
     },
   };
 };
