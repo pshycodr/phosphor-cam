@@ -1,10 +1,10 @@
-let blurCopyScratch: HTMLCanvasElement | null = null;
+let blurCopyScratch: OffscreenCanvas | null = null;
 
 function getBlurCopyScratch(
   w: number,
   h: number
-): CanvasRenderingContext2D | null {
-  if (!blurCopyScratch) blurCopyScratch = document.createElement("canvas");
+): OffscreenCanvasRenderingContext2D | null {
+  if (!blurCopyScratch) blurCopyScratch = new OffscreenCanvas(w, h);
   if (blurCopyScratch.width !== w || blurCopyScratch.height !== h) {
     blurCopyScratch.width = w;
     blurCopyScratch.height = h;
@@ -15,8 +15,8 @@ function getBlurCopyScratch(
 /** Uniform softening across the whole frame - unlike glow/bloom, this
  *  replaces the frame rather than adding light on top of it. */
 export function applyBlur(
-  canvas: HTMLCanvasElement,
-  ctx: CanvasRenderingContext2D,
+  canvas: OffscreenCanvas,
+  ctx: OffscreenCanvasRenderingContext2D,
   intensity = 0.5
 ) {
   const radius = intensity * 10;
@@ -34,6 +34,6 @@ export function applyBlur(
   ctx.filter = `blur(${radius}px)`;
   ctx.globalCompositeOperation = "source-over";
   ctx.globalAlpha = 1;
-  ctx.drawImage(blurCopyScratch as HTMLCanvasElement, 0, 0);
+  ctx.drawImage(blurCopyScratch as OffscreenCanvas, 0, 0);
   ctx.restore();
 }

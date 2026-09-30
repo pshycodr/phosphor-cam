@@ -8,7 +8,7 @@ import globals from "globals";
 import tseslint from "typescript-eslint";
 
 export default defineConfig([
-  globalIgnores(["dist", "archive"]),
+  globalIgnores(["dist", "archive", "android"]),
   {
     files: ["**/*.{ts,tsx}"],
     plugins: {

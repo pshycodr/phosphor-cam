@@ -1,10 +1,13 @@
 import type { GlowPassOptions } from "@/types";
 
-let prepScratch: HTMLCanvasElement | null = null;
-let blurScratch: HTMLCanvasElement | null = null;
+let prepScratch: OffscreenCanvas | null = null;
+let blurScratch: OffscreenCanvas | null = null;
 
-function getPrepScratch(w: number, h: number): CanvasRenderingContext2D | null {
-  if (!prepScratch) prepScratch = document.createElement("canvas");
+function getPrepScratch(
+  w: number,
+  h: number
+): OffscreenCanvasRenderingContext2D | null {
+  if (!prepScratch) prepScratch = new OffscreenCanvas(w, h);
   if (prepScratch.width !== w || prepScratch.height !== h) {
     prepScratch.width = w;
     prepScratch.height = h;
@@ -12,8 +15,11 @@ function getPrepScratch(w: number, h: number): CanvasRenderingContext2D | null {
   return prepScratch.getContext("2d");
 }
 
-function getBlurScratch(w: number, h: number): CanvasRenderingContext2D | null {
-  if (!blurScratch) blurScratch = document.createElement("canvas");
+function getBlurScratch(
+  w: number,
+  h: number
+): OffscreenCanvasRenderingContext2D | null {
+  if (!blurScratch) blurScratch = new OffscreenCanvas(w, h);
   if (blurScratch.width !== w || blurScratch.height !== h) {
     blurScratch.width = w;
     blurScratch.height = h;
@@ -22,8 +28,8 @@ function getBlurScratch(w: number, h: number): CanvasRenderingContext2D | null {
 }
 
 function applyGlowPass(
-  canvas: HTMLCanvasElement,
-  ctx: CanvasRenderingContext2D,
+  canvas: OffscreenCanvas,
+  ctx: OffscreenCanvasRenderingContext2D,
   {
     blur,
     strength,
@@ -61,14 +67,14 @@ function applyGlowPass(
   sctx.filter = "none";
   sctx.globalCompositeOperation = "source-over";
   sctx.globalAlpha = 1;
-  sctx.drawImage(prepScratch as HTMLCanvasElement, 0, 0, w, h);
+  sctx.drawImage(prepScratch as OffscreenCanvas, 0, 0, w, h);
 
   ctx.save();
   ctx.filter = `blur(${blur}px)`;
   ctx.globalCompositeOperation = "lighter";
   ctx.globalAlpha = strength;
   ctx.drawImage(
-    blurScratch as HTMLCanvasElement,
+    blurScratch as OffscreenCanvas,
     0,
     0,
     canvas.width,
@@ -78,8 +84,8 @@ function applyGlowPass(
 }
 
 export function applyGlow(
-  canvas: HTMLCanvasElement,
-  ctx: CanvasRenderingContext2D,
+  canvas: OffscreenCanvas,
+  ctx: OffscreenCanvasRenderingContext2D,
   intensity = 0.5
 ) {
   applyGlowPass(canvas, ctx, {
@@ -91,8 +97,8 @@ export function applyGlow(
 }
 
 export function applyBloom(
-  canvas: HTMLCanvasElement,
-  ctx: CanvasRenderingContext2D,
+  canvas: OffscreenCanvas,
+  ctx: OffscreenCanvasRenderingContext2D,
   intensity = 0.6
 ) {
   applyGlowPass(canvas, ctx, {
@@ -106,8 +112,8 @@ export function applyBloom(
 
 /** simulates film halation around highlights. */
 export function applyHalation(
-  canvas: HTMLCanvasElement,
-  ctx: CanvasRenderingContext2D,
+  canvas: OffscreenCanvas,
+  ctx: OffscreenCanvasRenderingContext2D,
   intensity = 0.5,
   tint = "rgb(255, 90, 40)"
 ) {

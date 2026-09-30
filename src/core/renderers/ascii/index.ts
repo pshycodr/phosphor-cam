@@ -1,5 +1,5 @@
 import { CHAR_SETS } from "@/constants/characterSets";
-import { runEffectPipeline } from "@/core/pipeline/effects";
+import { runEffectPipeline } from "@/core/pipeline/effects"; // must be worker-safe
 import { type RendererFactory } from "@/types";
 import {
   adjustColor,
@@ -43,12 +43,11 @@ export const createAsciiRenderer: RendererFactory = (canvas) => {
         const y = Math.floor(i / srcW) * cellSize;
 
         ctx.fillStyle = settings.colorMode ? `rgb(${r},${g},${b})` : fgColor;
-
         ctx.fillText(char, x, y);
       }
     },
 
-    captureImage(frame, settings, outputSize) {
+    async captureImage(frame, settings, outputSize) {
       const scaleFactor = settings.captureScale;
       const fontSize = settings.fontSize;
       const codec = settings.captureCodec;
@@ -63,18 +62,19 @@ export const createAsciiRenderer: RendererFactory = (canvas) => {
       const bgColor = settings.invert ? foreground : background;
       const fgColor = settings.invert ? background : foreground;
 
-      const analysisCanvas = document.createElement("canvas");
-      analysisCanvas.width = charsX;
-      analysisCanvas.height = charsY;
-      const analysisCtx = analysisCanvas.getContext("2d");
+      const analysisCanvas = new OffscreenCanvas(charsX, charsY);
+      const analysisCtx = analysisCanvas.getContext("2d", {
+        willReadFrequently: true,
+      });
       if (!analysisCtx) throw new Error("Canvas initialization failed");
       analysisCtx.drawImage(frame, 0, 0, charsX, charsY);
       const { data: pixels } = analysisCtx.getImageData(0, 0, charsX, charsY);
 
       const hiResFont = fontSize * scaleFactor;
-      const outCanvas = document.createElement("canvas");
-      outCanvas.width = charsX * hiResFont;
-      outCanvas.height = charsY * hiResFont;
+      const outCanvas = new OffscreenCanvas(
+        charsX * hiResFont,
+        charsY * hiResFont
+      );
       const outCtx = outCanvas.getContext("2d", { alpha: false });
       if (!outCtx) throw new Error("Canvas initialization failed");
 
@@ -99,13 +99,12 @@ export const createAsciiRenderer: RendererFactory = (canvas) => {
         const y = Math.floor(i / charsX) * hiResFont;
 
         outCtx.fillStyle = settings.colorMode ? `rgb(${r},${g},${b})` : fgColor;
-
         outCtx.fillText(char, x, y);
       }
 
       runEffectPipeline(outCanvas, outCtx, settings);
 
-      return outCanvas.toDataURL(`image/${codec}`);
+      return outCanvas.convertToBlob({ type: `image/${codec}` });
     },
 
     getAsciiText(frame, settings) {
@@ -128,10 +127,8 @@ export const createAsciiRenderer: RendererFactory = (canvas) => {
         Math.floor(standardWidth * aspectRatio * 0.55)
       );
 
-      const tempCanvas = document.createElement("canvas");
-      tempCanvas.width = standardWidth;
-      tempCanvas.height = standardHeight;
-      const tempCtx = tempCanvas.getContext("2d");
+      const tempCanvas = new OffscreenCanvas(standardWidth, standardHeight);
+      const tempCtx = tempCanvas.getContext("2d", { willReadFrequently: true });
       if (!tempCtx) return "";
 
       tempCtx.drawImage(frame, 0, 0, standardWidth, standardHeight);

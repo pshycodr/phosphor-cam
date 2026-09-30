@@ -107,7 +107,7 @@ const CameraControls = ({
     onFlip();
   }, [onFlip]);
 
-  const handleCopy = useCallback(() => {
+  const handleCopy = useCallback(async () => {
     setIsCopied(true);
     onCopy();
     clearTimeout(copyTimer.current);

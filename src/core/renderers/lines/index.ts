@@ -1,5 +1,5 @@
 import { runEffectPipeline } from "@/core/pipeline/effects";
-import type { AsciiSettings, RendererFactory } from "@/types";
+import type { AsciiSettings, Ctx2D, RendererFactory } from "@/types";
 import { sample, traceSmoothPath } from "@/utils/liensutils";
 
 /**
@@ -12,7 +12,7 @@ import { sample, traceSmoothPath } from "@/utils/liensutils";
  */
 export const createLinesRenderer: RendererFactory = (canvas) => {
   const drawScanlines = (
-    ctx: CanvasRenderingContext2D,
+    ctx: Ctx2D,
     pixels: Uint8ClampedArray,
     gridW: number,
     gridH: number,
@@ -160,7 +160,7 @@ export const createLinesRenderer: RendererFactory = (canvas) => {
       drawScanlines(ctx, pixels, srcW, srcH, cellSize, settings);
     },
 
-    captureImage(frame, settings, outputSize) {
+    async captureImage(frame, settings, outputSize) {
       const scaleFactor = 4;
       const codec = settings.captureCodec;
       const cellSize = settings.fontSize * scaleFactor;
@@ -170,17 +170,15 @@ export const createLinesRenderer: RendererFactory = (canvas) => {
         throw new Error("Invalid capture dimensions");
       }
 
-      const analysisCanvas = document.createElement("canvas");
-      analysisCanvas.width = gridW;
-      analysisCanvas.height = gridH;
-      const analysisCtx = analysisCanvas.getContext("2d");
+      const analysisCanvas = new OffscreenCanvas(gridW, gridH);
+      const analysisCtx = analysisCanvas.getContext("2d", {
+        willReadFrequently: true,
+      });
       if (!analysisCtx) throw new Error("Canvas init failed");
       analysisCtx.drawImage(frame, 0, 0, gridW, gridH);
       const pixels = analysisCtx.getImageData(0, 0, gridW, gridH).data;
 
-      const outCanvas = document.createElement("canvas");
-      outCanvas.width = gridW * cellSize;
-      outCanvas.height = gridH * cellSize;
+      const outCanvas = new OffscreenCanvas(gridW * cellSize, gridH * cellSize);
       const outCtx = outCanvas.getContext("2d", { alpha: false });
       if (!outCtx) throw new Error("Canvas init failed");
 
@@ -188,7 +186,7 @@ export const createLinesRenderer: RendererFactory = (canvas) => {
 
       runEffectPipeline(outCanvas, outCtx, settings);
 
-      return outCanvas.toDataURL(`image/${codec}`);
+      return outCanvas.convertToBlob({ type: `image/${codec}` });
     },
   };
 };

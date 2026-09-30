@@ -1,14 +1,9 @@
-import type { SpriteAtlas } from "@/types";
+import type { Ctx2D, SpriteAtlas } from "@/types";
 
 import { adjustColor, getLuminance } from "./asciiUtils";
 
 /** Draws one white dot: solid core with a short fade at the edge. */
-export function paintDot(
-  ctx: CanvasRenderingContext2D,
-  cx: number,
-  cy: number,
-  radius: number
-) {
+export function paintDot(ctx: Ctx2D, cx: number, cy: number, radius: number) {
   const g = ctx.createRadialGradient(cx, cy, radius * 0.6, cx, cy, radius);
   g.addColorStop(0, "rgba(255,255,255,1)");
   g.addColorStop(0.75, "rgba(255,255,255,1)");
@@ -33,9 +28,7 @@ export function buildWhiteAtlas(cell: number, DOT_LEVELS: number): SpriteAtlas {
   );
   const center = spriteSize / 2;
 
-  const canvas = document.createElement("canvas");
-  canvas.width = spriteSize * DOT_LEVELS;
-  canvas.height = spriteSize;
+  const canvas = new OffscreenCanvas(spriteSize * DOT_LEVELS, spriteSize);
 
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("halftone: atlas ctx");
@@ -63,9 +56,7 @@ export function tintAtlasSolid(
   source: SpriteAtlas,
   color: string
 ): SpriteAtlas {
-  const canvas = document.createElement("canvas");
-  canvas.width = source.canvas.width;
-  canvas.height = source.canvas.height;
+  const canvas = new OffscreenCanvas(source.canvas.width, source.canvas.height);
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("halftone: tint ctx");
 
@@ -146,12 +137,12 @@ export const getColorString = (
 };
 
 // Scratch canvas for colorMode, resized only when sprite size changes.
-const tintCanvas = document.createElement("canvas");
+const tintCanvas = new OffscreenCanvas(1, 1);
 const tintCtx = tintCanvas.getContext("2d");
 
 /** Fast path: copies an already-correctly-colored sprite, offset by padding. */
 export const blitSprite = (
-  ctx: CanvasRenderingContext2D,
+  ctx: Ctx2D,
   atlas: SpriteAtlas,
   level: number,
   dx: number,
@@ -175,7 +166,7 @@ export const blitSprite = (
 
 /** Slow path: copies white sprite to scratch, tints it, then draws it. */
 export const blitTintedSprite = (
-  ctx: CanvasRenderingContext2D,
+  ctx: Ctx2D,
   whiteAtlas: SpriteAtlas,
   level: number,
   dx: number,
