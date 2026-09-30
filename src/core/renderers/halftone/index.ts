@@ -114,7 +114,7 @@ export const createHalftoneRenderer: RendererFactory = (canvas) => {
       }
     },
 
-    captureImage(frame, settings, outputSize) {
+    async captureImage(frame, settings, outputSize) {
       const scaleFactor = settings.captureScale;
       const codec = settings.captureCodec;
       const gridW = Math.floor(outputSize.width / settings.fontSize);
@@ -128,17 +128,15 @@ export const createHalftoneRenderer: RendererFactory = (canvas) => {
       const height = outputSize.height * scaleFactor;
 
       // One pixel per dot: shrink the frame to the grid for analysis.
-      const analysisCanvas = document.createElement("canvas");
-      analysisCanvas.width = gridW;
-      analysisCanvas.height = gridH;
-      const analysisCtx = analysisCanvas.getContext("2d");
+      const analysisCanvas = new OffscreenCanvas(gridW, gridH);
+      const analysisCtx = analysisCanvas.getContext("2d", {
+        willReadFrequently: true,
+      });
       if (!analysisCtx) throw new Error("Canvas init failed");
       analysisCtx.drawImage(frame, 0, 0, gridW, gridH);
       const { data: pixels } = analysisCtx.getImageData(0, 0, gridW, gridH);
 
-      const outCanvas = document.createElement("canvas");
-      outCanvas.width = width;
-      outCanvas.height = height;
+      const outCanvas = new OffscreenCanvas(width, height);
       const outCtx = outCanvas.getContext("2d", { alpha: false });
       if (!outCtx) throw new Error("Canvas init failed");
 
@@ -199,7 +197,7 @@ export const createHalftoneRenderer: RendererFactory = (canvas) => {
 
       runEffectPipeline(outCanvas, outCtx, settings);
 
-      return outCanvas.toDataURL(`image/${codec}`);
+      return outCanvas.convertToBlob({ type: `image/${codec}` });
     },
   };
 };
