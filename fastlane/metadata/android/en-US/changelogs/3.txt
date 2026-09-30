@@ -1,0 +1,3 @@
+- Smoother, more responsive app: camera rendering now runs in a background thread, so sliders and buttons no longer lag while the preview is live
+- All render modes and effects carried over to the new renderer
+- Added a footer to the settings panel
