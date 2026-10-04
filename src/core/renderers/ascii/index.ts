@@ -24,7 +24,7 @@ export const createAsciiRenderer: RendererFactory = (canvas) => {
 
       ctx.fillStyle = bgColor;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.font = `${cellSize}px 'Fira Code', monospace`;
+      ctx.font = `${cellSize}px 'JetBrainsMono-Bold', monospace`;
       ctx.textBaseline = "top";
 
       const pixelCount = srcW * srcH;

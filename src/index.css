@@ -1,10 +1,17 @@
-@import url("https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap");
 @import "tailwindcss";
 
 :root {
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-left: env(safe-area-inset-left, 0px);
   --safe-right: env(safe-area-inset-right, 0px);
+}
+
+@font-face {
+  font-family: "JetBrainsMono-Bold";
+  src: url("./assets/fonts/JetBrainsMono-Bold.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
 }
 
 .app {
@@ -14,7 +21,7 @@
 }
 
 body {
-  font-family: "Fira Code", monospace;
+  font-family: "JetBrainsMono-Bold", sans-serif;
   background-color: #121212;
   color: #00ff00;
   overflow: hidden;
