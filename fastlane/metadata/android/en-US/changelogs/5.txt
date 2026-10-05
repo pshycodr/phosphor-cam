@@ -7,3 +7,4 @@ Version: v1.1.2
 - Faster startup: the font is now bundled with the app instead of downloaded from Google Fonts
 - The app now runs only on Android 11 and above
 - Smaller, optimized build and other internal fixes
+- remove incorrect internet permission
