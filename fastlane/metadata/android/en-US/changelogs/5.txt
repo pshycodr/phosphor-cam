@@ -1,0 +1,9 @@
+Version: v1.1.2
+
+- Front camera preview is now mirrored, like a normal selfie camera
+- Photos and videos now save to the same folder
+- Fixed saving on Android
+- New in-app notifications confirm when a photo or video is saved
+- Faster startup: the font is now bundled with the app instead of downloaded from Google Fonts
+- The app now runs only on Android 11 and above
+- Smaller, optimized build and other internal fixes
