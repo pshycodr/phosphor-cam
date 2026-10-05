@@ -17,6 +17,7 @@ import {
   LuType,
 } from "react-icons/lu";
 
+import { VERSION } from "@/constants/config";
 import { type SectionId } from "@/constants/settings";
 import { useSettingsStore } from "@/store/settingsStore";
 
@@ -303,7 +304,7 @@ function Settings() {
                     Phosphor Cam
                   </p>
 
-                  <p className="text-[10px] text-green-500/50">v1.1.1</p>
+                  <p className="text-[10px] text-green-500/50">{VERSION}</p>
                 </div>
               </div>
 

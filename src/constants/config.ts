@@ -9,3 +9,4 @@ export const getSavePath = (filename: string, type: "image" | "video") => {
       return `${SAVED_FOLDER}/videos/${filename}`;
   }
 };
+export const VERSION = "v1.1.1";
