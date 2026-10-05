@@ -1,5 +1,7 @@
 import { Directory, Filesystem } from "@capacitor/filesystem";
 
+import { getSavePath } from "@/constants/config";
+
 import { isNative } from "./isNative";
 
 function blobToBase64(blob: Blob): Promise<string> {
@@ -27,7 +29,7 @@ export async function saveVideo(blob: Blob, fileName: string) {
     const base64 = await blobToBase64(blob);
 
     await Filesystem.writeFile({
-      path: `PhosphorCam/${fileName}`,
+      path: getSavePath(fileName, "video"),
       data: base64,
       directory: Directory.Documents,
       recursive: true,

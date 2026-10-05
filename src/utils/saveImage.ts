@@ -1,5 +1,7 @@
 import { Directory, Filesystem } from "@capacitor/filesystem";
 
+import { getSavePath } from "@/constants/config";
+
 import { isNative } from "./isNative";
 
 function saveImageWeb(dataUrl: string, filename: string) {
@@ -18,7 +20,7 @@ async function saveImageNative(dataUrl: string, filename: string) {
   }
 
   await Filesystem.writeFile({
-    path: `Phosphor-Cam/${filename}`,
+    path: getSavePath(filename, "image"),
     data: base64,
     directory: Directory.Documents,
     recursive: true,
