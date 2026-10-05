@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import toast, { Toaster } from "react-hot-toast";
 import { MdCancel } from "react-icons/md";
 
 import CameraControls from "@/components/cameraControls";
@@ -7,6 +8,7 @@ import Settings from "@/components/settings";
 import type { CameraFacingMode } from "@/types";
 
 import Viewport, { type ViewportHandle } from "./components/viewport";
+import { isNative } from "./utils/isNative";
 import { getSupportedMediaRecorderMimeType } from "./utils/mediaRecorder";
 import { saveImage } from "./utils/saveImage";
 import { saveVideo } from "./utils/saveVideo";
@@ -23,6 +25,8 @@ function App() {
   const [clipboardSuccess, setClipboardSuccess] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [error, setError] = useState<string | null>(null);
+
+  const native = isNative();
 
   // Only one ref into the render layer now, instead of a ref threaded
   // through AsciiView into whichever renderer happened to be mounted.
@@ -87,6 +91,7 @@ function App() {
       const imageUrl = await viewportRef.current.captureImage();
       const fileName = `ascii-capture-${Date.now()}.png`;
       await saveImage(imageUrl, fileName);
+      toast("image saved");
     } catch (err) {
       console.error("Capture failed", err);
       setError("Capture isn't supported for this render mode yet.");
@@ -155,7 +160,7 @@ function App() {
           const fileName = `ascii-video-${Date.now()}.${extension}`;
 
           await saveVideo(blob, fileName);
-
+          toast("video saved");
           setRecordingTime(0);
         } catch (err) {
           console.error("Failed to save recording:", err);
@@ -186,6 +191,21 @@ function App() {
 
   return (
     <div className="h-screen w-screen overflow-hidden">
+      <Toaster
+        position="top-center"
+        containerStyle={{
+          top: native ? "calc(env(safe-area-inset-top, 0px) + 16px)" : 20,
+        }}
+        toastOptions={{
+          duration: 1000,
+          className: "border border-green-500 font-bold text-green-400",
+          style: {
+            background: "#000000",
+            color: "#05df72",
+          },
+        }}
+      />
+
       {/* No settings/stats props - Header and Settings read straight from their stores */}
       <Header width={windowSize.width} height={windowSize.height} />
       <Settings />
