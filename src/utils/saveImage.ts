@@ -1,5 +1,6 @@
-import { Capacitor } from "@capacitor/core";
 import { Directory, Filesystem } from "@capacitor/filesystem";
+
+import { isNative } from "./isNative";
 
 function saveImageWeb(dataUrl: string, filename: string) {
   const link = document.createElement("a");
@@ -25,7 +26,7 @@ async function saveImageNative(dataUrl: string, filename: string) {
 }
 
 export async function saveImage(dataUrl: string, filename: string) {
-  if (Capacitor.isNativePlatform()) {
+  if (isNative()) {
     await saveImageNative(dataUrl, filename);
   } else {
     saveImageWeb(dataUrl, filename);

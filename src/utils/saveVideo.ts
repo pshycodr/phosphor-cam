@@ -1,5 +1,6 @@
-import { Capacitor } from "@capacitor/core";
 import { Directory, Filesystem } from "@capacitor/filesystem";
+
+import { isNative } from "./isNative";
 
 function blobToBase64(blob: Blob): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -22,7 +23,7 @@ function blobToBase64(blob: Blob): Promise<string> {
 }
 
 export async function saveVideo(blob: Blob, fileName: string) {
-  if (Capacitor.isNativePlatform()) {
+  if (isNative()) {
     const base64 = await blobToBase64(blob);
 
     await Filesystem.writeFile({
