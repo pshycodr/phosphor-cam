@@ -63,19 +63,11 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Fonts (cache-first)
-  if (
-    url.origin === "https://fonts.googleapis.com" ||
-    url.origin === "https://fonts.gstatic.com"
-  ) {
-    event.respondWith(cacheFirst(request));
-    return;
-  }
-
+  // All other assets (including fonts) fall through here
   event.respondWith(staleWhileRevalidate(request));
 });
 
-// Cache First
+// Cache First (Left intact in case other features or messages invoke it)
 async function cacheFirst(request) {
   const cache = await caches.open(CACHE_NAME);
   const cached = await cache.match(request);
