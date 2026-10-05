@@ -35,12 +35,9 @@ function App() {
   const recordedChunksRef = useRef<Blob[]>([]);
   const recordingTimerRef = useRef<number | null>(null);
 
-  console.log(process.env.NODE_ENV);
-
   useEffect(() => {
     let active = true;
     let currentStream: MediaStream | null = null;
-
     const start = async () => {
       try {
         const video = await navigator.mediaDevices.getUserMedia({
@@ -236,7 +233,12 @@ function App() {
         </div>
       )}
 
-      <Viewport ref={viewportRef} stream={stream} canvasSize={windowSize} />
+      <Viewport
+        ref={viewportRef}
+        stream={stream}
+        canvasSize={windowSize}
+        mirrored={facingMode === "user"}
+      />
 
       <CameraControls
         onFlip={toggleCamera}

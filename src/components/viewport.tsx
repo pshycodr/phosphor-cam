@@ -10,14 +10,14 @@ export interface ViewportHandle {
   getAsciiText: () => Promise<string>;
   getCanvas: () => HTMLCanvasElement | null;
 }
-
 interface ViewportProps {
   stream: MediaStream | null;
   canvasSize: { width: number; height: number };
+  mirrored?: boolean;
 }
 
 const Viewport = forwardRef<ViewportHandle, ViewportProps>(
-  ({ stream, canvasSize }, ref) => {
+  ({ stream, canvasSize, mirrored = false }, ref) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -116,7 +116,10 @@ const Viewport = forwardRef<ViewportHandle, ViewportProps>(
     );
 
     return (
-      <div className="fixed inset-0 flex items-center justify-center overflow-hidden bg-black">
+      <div
+        className="fixed inset-0 flex items-center justify-center overflow-hidden bg-black"
+        style={{ transform: mirrored ? "scaleX(-1)" : undefined }}
+      >
         <video
           ref={videoRef}
           style={{ display: "none" }}
