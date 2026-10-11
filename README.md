@@ -7,11 +7,6 @@
     <i>Transform your camera feed into real-time ASCII art</i>
   </p>
 
-[![GitHub stars](https://img.shields.io/github/stars/pshycodr/phosphor-cam?style=social)](https://github.com/pshycodr/phosphor-cam/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/pshycodr/phosphor-cam?style=social)](https://github.com/pshycodr/phosphor-cam/network/members)
-[![GitHub watchers](https://img.shields.io/github/watchers/pshycodr/phosphor-cam?style=social)](https://github.com/pshycodr/phosphor-cam/watchers)
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![CI](https://github.com/pshycodr/phosphor-cam/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/pshycodr/phosphor-cam/actions/workflows/ci.yml?query=branch%3Amain)
 [![Android Release](https://img.shields.io/github/v/release/pshycodr/phosphor-cam?label=Android&logo=android&logoColor=white&color=3DDC84)](https://github.com/pshycodr/phosphor-cam/releases/latest)
@@ -19,8 +14,14 @@
 </div>
 
 <div align="center">
+  <a href="https://f-droid.org/packages/site.aroy.phosphor/">
+    <img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" alt="Get it on F-Droid" height="80">
+  </a>
   <a href="https://github.com/pshycodr/phosphor-cam/releases/latest">
-    <img src="https://img.shields.io/badge/Download-Latest%20APK-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Download latest APK">
+    <img src="https://raw.githubusercontent.com/rubenpgrady/get-it-on-github/refs/heads/main/get-it-on-github.png" alt="Get it on GitHub" height="80">
+  </a>
+  <a href="https://phosphor.aroy.site/">
+    <img src="./public//assets/use-it-on-website.png" alt="Get it on GitHub" height="80">
   </a>
 </div>
 
@@ -45,12 +46,6 @@ Five render engines are available and can be switched at runtime without restart
 ## Get the app
 
 Phosphor Cam is available as a web app, a PWA, and a native Android app. The Android build ships from the same codebase, runs fully offline, and is signed and published automatically on every release.
-
-<div align="center">
-  <a href="https://github.com/pshycodr/phosphor-cam/releases/latest">
-    <img src="https://img.shields.io/badge/Download-Latest%20APK-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Download latest APK">
-  </a>
-</div>
 
 The link above always points to the latest release. Grab the `.apk` from the Assets section and install it directly — no Play Store, no account, no internet required after install.
 
