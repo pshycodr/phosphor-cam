@@ -1,3 +1,5 @@
+import type { AnyCanvas, Ctx2D } from "@/shared/types";
+
 const GRAIN_TILE_COUNT = 4;
 const GRAIN_TILE_SIZE = 128;
 
@@ -25,11 +27,7 @@ function buildGrainTiles(): OffscreenCanvas[] {
   return tiles;
 }
 
-export function applyGrain(
-  canvas: OffscreenCanvas,
-  ctx: OffscreenCanvasRenderingContext2D,
-  intensity = 0.4
-) {
+export function applyGrain(canvas: AnyCanvas, ctx: Ctx2D, intensity = 0.4) {
   if (!grainTiles) grainTiles = buildGrainTiles();
   grainFrame++;
   const tile = grainTiles[grainFrame % grainTiles.length];

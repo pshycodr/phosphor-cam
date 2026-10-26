@@ -1,5 +1,5 @@
 import { runEffectPipeline } from "@/core/pipeline/effects";
-import type { RendererFactory } from "@/types";
+import type { RendererFactory } from "@/shared/types";
 import {
   blitSprite,
   blitTintedSprite,
@@ -7,7 +7,7 @@ import {
   getColorString,
   getTintedAtlas,
   getWhiteAtlas,
-} from "@/utils/halftoneUtils";
+} from "@/shared/utils/halftoneUtils";
 
 // Number of dot sizes in the atlas. Level 0 means no dot and is skipped.
 const DOT_LEVELS = 64;

@@ -1,12 +1,12 @@
-import { CHAR_SETS } from "@/constants/characterSets";
 import { runEffectPipeline } from "@/core/pipeline/effects"; // must be worker-safe
-import { type RendererFactory } from "@/types";
+import { CHAR_SETS } from "@/shared/constants/characterSets";
+import { type RendererFactory } from "@/shared/types";
 import {
   adjustColor,
   getBrightnessMap,
   getChar,
   getLuminance,
-} from "@/utils/asciiUtils";
+} from "@/shared/utils/asciiUtils";
 
 export const createAsciiRenderer: RendererFactory = (canvas) => {
   return {

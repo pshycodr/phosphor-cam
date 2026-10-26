@@ -1,8 +1,10 @@
+import type { AnyCanvas, Ctx2D } from "@/shared/types";
+
 let scanlinePattern: CanvasPattern | null = null;
 let scanlinePatternKey = "";
 
 function getScanlinePattern(
-  ctx: OffscreenCanvasRenderingContext2D,
+  ctx: Ctx2D,
   spacing: number,
   alpha: number
 ): CanvasPattern | null {
@@ -21,11 +23,7 @@ function getScanlinePattern(
   return scanlinePattern;
 }
 
-export function applyScanlines(
-  canvas: OffscreenCanvas,
-  ctx: OffscreenCanvasRenderingContext2D,
-  intensity = 0.5
-) {
+export function applyScanlines(canvas: AnyCanvas, ctx: Ctx2D, intensity = 0.5) {
   const pattern = getScanlinePattern(ctx, 3, 0.5 * intensity);
   if (!pattern) return;
 

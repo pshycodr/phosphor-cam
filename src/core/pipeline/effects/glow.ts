@@ -1,4 +1,4 @@
-import type { GlowPassOptions } from "@/types";
+import type { AnyCanvas, Ctx2D, GlowPassOptions } from "@/shared/types";
 
 let prepScratch: OffscreenCanvas | null = null;
 let blurScratch: OffscreenCanvas | null = null;
@@ -28,8 +28,8 @@ function getBlurScratch(
 }
 
 function applyGlowPass(
-  canvas: OffscreenCanvas,
-  ctx: OffscreenCanvasRenderingContext2D,
+  canvas: AnyCanvas,
+  ctx: Ctx2D,
   {
     blur,
     strength,
@@ -83,11 +83,7 @@ function applyGlowPass(
   ctx.restore();
 }
 
-export function applyGlow(
-  canvas: OffscreenCanvas,
-  ctx: OffscreenCanvasRenderingContext2D,
-  intensity = 0.5
-) {
+export function applyGlow(canvas: AnyCanvas, ctx: Ctx2D, intensity = 0.5) {
   applyGlowPass(canvas, ctx, {
     blur: 6,
     strength: 0.25 * intensity,
@@ -96,11 +92,7 @@ export function applyGlow(
   });
 }
 
-export function applyBloom(
-  canvas: OffscreenCanvas,
-  ctx: OffscreenCanvasRenderingContext2D,
-  intensity = 0.6
-) {
+export function applyBloom(canvas: AnyCanvas, ctx: Ctx2D, intensity = 0.6) {
   applyGlowPass(canvas, ctx, {
     blur: 18,
     strength: 0.55 * intensity,
@@ -112,8 +104,8 @@ export function applyBloom(
 
 /** simulates film halation around highlights. */
 export function applyHalation(
-  canvas: OffscreenCanvas,
-  ctx: OffscreenCanvasRenderingContext2D,
+  canvas: AnyCanvas,
+  ctx: Ctx2D,
   intensity = 0.5,
   tint = "rgb(255, 90, 40)"
 ) {

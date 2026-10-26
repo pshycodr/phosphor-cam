@@ -1,5 +1,5 @@
-import type { AsciiSettings } from "@/types";
-import type { EffectKey } from "@/types/effects";
+import type { AnyCanvas, AsciiSettings, Ctx2D } from "@/shared/types";
+import type { EffectKey } from "@/shared/types/effects";
 
 import { applyChromaticAberration } from "./chromaticAberration";
 import { applyBloom, applyGlow, applyHalation } from "./glow";
@@ -9,11 +9,7 @@ import { applyVignette } from "./vignette";
 
 export interface EffectPipelineEntry {
   key: EffectKey;
-  apply: (
-    canvas: OffscreenCanvas,
-    ctx: OffscreenCanvasRenderingContext2D,
-    intensity: number
-  ) => void;
+  apply: (canvas: AnyCanvas, ctx: Ctx2D, intensity: number) => void;
 }
 
 export const EFFECT_PIPELINE: EffectPipelineEntry[] = [
@@ -27,8 +23,8 @@ export const EFFECT_PIPELINE: EffectPipelineEntry[] = [
 ];
 
 export function runEffectPipeline(
-  canvas: OffscreenCanvas,
-  ctx: OffscreenCanvasRenderingContext2D,
+  canvas: AnyCanvas,
+  ctx: Ctx2D,
   settings: AsciiSettings
 ): void {
   for (const { key, apply } of EFFECT_PIPELINE) {

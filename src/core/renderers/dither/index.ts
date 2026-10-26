@@ -1,6 +1,6 @@
 import { runEffectPipeline } from "@/core/pipeline/effects"; // must be worker-safe
-import { type RendererFactory } from "@/types";
-import { adjustColor, getLuminance } from "@/utils/asciiUtils";
+import { type RendererFactory } from "@/shared/types";
+import { adjustColor, getLuminance } from "@/shared/utils/asciiUtils";
 import {
   ensureFloat,
   ensureUint8,
@@ -8,7 +8,7 @@ import {
   getRgbString,
   hexToRgb,
   packRgb,
-} from "@/utils/ditherUtils";
+} from "@/shared/utils/ditherUtils";
 
 /**
  * Floyd-Steinberg Error-Diffusion Dithering

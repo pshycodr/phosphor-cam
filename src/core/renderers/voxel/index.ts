@@ -1,5 +1,5 @@
 import { runEffectPipeline } from "@/core/pipeline/effects";
-import type { AsciiSettings, Ctx2D, RendererFactory } from "@/types";
+import type { AsciiSettings, Ctx2D, RendererFactory } from "@/shared/types";
 import {
   adjustPixel,
   type Atlas,
@@ -12,7 +12,7 @@ import {
   lookupColor,
   type Palette,
   VOXEL_COLORS,
-} from "@/utils/voxelUtils";
+} from "@/shared/utils/voxelUtils";
 
 /**
  * VOXEL renderer.
