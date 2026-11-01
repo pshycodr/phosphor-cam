@@ -8,7 +8,7 @@
 
 @font-face {
   font-family: "JetBrainsMono-Bold";
-  src: url("./assets/fonts/JetBrainsMono-Bold.woff2") format("woff2");
+  src: url("/assets/fonts/JetBrainsMono-Bold.woff2") format("woff2");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -154,4 +154,23 @@ body {
 .settings-toggle:checked {
   background: #22c55e;
   box-shadow: 0 0 8px rgba(34, 197, 94, 0.9);
+}
+
+/* Larger touch targets on phones and tablets. */
+@media (pointer: coarse) {
+  .settings-slider::-webkit-slider-thumb {
+    height: 22px;
+    width: 22px;
+    margin-top: -9px;
+  }
+
+  .settings-slider::-moz-range-thumb {
+    height: 22px;
+    width: 22px;
+  }
+
+  .settings-toggle {
+    width: 28px;
+    height: 28px;
+  }
 }
