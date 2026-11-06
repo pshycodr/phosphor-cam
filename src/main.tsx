@@ -1,4 +1,5 @@
 import { StrictMode } from "react";
+import { BrowserRouter } from "react-router";
 import { createRoot } from "react-dom/client";
 
 import { Capacitor } from "@capacitor/core";
@@ -6,7 +7,7 @@ import { StatusBar } from "@capacitor/status-bar";
 
 import App from "./App.tsx";
 
-import "./index.css";
+import "./styles/index.css";
 
 if (process.env.NODE_ENV === "production") {
   if ("serviceWorker" in navigator) {
@@ -25,6 +26,8 @@ if (Capacitor.getPlatform() === "android") {
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <App />
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
   </StrictMode>
 );

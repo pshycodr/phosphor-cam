@@ -1,7 +1,9 @@
+import type { AnyCanvas, Ctx2D } from "@/shared/types";
+
 let vignetteCache: { key: string; gradient: CanvasGradient } | null = null;
 
 function getVignetteGradient(
-  ctx: OffscreenCanvasRenderingContext2D,
+  ctx: Ctx2D,
   w: number,
   h: number,
   strength: number
@@ -27,11 +29,7 @@ function getVignetteGradient(
   return gradient;
 }
 
-export function applyVignette(
-  canvas: OffscreenCanvas,
-  ctx: OffscreenCanvasRenderingContext2D,
-  intensity = 0.5
-) {
+export function applyVignette(canvas: AnyCanvas, ctx: Ctx2D, intensity = 0.5) {
   const strength = 0.15 + intensity * 0.55;
   const gradient = getVignetteGradient(
     ctx,

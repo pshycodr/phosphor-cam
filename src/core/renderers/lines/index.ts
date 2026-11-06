@@ -1,6 +1,6 @@
 import { runEffectPipeline } from "@/core/pipeline/effects";
-import type { AsciiSettings, Ctx2D, RendererFactory } from "@/types";
-import { sample, traceSmoothPath } from "@/utils/liensutils";
+import type { AsciiSettings, Ctx2D, RendererFactory } from "@/shared/types";
+import { sample, traceSmoothPath } from "@/shared/utils/liensutils";
 
 /**
  * LINES renderer (horizontal / vertical scanline halftone).

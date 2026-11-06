@@ -1,3 +1,5 @@
+import type { AnyCanvas, Ctx2D } from "@/shared/types";
+
 let caSourceScratch: OffscreenCanvas | null = null;
 let caChannelScratch: OffscreenCanvas | null = null;
 
@@ -26,7 +28,7 @@ function getCaChannelScratch(
 }
 
 function drawTintedChannel(
-  ctx: OffscreenCanvasRenderingContext2D,
+  ctx: Ctx2D,
   source: OffscreenCanvas,
   tint: string,
   dx: number,
@@ -49,8 +51,8 @@ function drawTintedChannel(
 }
 
 export function applyChromaticAberration(
-  canvas: OffscreenCanvas,
-  ctx: OffscreenCanvasRenderingContext2D,
+  canvas: AnyCanvas,
+  ctx: Ctx2D,
   intensity = 0.5
 ) {
   const offset = Math.round(intensity * 8);

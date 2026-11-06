@@ -1,4 +1,4 @@
-import type { RendererFactory, RenderMode } from "@/types";
+import type { RendererFactory, RenderMode } from "@/shared/types";
 
 import { createAsciiRenderer } from "./ascii";
 import { createDitherRenderer } from "./dither";
