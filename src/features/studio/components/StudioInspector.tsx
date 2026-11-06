@@ -14,10 +14,23 @@ import { useStudioStore } from "../store/studioStore";
 
 import PresetsPanel from "./controls/PresetsPanel";
 
-const PresetsBadge = () => <>{STUDIO_PRESETS.length} looks</>;
+const PRESETS_SECTION: ExtraSettingsSection = {
+  id: "presets",
+  icon: <Sparkles size={16} />,
+  title: "Presets",
+  badge: <>{STUDIO_PRESETS.length} looks</>,
+  content: <PresetsPanel />,
+};
+
+const LEADING_SECTIONS = [PRESETS_SECTION];
+
+const focusRing =
+  "focus-visible:ring-2 focus-visible:ring-green-400/70 focus-visible:outline-none";
 
 function StudioInspector() {
   const [isOpen, setIsOpen] = useState(false);
+  const fabRef = useRef<HTMLButtonElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
 
   const settings = useStudioStore((s) => s.settings);
   const updateSettings = useStudioStore((s) => s.updateSettings);
@@ -34,26 +47,12 @@ function StudioInspector() {
     [settings, updateSettings, updateEffect]
   );
 
-  const presetsSection = useMemo<ExtraSettingsSection>(
-    () => ({
-      id: "presets",
-      icon: <Sparkles size={16} />,
-      title: "Presets",
-      badge: <PresetsBadge />,
-      content: <PresetsPanel />,
-    }),
-    []
-  );
-
-  const fabRef = useRef<HTMLButtonElement>(null);
-  const closeRef = useRef<HTMLButtonElement>(null);
-
-  const open = useCallback(() => {
+  const open = () => {
     setIsOpen(true);
     requestAnimationFrame(() =>
       closeRef.current?.focus({ preventScroll: true })
     );
-  }, []);
+  };
 
   const close = useCallback(() => {
     setIsOpen(false);
@@ -73,44 +72,41 @@ function StudioInspector() {
 
   return (
     <SettingsControlsProvider value={controls}>
+      {/* Desktop sidebar */}
       <aside
         aria-label="Editing controls"
-        className="hidden h-full w-84 shrink-0 flex-col border-l border-green-500/20 bg-zinc-950/95 shadow-xl select-none lg:flex"
+        className="hidden h-full w-84 shrink-0 flex-col border-l border-zinc-800 bg-zinc-950 select-none lg:flex"
       >
-        <header className="flex h-14 shrink-0 items-center justify-between border-b border-green-500/20 bg-black/60 px-4">
-          <div className="flex items-center gap-2 text-green-400">
-            <SlidersHorizontal size={16} />
-            <span className="text-sm font-bold tracking-wide">Inspector</span>
-          </div>
-          <span className="font-mono text-[10px] font-bold tracking-wider text-zinc-500 uppercase">
-            Edit
-          </span>
+        <header className="flex h-14 shrink-0 items-center gap-2 border-b border-zinc-800 px-4 text-sm font-semibold text-green-400">
+          <SlidersHorizontal size={16} />
+          Inspector
         </header>
 
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-3">
           <SettingsSections
             idPrefix="studio-desktop"
-            leadingSections={[presetsSection]}
+            leadingSections={LEADING_SECTIONS}
           />
         </div>
       </aside>
 
+      {/* Mobile: button + bottom sheet */}
       {!isOpen && (
         <button
           ref={fabRef}
           type="button"
           onClick={open}
           aria-label="Open editing controls"
-          className="fixed right-[max(1rem,env(safe-area-inset-right))] bottom-[max(1rem,env(safe-area-inset-bottom))] z-40 flex min-h-12 items-center gap-2 rounded-full border border-green-500/40 bg-black/80 px-4 text-sm font-bold text-green-400 shadow-2xl backdrop-blur-md transition-colors hover:border-green-400 hover:bg-green-950/60 focus-visible:ring-2 focus-visible:ring-green-400/70 focus-visible:outline-none lg:hidden"
+          className={`fixed right-[max(1rem,env(safe-area-inset-right))] bottom-[max(1rem,env(safe-area-inset-bottom))] z-40 flex min-h-12 items-center gap-2 rounded-full bg-green-500 px-4 text-sm font-semibold text-black lg:hidden ${focusRing}`}
         >
           <SlidersHorizontal size={18} />
-          <span>Adjust</span>
+          Adjust
         </button>
       )}
 
       {isOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 z-40 bg-black/70 lg:hidden"
           onClick={close}
           aria-hidden="true"
         />
@@ -122,7 +118,7 @@ function StudioInspector() {
         aria-hidden={!isOpen}
         aria-label="Editing controls"
         style={offset ? { transform: `translateY(${offset}px)` } : undefined}
-        className={`fixed inset-x-0 bottom-0 z-50 flex max-h-[86dvh] flex-col rounded-t-2xl border-t border-green-500/30 bg-zinc-950/95 pb-[env(safe-area-inset-bottom)] shadow-2xl backdrop-blur-xl motion-reduce:transition-none lg:hidden ${
+        className={`fixed inset-x-0 bottom-0 z-50 flex max-h-[86dvh] flex-col rounded-t-2xl border-t border-zinc-800 bg-zinc-950 pb-[env(safe-area-inset-bottom)] motion-reduce:transition-none lg:hidden ${
           offset
             ? "transition-none"
             : "transition-[transform,translate,visibility] duration-300 ease-out"
@@ -133,22 +129,19 @@ function StudioInspector() {
           className="flex shrink-0 cursor-grab touch-none justify-center pt-3 pb-2"
           aria-hidden="true"
         >
-          <div className="h-1 w-10 rounded-full bg-green-500/40" />
+          <div className="h-1 w-10 rounded-full bg-zinc-700" />
         </div>
 
-        <header className="flex shrink-0 items-center justify-between border-b border-green-500/20 px-5 py-2">
-          <div className="flex items-center gap-2 text-green-400">
-            <SlidersHorizontal size={16} />
-            <h2 className="text-base font-bold tracking-wide">
-              Editing controls
-            </h2>
-          </div>
+        <header className="flex shrink-0 items-center justify-between border-b border-zinc-800 px-5 py-2">
+          <h2 className="text-sm font-semibold text-green-400">
+            Editing controls
+          </h2>
           <button
             ref={closeRef}
             type="button"
             onClick={close}
             aria-label="Close editing controls"
-            className="-mr-2 flex size-10 items-center justify-center rounded-lg text-green-400 transition-colors hover:bg-green-900/30 focus-visible:ring-2 focus-visible:ring-green-400/70 focus-visible:outline-none"
+            className={`-mr-2 flex size-10 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:text-white ${focusRing}`}
           >
             <X size={20} />
           </button>
@@ -157,7 +150,7 @@ function StudioInspector() {
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pt-2 pb-8 text-sm text-gray-200">
           <SettingsSections
             idPrefix="studio-mobile"
-            leadingSections={[presetsSection]}
+            leadingSections={LEADING_SECTIONS}
           />
         </div>
       </aside>
