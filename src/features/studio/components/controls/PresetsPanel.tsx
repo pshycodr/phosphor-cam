@@ -2,12 +2,18 @@ import { memo, useMemo } from "react";
 
 import { Check } from "lucide-react";
 
+import { useSettingsSelector } from "@/shared/components/settings/useSettingsControls";
+
 import { STUDIO_PRESETS, type StudioPreset } from "../../constants/presets";
 import { useStudioStore } from "../../store/studioStore";
 
 function PresetsPanel() {
-  const currentSettings = useStudioStore((s) => s.settings);
   const applyPreset = useStudioStore((s) => s.applyPreset);
+  const renderMode = useSettingsSelector((settings) => settings.renderMode);
+  const colorMode = useSettingsSelector((settings) => settings.colorMode);
+  const foreground = useSettingsSelector(
+    (settings) => settings.color.foreground
+  );
 
   const categories = useMemo(() => {
     const map = new Map<string, StudioPreset[]>();
@@ -29,11 +35,10 @@ function PresetsPanel() {
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-1">
             {presets.map((preset) => {
               const isMatch =
-                currentSettings.renderMode === preset.settings.renderMode &&
-                currentSettings.colorMode === preset.settings.colorMode &&
+                renderMode === preset.settings.renderMode &&
+                colorMode === preset.settings.colorMode &&
                 (!preset.settings.color?.foreground ||
-                  currentSettings.color.foreground ===
-                    preset.settings.color.foreground);
+                  foreground === preset.settings.color.foreground);
 
               return (
                 <button
