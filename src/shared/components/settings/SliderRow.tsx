@@ -24,10 +24,11 @@ const SliderRow = memo(function SliderRow({
   const value = useSettingsSelector(
     (settings) => settings[settingKey] as number
   );
-  const { updateSettings } = useSettingsActions();
+  const { updateSettings, commitHistory } = useSettingsActions();
 
   const config = SLIDER_CONFIGS[settingKey];
   const text = formatValue(settingKey, value);
+  const commit = () => commitHistory?.();
 
   return (
     <div>
@@ -55,6 +56,9 @@ const SliderRow = memo(function SliderRow({
             { history: false }
           )
         }
+        onPointerUp={commit}
+        onKeyUp={commit}
+        onBlur={commit}
         className="settings-slider w-full"
       />
     </div>

@@ -88,6 +88,8 @@ const WHEEL_PX = 480;
 interface ColorPickerProps {
   value: string;
   onChange: (hex: string) => void;
+  /** Called when a drag or edit finishes so the parent can record one undo step. */
+  onCommit?: () => void;
   /** Optional heading. Leave out when the parent already labels the picker. */
   title?: string;
 }
@@ -95,6 +97,7 @@ interface ColorPickerProps {
 const ColorPicker = memo(function ColorPicker({
   value,
   onChange,
+  onCommit,
   title,
 }: ColorPickerProps) {
   const wheelRef = useRef<HTMLCanvasElement>(null);
@@ -212,8 +215,9 @@ const ColorPicker = memo(function ColorPicker({
         e.currentTarget.releasePointerCapture(e.pointerId);
       }
       setDragging(false);
+      onCommit?.();
     },
-    []
+    [onCommit]
   );
 
   /* -------- marker position (percent, so it scales with the wheel) -------- */
@@ -277,6 +281,9 @@ const ColorPicker = memo(function ColorPicker({
           step={0.01}
           value={hsv.v}
           onChange={(e) => emit({ ...hsv, v: +e.target.value })}
+          onPointerUp={() => onCommit?.()}
+          onKeyUp={() => onCommit?.()}
+          onBlur={() => onCommit?.()}
           className="settings-slider w-full"
           aria-label="Brightness"
         />
@@ -306,8 +313,12 @@ const ColorPicker = memo(function ColorPicker({
           }}
           onBlur={(e) => {
             const hex = normalizeHex(e.target.value);
-            if (hex) commit(hex);
-            else setHexInput(value);
+            if (hex) {
+              commit(hex);
+              onCommit?.();
+            } else {
+              setHexInput(value);
+            }
           }}
           onKeyDown={(e) => {
             if (e.key === "Enter") e.currentTarget.blur();

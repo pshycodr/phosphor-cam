@@ -17,6 +17,12 @@ export interface SettingsActions {
     patch: Partial<EffectProps>,
     options?: SettingsUpdateOptions
   ) => void;
+  /**
+   * Records the current settings as a single undo step. Continuous controls
+   * (sliders, color wheel) update with `history: false` while dragging and
+   * call this once on release so one gesture becomes one undo entry.
+   */
+  commitHistory?: () => void;
 }
 
 export interface SettingsControlsValue extends SettingsActions {

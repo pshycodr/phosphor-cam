@@ -10,6 +10,7 @@ interface ColorSwitchProps {
   open: boolean;
   onToggle: () => void;
   onChange: (value: string) => void;
+  onCommit?: () => void;
 }
 
 const ColorSwitch = ({
@@ -18,6 +19,7 @@ const ColorSwitch = ({
   open,
   onToggle,
   onChange,
+  onCommit,
 }: ColorSwitchProps) => {
   const panelId = useId();
 
@@ -58,7 +60,13 @@ const ColorSwitch = ({
 
       <Collapse id={panelId} open={open}>
         <div className="px-3 pt-2 pb-4">
-          {mounted && <ColorPicker value={value} onChange={onChange} />}
+          {mounted && (
+            <ColorPicker
+              value={value}
+              onChange={onChange}
+              onCommit={onCommit}
+            />
+          )}
         </div>
       </Collapse>
     </div>

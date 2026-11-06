@@ -71,7 +71,7 @@ export const AppearanceMode = () => {
   const colorMode = useSettingsSelector((settings) => settings.colorMode);
   const invert = useSettingsSelector((settings) => settings.invert);
   const color = useSettingsSelector((settings) => settings.color);
-  const { updateSettings } = useSettingsActions();
+  const { updateSettings, commitHistory } = useSettingsActions();
 
   const [activePicker, setActivePicker] = useState<PickerKey | null>(null);
 
@@ -80,12 +80,15 @@ export const AppearanceMode = () => {
     []
   );
 
+  // Live drags update without history; the picker commits once on release.
   const handleColorChange = useCallback(
     (key: PickerKey, value: string) => {
-      updateSettings({ color: { ...color, [key]: value } });
+      updateSettings({ color: { ...color, [key]: value } }, { history: false });
     },
     [color, updateSettings]
   );
+
+  const commitColor = useCallback(() => commitHistory?.(), [commitHistory]);
 
   const applyPreset = useCallback(
     (foreground: string, background: string) => {
@@ -175,6 +178,7 @@ export const AppearanceMode = () => {
                 open={activePicker === "foreground"}
                 onToggle={() => togglePicker("foreground")}
                 onChange={(v) => handleColorChange("foreground", v)}
+                onCommit={commitColor}
               />
               <ColorSwitch
                 label="Background"
@@ -182,6 +186,7 @@ export const AppearanceMode = () => {
                 open={activePicker === "background"}
                 onToggle={() => togglePicker("background")}
                 onChange={(v) => handleColorChange("background", v)}
+                onCommit={commitColor}
               />
             </div>
 

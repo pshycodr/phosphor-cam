@@ -49,6 +49,8 @@ interface StudioState {
     patch: Partial<EffectProps>,
     recordHistory?: boolean
   ) => void;
+  /** Push the current settings onto the undo stack (one entry per gesture). */
+  commitHistory: () => void;
   applyPreset: (presetSettings: Partial<AsciiSettings>) => void;
   resetSettings: () => void;
   undo: () => void;
@@ -68,6 +70,10 @@ const MAX_HISTORY = 30;
 
 function cloneSettings(s: AsciiSettings): AsciiSettings {
   return JSON.parse(JSON.stringify(s));
+}
+
+function settingsEqual(a: AsciiSettings, b: AsciiSettings) {
+  return JSON.stringify(a) === JSON.stringify(b);
 }
 
 export const useStudioStore = create<StudioState>((set, get) => ({
@@ -125,6 +131,12 @@ export const useStudioStore = create<StudioState>((set, get) => ({
     }
 
     const { history, historyIndex } = get();
+    const current = history[historyIndex];
+    if (current && settingsEqual(current, next)) {
+      set({ settings: next });
+      return;
+    }
+
     const truncatedHistory = history.slice(0, historyIndex + 1);
     const newHistory = [...truncatedHistory, cloneSettings(next)].slice(
       -MAX_HISTORY
@@ -145,6 +157,22 @@ export const useStudioStore = create<StudioState>((set, get) => ({
       [key]: { ...currentEffect, ...patch },
     };
     get().updateSettings({ effects: nextEffects }, recordHistory);
+  },
+
+  commitHistory: () => {
+    const { settings, history, historyIndex } = get();
+    const current = history[historyIndex];
+    if (current && settingsEqual(current, settings)) return;
+
+    const newHistory = [
+      ...history.slice(0, historyIndex + 1),
+      cloneSettings(settings),
+    ].slice(-MAX_HISTORY);
+
+    set({
+      history: newHistory,
+      historyIndex: newHistory.length - 1,
+    });
   },
 
   applyPreset: (presetSettings) => {

@@ -82,7 +82,7 @@ const EffectRow = ({ effectKey, label, description }: EffectRowProps) => {
   const intensity = useSettingsSelector(
     (settings) => settings.effects[effectKey].intensity
   );
-  const { updateEffect } = useSettingsActions();
+  const { updateEffect, commitHistory } = useSettingsActions();
 
   const toggle = useCallback(
     () => updateEffect(effectKey, { enabled: !enabled }),
@@ -98,6 +98,8 @@ const EffectRow = ({ effectKey, label, description }: EffectRowProps) => {
       ),
     [updateEffect, effectKey]
   );
+
+  const commit = useCallback(() => commitHistory?.(), [commitHistory]);
 
   return (
     <div className="py-2">
@@ -117,6 +119,9 @@ const EffectRow = ({ effectKey, label, description }: EffectRowProps) => {
             step={0.05}
             value={intensity}
             onChange={onIntensityChange}
+            onPointerUp={commit}
+            onKeyUp={commit}
+            onBlur={commit}
             aria-label={`${label} intensity`}
             className="settings-slider w-full"
           />

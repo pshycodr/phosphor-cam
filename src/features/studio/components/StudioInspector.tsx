@@ -34,6 +34,7 @@ function StudioInspector() {
 
   const updateSettings = useStudioStore((s) => s.updateSettings);
   const updateEffect = useStudioStore((s) => s.updateEffect);
+  const commitHistory = useStudioStore((s) => s.commitHistory);
 
   const controls = useMemo<SettingsControlsValue>(
     () => ({
@@ -43,8 +44,9 @@ function StudioInspector() {
         updateSettings(patch, options?.history ?? true),
       updateEffect: (key, patch, options) =>
         updateEffect(key, patch, options?.history ?? true),
+      commitHistory,
     }),
-    [updateSettings, updateEffect]
+    [updateSettings, updateEffect, commitHistory]
   );
 
   const open = () => {

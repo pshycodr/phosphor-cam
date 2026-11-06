@@ -61,13 +61,36 @@ function StudioHeader({ onOpenFilePicker }: StudioHeaderProps) {
   const canUndo = useStudioStore((s) => s.historyIndex > 0);
   const canRedo = useStudioStore((s) => s.historyIndex < s.history.length - 1);
 
-  // Undo / redo shortcuts: Ctrl/Cmd+Z, Ctrl/Cmd+Shift+Z
+  // Undo / redo shortcuts: Ctrl/Cmd+Z, Ctrl/Cmd+Shift+Z, Ctrl+Y.
+  // Ignore real text fields so native editing undo keeps working.
   useEffect(() => {
+    const isTextEntry = (target: EventTarget | null) => {
+      if (!(target instanceof HTMLElement)) return false;
+      if (target.isContentEditable) return true;
+      if (target.tagName === "TEXTAREA" || target.tagName === "SELECT") {
+        return true;
+      }
+      if (target.tagName === "INPUT") {
+        const type = (target as HTMLInputElement).type;
+        return !["range", "checkbox", "radio", "button", "submit"].includes(
+          type
+        );
+      }
+      return false;
+    };
+
     const onKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") {
+      if (!(e.ctrlKey || e.metaKey) || e.altKey) return;
+      if (isTextEntry(e.target)) return;
+
+      const key = e.key.toLowerCase();
+      if (key === "z") {
         e.preventDefault();
         if (e.shiftKey) redo();
         else undo();
+      } else if (key === "y") {
+        e.preventDefault();
+        redo();
       }
     };
     window.addEventListener("keydown", onKeyDown);
@@ -126,7 +149,7 @@ function StudioHeader({ onOpenFilePicker }: StudioHeaderProps) {
             <Undo2 size={16} />
           </IconButton>
           <IconButton
-            label="Redo (Ctrl+Shift+Z)"
+            label="Redo (Ctrl+Shift+Z / Ctrl+Y)"
             onClick={redo}
             disabled={!canRedo}
           >

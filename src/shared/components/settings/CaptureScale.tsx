@@ -29,7 +29,7 @@ const WARN_LEFT_PCT = ((WARN_THRESHOLD - MIN) / (MAX - MIN)) * 100;
 const CaptureScale = () => {
   const id = useId();
   const captureScale = useSettingsSelector((settings) => settings.captureScale);
-  const { updateSettings } = useSettingsActions();
+  const { updateSettings, commitHistory } = useSettingsActions();
 
   const value = clamp(captureScale);
   const isHigh = value > WARN_THRESHOLD;
@@ -46,6 +46,8 @@ const CaptureScale = () => {
     },
     [updateSettings]
   );
+
+  const commit = useCallback(() => commitHistory?.(), [commitHistory]);
 
   return (
     <div className="py-1">
@@ -80,6 +82,9 @@ const CaptureScale = () => {
           step={1}
           value={value}
           onChange={onChange}
+          onPointerUp={commit}
+          onKeyUp={commit}
+          onBlur={commit}
           aria-valuemin={MIN}
           aria-valuemax={MAX}
           aria-valuenow={value}
