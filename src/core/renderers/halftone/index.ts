@@ -1,10 +1,13 @@
 import { runEffectPipeline } from "@/core/pipeline/effects";
-import type { RendererFactory } from "@/shared/types";
+import type { Ctx2D, RendererFactory, SpriteAtlas } from "@/shared/types";
 import {
   blitSprite,
   blitTintedSprite,
+  colorizeMask,
   computeLevel,
   getColorString,
+  getGridLayer,
+  getMaskLayer,
   getTintedAtlas,
   getWhiteAtlas,
 } from "@/shared/utils/halftoneUtils";
@@ -34,11 +37,55 @@ const COLOR_LUT_SIZE = 1 << (COLOR_LUT_BITS * 3);
  * - Dot sprites are pre-rendered into a shared atlas (see halftoneUtils) so
  *   drawing is just a drawImage per dot.
  * - In solid mode the whole atlas is tinted once for the foreground color.
- *   In colorMode each dot is tinted individually from its source pixel,
- *   using a quantized color LUT to avoid building millions of CSS strings.
+ * - In colorMode the dots are drawn once into an alpha mask, then the frame
+ *   is painted through that mask in a single pass. That keeps each dot's real
+ *   color without tinting thousands of sprites per frame.
  * - `invert` swaps the foreground/background colors as well as the dot
  *   mapping, so the result reads as a true negative.
  */
+
+/** Draws every visible dot sprite from an atlas at the brick layout. */
+function drawDots(
+  ctx: Ctx2D,
+  atlas: SpriteAtlas,
+  pixels: Uint8ClampedArray,
+  srcW: number,
+  srcH: number,
+  cellSize: number,
+  contrast: number,
+  brightness: number,
+  invert: boolean
+) {
+  const rowOffset = cellSize * 0.5;
+
+  for (let y = 0; y < srcH; y++) {
+    const yOff = (y & 1) === 1 ? rowOffset : 0;
+    const yBase = y * cellSize;
+
+    for (let x = 0; x < srcW; x++) {
+      const i = y * srcW + x;
+      const p = i * 4;
+      const r = pixels[p];
+      const g = pixels[p + 1];
+      const b = pixels[p + 2];
+
+      const level = computeLevel(
+        r,
+        g,
+        b,
+        contrast,
+        brightness,
+        invert,
+        DOT_LEVELS
+      );
+      // Background fill already covers level 0.
+      if (level === 0) continue;
+
+      blitSprite(ctx, atlas, level, x * cellSize + yOff, yBase);
+    }
+  }
+}
+
 export const createHalftoneRenderer: RendererFactory = (canvas) => {
   return {
     render(imageData, ctx, settings, cellSize) {
@@ -60,58 +107,46 @@ export const createHalftoneRenderer: RendererFactory = (canvas) => {
         canvas.height = outH;
       }
 
+      if (colorMode) {
+        // Draw the dots once as an alpha mask, colorize it with the frame,
+        // then lay it over the background. Three full-frame draws total.
+        const { canvas: maskCanvas, ctx: maskCtx } = getMaskLayer(outW, outH);
+        drawDots(
+          maskCtx,
+          getWhiteAtlas(cellSize, DOT_LEVELS),
+          pixels,
+          srcW,
+          srcH,
+          cellSize,
+          contrast,
+          brightness,
+          invert
+        );
+
+        colorizeMask(maskCtx, getGridLayer(imageData), outW, outH);
+
+        ctx.globalCompositeOperation = "source-over";
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = bgColor;
+        ctx.fillRect(0, 0, outW, outH);
+        ctx.drawImage(maskCanvas, 0, 0);
+        return;
+      }
+
       ctx.fillStyle = bgColor;
       ctx.fillRect(0, 0, outW, outH);
 
-      const whiteAtlas = getWhiteAtlas(cellSize, DOT_LEVELS);
-      // colorMode tints per dot, so it only needs the white atlas.
-      const tintedAtlas = colorMode
-        ? null
-        : getTintedAtlas(cellSize, dotColor, DOT_LEVELS);
-
-      const rowOffset = cellSize * 0.5;
-
-      for (let y = 0; y < srcH; y++) {
-        const yOff = (y & 1) === 1 ? rowOffset : 0;
-        const yBase = y * cellSize;
-
-        for (let x = 0; x < srcW; x++) {
-          const i = y * srcW + x;
-          const p = i * 4;
-          const r = pixels[p];
-          const g = pixels[p + 1];
-          const b = pixels[p + 2];
-
-          const level = computeLevel(
-            r,
-            g,
-            b,
-            contrast,
-            brightness,
-            invert,
-            DOT_LEVELS
-          );
-          // Background fill already covers level 0.
-          if (level === 0) continue;
-
-          const dx = x * cellSize + yOff;
-          const dy = yBase;
-
-          if (colorMode) {
-            const colorString = getColorString(
-              r,
-              g,
-              b,
-              COLOR_LUT_SIZE,
-              COLOR_LUT_SHIFT,
-              COLOR_LUT_BITS
-            );
-            blitTintedSprite(ctx, whiteAtlas, level, dx, dy, colorString);
-          } else {
-            blitSprite(ctx, tintedAtlas!, level, dx, dy);
-          }
-        }
-      }
+      drawDots(
+        ctx,
+        getTintedAtlas(cellSize, dotColor, DOT_LEVELS),
+        pixels,
+        srcW,
+        srcH,
+        cellSize,
+        contrast,
+        brightness,
+        invert
+      );
     },
 
     async captureImage(frame, settings, outputSize) {

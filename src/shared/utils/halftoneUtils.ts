@@ -136,9 +136,76 @@ export const getColorString = (
   return s;
 };
 
-// Scratch canvas for colorMode, resized only when sprite size changes.
+// Scratch canvas for the legacy per-dot tint path (still used by capture).
 const tintCanvas = new OffscreenCanvas(1, 1);
 const tintCtx = tintCanvas.getContext("2d");
+
+/* ------------------------- colorMode layers ---------------------------- */
+
+// Dots are drawn here as a white alpha mask, then recolored in one pass.
+let maskCanvas: OffscreenCanvas | null = null;
+let maskCtx: OffscreenCanvasRenderingContext2D | null = null;
+
+// The low-res frame, kept so it can be stretched over the dot mask.
+let gridCanvas: OffscreenCanvas | null = null;
+let gridCtx: OffscreenCanvasRenderingContext2D | null = null;
+
+/** Returns a cleared, full-frame alpha mask sized to the output. */
+export const getMaskLayer = (width: number, height: number) => {
+  if (
+    !maskCanvas ||
+    maskCanvas.width !== width ||
+    maskCanvas.height !== height
+  ) {
+    maskCanvas = new OffscreenCanvas(width, height);
+    maskCtx = maskCanvas.getContext("2d");
+  }
+  if (!maskCtx) throw new Error("halftone: mask ctx");
+
+  maskCtx.setTransform(1, 0, 0, 1, 0, 0);
+  maskCtx.globalAlpha = 1;
+  maskCtx.globalCompositeOperation = "source-over";
+  maskCtx.clearRect(0, 0, width, height);
+
+  return { canvas: maskCanvas, ctx: maskCtx };
+};
+
+/** Returns the cached grid canvas holding this frame's pixels. */
+export const getGridLayer = (imageData: ImageData) => {
+  if (
+    !gridCanvas ||
+    gridCanvas.width !== imageData.width ||
+    gridCanvas.height !== imageData.height
+  ) {
+    gridCanvas = new OffscreenCanvas(imageData.width, imageData.height);
+    gridCtx = gridCanvas.getContext("2d");
+  }
+  if (!gridCtx) throw new Error("halftone: grid ctx");
+
+  gridCtx.putImageData(imageData, 0, 0);
+
+  return gridCanvas;
+};
+
+/**
+ * Recolors an alpha dot mask in one pass: the frame is drawn with
+ * `source-in`, so it only lands where a dot exists. Nearest-neighbor keeps
+ * each dot flat-tinted by its own source pixel (matching the old per-dot
+ * tint) and avoids interpolation work.
+ */
+export const colorizeMask = (
+  ctx: OffscreenCanvasRenderingContext2D,
+  frame: CanvasImageSource,
+  width: number,
+  height: number
+) => {
+  ctx.globalAlpha = 1;
+  ctx.globalCompositeOperation = "source-in";
+  ctx.imageSmoothingEnabled = false;
+  ctx.drawImage(frame, 0, 0, width, height);
+  ctx.globalCompositeOperation = "source-over";
+  ctx.imageSmoothingEnabled = true;
+};
 
 /** Fast path: copies an already-correctly-colored sprite, offset by padding. */
 export const blitSprite = (
