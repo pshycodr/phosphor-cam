@@ -12,9 +12,9 @@ interface StudioEmptyStateProps {
 }
 
 const SAMPLES = [
-  { title: "Synth Banner", url: "/assets/banner.png" },
-  { title: "Phosphor Icon", url: "/assets/icon-foreground.png" },
-  { title: "Terminal Badge", url: "/assets/icon-only.png" },
+  { title: "Clock Tower", url: "/studio/img1.jpg" },
+  { title: "Flower", url: "/studio/img2.jpg" },
+  { title: "People sitting", url: "/studio/img3.jpg" },
 ];
 
 const focusRing =
