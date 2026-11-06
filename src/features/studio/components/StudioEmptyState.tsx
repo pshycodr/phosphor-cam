@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import { Clipboard, Upload } from "lucide-react";
 
 import { useStudioStore } from "../store/studioStore";
+import { loadBoundedStudioImage } from "../utils/imageSource";
 
 interface StudioEmptyStateProps {
   onOpenFilePicker: () => void;
@@ -91,10 +92,8 @@ function StudioEmptyState({
 
   const loadSample = async (url: string, title: string) => {
     try {
-      const img = new Image();
-      img.src = url;
-      await img.decode();
-      loadImage(null, url, `${title}.png`, img.naturalWidth, img.naturalHeight);
+      const source = await loadBoundedStudioImage(url);
+      loadImage(null, source.url, `${title}.png`, source.width, source.height);
     } catch {
       toast.error("Could not load sample image");
     }

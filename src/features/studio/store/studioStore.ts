@@ -84,6 +84,11 @@ export const useStudioStore = create<StudioState>((set, get) => ({
   setWorkerController: (c) => set({ workerController: c }),
 
   loadImage: (file, url, name, width, height) => {
+    const previous = get().image;
+    if (previous?.url.startsWith("blob:") && previous.url !== url) {
+      URL.revokeObjectURL(previous.url);
+    }
+
     set({
       image: {
         file,

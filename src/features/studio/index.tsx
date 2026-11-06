@@ -9,6 +9,7 @@ import StudioHeader from "./components/StudioHeader";
 import StudioInspector from "./components/StudioInspector";
 import StudioViewport from "./components/StudioViewport";
 import { useStudioStore } from "./store/studioStore";
+import { loadBoundedStudioImage } from "./utils/imageSource";
 
 export default function StudioPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -36,18 +37,9 @@ export default function StudioPage() {
       }
 
       try {
-        const objectUrl = URL.createObjectURL(file);
-        const img = new Image();
-        img.src = objectUrl;
-        await img.decode();
+        const source = await loadBoundedStudioImage(file);
 
-        loadImage(
-          file,
-          objectUrl,
-          file.name,
-          img.naturalWidth,
-          img.naturalHeight
-        );
+        loadImage(file, source.url, file.name, source.width, source.height);
         toast.success(`Loaded ${file.name}`);
       } catch (err) {
         console.error("Error loading image file", err);
