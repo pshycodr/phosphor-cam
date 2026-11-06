@@ -14,17 +14,17 @@ import { useSettingsStore } from "../store/settingsStore";
 function Settings() {
   const [isOpen, setIsOpen] = useState(false);
 
-  const settings = useSettingsStore((s) => s.settings);
   const updateSettings = useSettingsStore((s) => s.updateSettings);
   const updateEffect = useSettingsStore((s) => s.updateEffect);
 
   const controls = useMemo<SettingsControlsValue>(
     () => ({
-      settings,
+      getSettings: () => useSettingsStore.getState().settings,
+      subscribe: (listener) => useSettingsStore.subscribe(listener),
       updateSettings: (patch) => updateSettings(patch),
       updateEffect: (key, patch) => updateEffect(key, patch),
     }),
-    [settings, updateSettings, updateEffect]
+    [updateSettings, updateEffect]
   );
 
   const fabRef = useRef<HTMLButtonElement>(null);

@@ -1,7 +1,7 @@
 import { memo, type ReactNode, useCallback } from "react";
 import { LuColumns3, LuRows3 } from "react-icons/lu";
 
-import { useSettingsControls } from "./useSettingsControls";
+import { useSettingsActions, useSettingsSelector } from "./useSettingsControls";
 
 const FOCUS_RING =
   "outline-none focus-visible:ring-2 focus-visible:ring-green-400/70";
@@ -60,8 +60,10 @@ const SideButton = ({
 );
 
 const LinesDirectionPicker = () => {
-  const { settings, updateSettings } = useSettingsControls();
-  const lineDirection = settings.lineDirection;
+  const lineDirection = useSettingsSelector(
+    (settings) => settings.lineDirection
+  );
+  const { updateSettings } = useSettingsActions();
 
   const setHorizontal = useCallback(
     () => updateSettings({ lineDirection: "horizontal" }),

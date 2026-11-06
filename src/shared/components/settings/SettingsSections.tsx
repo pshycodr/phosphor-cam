@@ -18,7 +18,7 @@ import LinesDirectionPicker from "./LinesDirectionPicker";
 import RenderMode from "./RenderMode";
 import AdjustmentsContent from "./SliderRow";
 import ToggleRow from "./ToggleRow";
-import { useSettingsControls } from "./useSettingsControls";
+import { useSettingsActions, useSettingsSelector } from "./useSettingsControls";
 
 export interface ExtraSettingsSection {
   id: string;
@@ -39,31 +39,52 @@ interface SettingsSectionsProps {
 }
 
 const CharacterSetBadge = memo(() => {
-  const { settings } = useSettingsControls();
-  return <span className="capitalize">{settings.characterSet}</span>;
+  const characterSet = useSettingsSelector((settings) => settings.characterSet);
+  return <span className="capitalize">{characterSet}</span>;
 });
 
 const CaptureBadge = memo(() => {
-  const { settings } = useSettingsControls();
+  const captureScale = useSettingsSelector((settings) => settings.captureScale);
+  const captureCodec = useSettingsSelector((settings) => settings.captureCodec);
+
   return (
     <span>
-      {settings.captureScale}X, {settings.captureCodec}
+      {captureScale}X, {captureCodec}
     </span>
   );
 });
 
 const AdjustmentsBadge = memo(() => {
-  const { settings } = useSettingsControls();
-  return <>{settings.fontSize}px</>;
+  const fontSize = useSettingsSelector((settings) => settings.fontSize);
+  return <>{fontSize}px</>;
 });
 
 const EffectsBadge = memo(() => {
-  const { settings } = useSettingsControls();
-  const effects = Object.values(settings.effects);
-  const activeCount = effects.filter((effect) => effect.enabled).length;
+  const activeEffects = useSettingsSelector((settings) => {
+    const effects = Object.values(settings.effects);
+    const activeCount = effects.filter((effect) => effect.enabled).length;
+    return activeCount > 0 ? `${activeCount}/${effects.length} active` : "Off";
+  });
+
+  return <>{activeEffects}</>;
+});
+
+const Voxel3DToggle = memo(() => {
+  const voxel3d = useSettingsSelector((settings) => settings.voxel3d);
+  const { updateSettings } = useSettingsActions();
+
+  const toggle = useCallback(
+    () => updateSettings({ voxel3d: !voxel3d }),
+    [updateSettings, voxel3d]
+  );
 
   return (
-    <>{activeCount > 0 ? `${activeCount}/${effects.length} active` : "Off"}</>
+    <ToggleRow
+      label="Voxel 3D Mode"
+      description="Render raised, shaded voxel cubes."
+      checked={voxel3d}
+      onChange={toggle}
+    />
   );
 });
 
@@ -75,7 +96,7 @@ function SettingsSections({
   className = "",
   idPrefix = "settings",
 }: SettingsSectionsProps) {
-  const { settings, updateSettings } = useSettingsControls();
+  const renderMode = useSettingsSelector((settings) => settings.renderMode);
   const [openSection, setOpenSection] = useState<string | null>(
     defaultOpenSection
   );
@@ -83,11 +104,6 @@ function SettingsSections({
   const toggleSection = useCallback(
     (id: string) => setOpenSection((current) => (current === id ? null : id)),
     []
-  );
-
-  const toggleVoxel3D = useCallback(
-    () => updateSettings({ voxel3d: !settings.voxel3d }),
-    [settings.voxel3d, updateSettings]
   );
 
   const renderExtraSection = (section: ExtraSettingsSection) => {
@@ -139,16 +155,9 @@ function SettingsSections({
         isOpen={openSection === "adjustments"}
         onToggle={toggleSection}
       >
-        {settings.renderMode === "voxel" && (
-          <ToggleRow
-            label="Voxel 3D Mode"
-            description="Render raised, shaded voxel cubes."
-            checked={settings.voxel3d}
-            onChange={toggleVoxel3D}
-          />
-        )}
+        {renderMode === "voxel" && <Voxel3DToggle />}
 
-        {settings.renderMode === "lines" && <LinesDirectionPicker />}
+        {renderMode === "lines" && <LinesDirectionPicker />}
 
         <AdjustmentsContent />
       </Accordion>
@@ -165,7 +174,7 @@ function SettingsSections({
         <EffectsPanel />
       </Accordion>
 
-      {settings.renderMode === "ascii" && (
+      {renderMode === "ascii" && (
         <Accordion
           id="characterSet"
           idPrefix={idPrefix}

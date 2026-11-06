@@ -2,13 +2,13 @@ import { memo, useCallback } from "react";
 
 import type { Codecs } from "@/shared/types";
 
-import { useSettingsControls } from "./useSettingsControls";
+import { useSettingsActions, useSettingsSelector } from "./useSettingsControls";
 
 const CODECS: Codecs[] = ["png", "jpeg", "webp"];
 
 const CodecSelector = () => {
-  const { settings, updateSettings } = useSettingsControls();
-  const codec = settings.captureCodec;
+  const codec = useSettingsSelector((settings) => settings.captureCodec);
+  const { updateSettings } = useSettingsActions();
 
   const handleChange = useCallback(
     (nextCodec: Codecs) => {

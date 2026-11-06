@@ -2,11 +2,11 @@ import { memo } from "react";
 
 import { RENDER_MODES } from "@/shared/constants/settings";
 
-import { useSettingsControls } from "./useSettingsControls";
+import { useSettingsActions, useSettingsSelector } from "./useSettingsControls";
 
 const RenderMode = () => {
-  const { settings, updateSettings } = useSettingsControls();
-  const renderMode = settings.renderMode;
+  const renderMode = useSettingsSelector((settings) => settings.renderMode);
+  const { updateSettings } = useSettingsActions();
 
   return (
     <section className="border-b border-green-500/15 py-5">

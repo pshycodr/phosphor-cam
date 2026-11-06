@@ -32,19 +32,19 @@ function StudioInspector() {
   const fabRef = useRef<HTMLButtonElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
 
-  const settings = useStudioStore((s) => s.settings);
   const updateSettings = useStudioStore((s) => s.updateSettings);
   const updateEffect = useStudioStore((s) => s.updateEffect);
 
   const controls = useMemo<SettingsControlsValue>(
     () => ({
-      settings,
+      getSettings: () => useStudioStore.getState().settings,
+      subscribe: (listener) => useStudioStore.subscribe(listener),
       updateSettings: (patch, options) =>
         updateSettings(patch, options?.history ?? true),
       updateEffect: (key, patch, options) =>
         updateEffect(key, patch, options?.history ?? true),
     }),
-    [settings, updateSettings, updateEffect]
+    [updateSettings, updateEffect]
   );
 
   const open = () => {

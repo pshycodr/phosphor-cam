@@ -3,7 +3,7 @@ import { type ChangeEvent, memo, useCallback } from "react";
 import type { EffectKey } from "@/shared/types";
 
 import ToggleRow from "./ToggleRow";
-import { useSettingsControls } from "./useSettingsControls";
+import { useSettingsActions, useSettingsSelector } from "./useSettingsControls";
 
 interface EffectConfig {
   key: EffectKey;
@@ -76,8 +76,13 @@ interface EffectRowProps {
 }
 
 const EffectRow = ({ effectKey, label, description }: EffectRowProps) => {
-  const { settings, updateEffect } = useSettingsControls();
-  const { enabled, intensity } = settings.effects[effectKey];
+  const enabled = useSettingsSelector(
+    (settings) => settings.effects[effectKey].enabled
+  );
+  const intensity = useSettingsSelector(
+    (settings) => settings.effects[effectKey].intensity
+  );
+  const { updateEffect } = useSettingsActions();
 
   const toggle = useCallback(
     () => updateEffect(effectKey, { enabled: !enabled }),

@@ -7,8 +7,7 @@ export interface SettingsUpdateOptions {
   history?: boolean;
 }
 
-export interface SettingsControlsValue {
-  settings: AsciiSettings;
+export interface SettingsActions {
   updateSettings: (
     patch: Partial<AsciiSettings>,
     options?: SettingsUpdateOptions
@@ -18,6 +17,13 @@ export interface SettingsControlsValue {
     patch: Partial<EffectProps>,
     options?: SettingsUpdateOptions
   ) => void;
+}
+
+export interface SettingsControlsValue extends SettingsActions {
+  /** Current snapshot, read on demand instead of subscribing to the whole tree. */
+  getSettings: () => AsciiSettings;
+  /** Subscribe to changes from the backing store. */
+  subscribe: (listener: () => void) => () => void;
 }
 
 export const SettingsControlsContext =

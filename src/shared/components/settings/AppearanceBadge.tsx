@@ -1,10 +1,10 @@
 import { memo } from "react";
 
-import { useSettingsControls } from "./useSettingsControls";
+import { useSettingsSelector } from "./useSettingsControls";
 
 const AppearanceBadge = () => {
-  const { settings } = useSettingsControls();
-  const { colorMode, color } = settings;
+  const colorMode = useSettingsSelector((settings) => settings.colorMode);
+  const color = useSettingsSelector((settings) => settings.color);
 
   if (colorMode) return <>Live camera color</>;
 

@@ -1,7 +1,7 @@
 import { type ChangeEvent, memo, useCallback, useId, useMemo } from "react";
 import { IoWarningOutline } from "react-icons/io5";
 
-import { useSettingsControls } from "./useSettingsControls";
+import { useSettingsActions, useSettingsSelector } from "./useSettingsControls";
 
 const MIN = 1;
 const MAX = 20;
@@ -28,8 +28,8 @@ const WARN_LEFT_PCT = ((WARN_THRESHOLD - MIN) / (MAX - MIN)) * 100;
 
 const CaptureScale = () => {
   const id = useId();
-  const { settings, updateSettings } = useSettingsControls();
-  const captureScale = settings.captureScale;
+  const captureScale = useSettingsSelector((settings) => settings.captureScale);
+  const { updateSettings } = useSettingsActions();
 
   const value = clamp(captureScale);
   const isHigh = value > WARN_THRESHOLD;

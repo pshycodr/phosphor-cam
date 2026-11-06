@@ -3,11 +3,11 @@ import { memo } from "react";
 import { CHAR_SETS, CHARACTER_SETS } from "@/shared/constants/characterSets";
 import type { AsciiSettings } from "@/shared/types";
 
-import { useSettingsControls } from "./useSettingsControls";
+import { useSettingsActions, useSettingsSelector } from "./useSettingsControls";
 
 const CharacterSet = () => {
-  const { settings, updateSettings } = useSettingsControls();
-  const characterSet = settings.characterSet;
+  const characterSet = useSettingsSelector((settings) => settings.characterSet);
+  const { updateSettings } = useSettingsActions();
 
   return (
     <>

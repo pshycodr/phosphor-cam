@@ -3,7 +3,7 @@ import { memo, useId } from "react";
 import { SLIDER_CONFIGS } from "@/shared/constants/settings";
 import type { AsciiSettings } from "@/shared/types";
 
-import { useSettingsControls } from "./useSettingsControls";
+import { useSettingsActions, useSettingsSelector } from "./useSettingsControls";
 
 export type SliderKey = keyof typeof SLIDER_CONFIGS;
 
@@ -21,8 +21,10 @@ const SliderRow = memo(function SliderRow({
   settingKey: SliderKey;
 }) {
   const id = useId();
-  const { settings, updateSettings } = useSettingsControls();
-  const value = settings[settingKey] as number;
+  const value = useSettingsSelector(
+    (settings) => settings[settingKey] as number
+  );
+  const { updateSettings } = useSettingsActions();
 
   const config = SLIDER_CONFIGS[settingKey];
   const text = formatValue(settingKey, value);

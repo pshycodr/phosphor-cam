@@ -5,7 +5,7 @@ import { COLOR_PRESETS } from "@/shared/constants/colorPresets";
 
 import ColorSwitch from "./ColorSwitch";
 import ToggleRow from "./ToggleRow";
-import { useSettingsControls } from "./useSettingsControls";
+import { useSettingsActions, useSettingsSelector } from "./useSettingsControls";
 
 /* ----------------------------- random colors ---------------------------- */
 
@@ -68,8 +68,10 @@ type PickerKey = "foreground" | "background";
 /* ------------------------------- component ------------------------------ */
 
 export const AppearanceMode = () => {
-  const { settings, updateSettings } = useSettingsControls();
-  const { colorMode, invert, color } = settings;
+  const colorMode = useSettingsSelector((settings) => settings.colorMode);
+  const invert = useSettingsSelector((settings) => settings.invert);
+  const color = useSettingsSelector((settings) => settings.color);
+  const { updateSettings } = useSettingsActions();
 
   const [activePicker, setActivePicker] = useState<PickerKey | null>(null);
 
