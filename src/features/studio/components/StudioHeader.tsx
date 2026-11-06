@@ -75,7 +75,7 @@ function StudioHeader({ onOpenFilePicker }: StudioHeaderProps) {
   }, [undo, redo]);
 
   return (
-    <header className="relative z-30 flex h-14 shrink-0 items-center justify-between border-b border-green-500/20 bg-black/90 px-3 backdrop-blur-md select-none md:px-5">
+    <header className="relative top-[max(1rem,env(safe-area-inset-top))] left-[max(1rem,env(safe-area-inset-left))] z-30 flex h-14 shrink-0 items-center justify-between border-b border-green-500/20 bg-black/90 px-3 backdrop-blur-md select-none md:px-5">
       {/* Left: back + brand */}
       <div className="flex items-center gap-3">
         <Link
