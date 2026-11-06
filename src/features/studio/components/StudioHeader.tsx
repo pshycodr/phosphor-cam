@@ -1,4 +1,4 @@
-import { memo, type ReactNode,useEffect } from "react";
+import { memo, type ReactNode, useEffect } from "react";
 import { Link } from "react-router";
 
 import {
