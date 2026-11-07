@@ -1,4 +1,4 @@
-Phosphor Cam turns your live camera feed into ASCII art, dithering, halftone, lines and voxel visuals, in real time and entirely on your device.
+Phosphor Cam turns your live camera feed into ASCII art, dithering, halftone, lines and voxel visuals, in real time and entirely on your device. With Phosphor Studio, you can give any photo the same treatment.
 
 Point your camera at anything, pick a style, and watch the world get redrawn as text, dots, ribbons or pixel blocks. Switch styles on the fly without restarting the camera, and fine-tune the look until it feels right.
 
@@ -7,21 +7,31 @@ Point your camera at anything, pick a style, and watch the world get redrawn as 
 - Dither: a retro, print-like bitmap look<br/>
 - Halftone: your image rebuilt as a grid of dots<br/>
 - Voxel: chunky pixels with a 3D block effect<br/>
-- Lines: every row drawn as one continuous ribbon
+- Lines: every row or column drawn as one continuous ribbon
+
+<b>Phosphor Studio</b><br/>
+Open Studio from the button beside settings to edit a photo instead of the live feed.<br/>
+- Load an image from your device, drag and drop it, paste it, or start from a sample<br/>
+- Zoom, pan and pinch to inspect the result, and hold Compare to see the original<br/>
+- Undo and redo adjustments, with keyboard shortcuts<br/>
+- Ten presets across Retro CRT, Print & Dither and Digital & 3D<br/>
+- Export at up to 20x scale as PNG, JPEG or WEBP, copy the image, or copy the ASCII as plain text
 
 <b>Make it yours</b><br/>
-- Several ASCII character sets, including blocks, matrix and edges<br/>
-- Adjustable cell size, contrast and brightness<br/>
+- 22 ASCII character sets, including blocks, matrix, braille, runes and more<br/>
+- Adjustable character size, contrast and brightness<br/>
+- Seven effects: glow, bloom, halation, chromatic aberration, vignette, scanlines and grain<br/>
 - Color mode, invert, and custom foreground and background colors<br/>
+- Horizontal or vertical lines, and an optional 3D mode for voxels<br/>
 - Live FPS and render time readout
 
 <b>Capture and share</b><br/>
-- Save high-resolution images of what you see<br/>
+- Save high-resolution images of what you see, as PNG, JPEG or WEBP<br/>
 - Record video of the rendered output<br/>
 - Copy the current ASCII art to your clipboard as text<br/>
 - Switch between front and back cameras
 
 <b>Private and offline</b><br/>
-Everything runs locally. Your camera feed is never uploaded, and the app needs no account, no server and no internet connection. It contains no ads and no trackers.
+Everything runs locally. Your camera feed and photos are never uploaded, and the app needs no account, no server and no internet connection. It contains no ads and no trackers.
 
 Phosphor Cam is free and open source under the MIT license.

@@ -1,0 +1,10 @@
+Version: v1.2.0
+
+- New Phosphor Studio: edit photos with ASCII, dither, halftone or voxel art
+- Ten presets, undo/redo, zoom and hold-to-compare
+- Export at up to 20x as PNG, JPEG or WEBP, or copy image or ASCII text
+- Seven effects, including glow, bloom, halation and scanlines
+- 22 ASCII character sets, up from 5
+- Camera and Studio now share one settings panel
+- Fixed halftone in color mode freezing or crashing on phones
+- Large photos are downscaled first, keeping Studio fast and stable
