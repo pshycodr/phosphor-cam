@@ -7,7 +7,7 @@ declare const process: {
 const devServerUrl = process.env.CAPACITOR_DEV_SERVER_URL;
 
 const config: CapacitorConfig = {
-  appId: "site.aroy.phosphorcam",
+  appId: "site.aroy.phosphor",
   appName: "Phosphor Cam",
   webDir: "dist",
   plugins: {
