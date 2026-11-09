@@ -6,6 +6,17 @@
   --safe-right: env(safe-area-inset-right, 0px);
 }
 
+html,
+body {
+  touch-action: pan-x pan-y;
+  overscroll-behavior: none;
+  -webkit-text-size-adjust: 100%;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
 @font-face {
   font-family: "JetBrainsMono-Bold";
   src: url("/assets/fonts/JetBrainsMono-Bold.woff2") format("woff2");
