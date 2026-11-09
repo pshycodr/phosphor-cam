@@ -11,7 +11,6 @@ import { useSheetDrag } from "@/shared/hooks/useSheetDrag";
 
 import { STUDIO_PRESETS } from "../constants/presets";
 import { useStudioStore } from "../store/studioStore";
-
 import PresetsPanel from "./controls/PresetsPanel";
 
 const PRESETS_SECTION: ExtraSettingsSection = {

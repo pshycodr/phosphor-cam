@@ -1,6 +1,6 @@
 import { StrictMode } from "react";
-import { BrowserRouter } from "react-router";
 import { createRoot } from "react-dom/client";
+import { BrowserRouter } from "react-router";
 
 import { Capacitor } from "@capacitor/core";
 import { StatusBar } from "@capacitor/status-bar";

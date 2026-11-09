@@ -13,22 +13,22 @@
     "android:open": "bunx cap open android",
     "android:release": "bun run android:sync && cd android && sh ./release-apk.sh",
     "start": "vite start",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
+    "lint": "oxlint .",
+    "lint:fix": "oxlint . --fix",
     "typecheck": "tsc --noEmit",
     "preview": "vite preview",
-    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md,mdx,css}\"",
-    "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,md,mdx,css}\"",
+    "format": "oxfmt \"**/*.{js,jsx,ts,tsx,json,md,mdx,css}\"",
+    "format:check": "oxfmt --check \"**/*.{js,jsx,ts,tsx,json,md,mdx,css}\"",
     "lint-staged": "lint-staged",
     "prepare": "husky"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
-      "prettier --write",
-      "eslint --fix"
+      "oxlint --fix",
+      "oxfmt"
     ],
     "*.{json,md,mdx,css}": [
-      "prettier --write"
+      "oxfmt"
     ]
   },
   "dependencies": {
@@ -50,26 +50,15 @@
   "devDependencies": {
     "@capacitor/assets": "^3.0.5",
     "@capacitor/cli": "^8.5.2",
-    "@eslint/js": "^10.0.1",
-    "@eslint/markdown": "^8.0.1",
     "@types/node": "^26.6.3",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
-    "eslint": "^10.2.0",
-    "eslint-plugin-import": "^2.32.0",
-    "eslint-plugin-react": "^7.37.5",
-    "eslint-plugin-react-hooks": "^7.0.1",
-    "eslint-plugin-react-refresh": "^0.5.2",
-    "eslint-plugin-simple-import-sort": "^13.0.0",
-    "globals": "^17.5.0",
     "husky": "^9.1.7",
-    "jiti": "^2.6.1",
     "lint-staged": "^16.4.0",
-    "prettier": "^3.8.2",
-    "prettier-plugin-tailwindcss": "^0.7.2",
+    "oxfmt": "^0.77.0",
+    "oxlint": "^1.92.0",
     "typescript": "~6.0.2",
-    "typescript-eslint": "^8.58.2",
     "vite": "^8.0.8"
   },
   "engines": {

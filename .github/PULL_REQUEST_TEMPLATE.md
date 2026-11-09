@@ -49,7 +49,7 @@ Focus on intent rather than describing the diff.
 # Checklist
 
 - [ ] My code follows the project's style
-- [ ] `eslint` passes with no new warnings
+- [ ] `oxlint` passes with no new warnings
 - [ ] `tsc --noEmit` passes (no new type errors)
 - [ ] The build succeeds locally (`vite build`)
 - [ ] No new console errors/warnings in the browser

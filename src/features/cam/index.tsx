@@ -10,9 +10,9 @@ import Header from "./components/header";
 import Settings from "./components/settings";
 import type { ViewportHandle } from "./components/viewport";
 import Viewport from "./components/viewport";
+import type { CameraFacingMode } from "./types";
 import { getSupportedMediaRecorderMimeType } from "./utils/mediaRecorder";
 import { saveVideo } from "./utils/saveVideo";
-import type { CameraFacingMode } from "./types";
 
 function Cam() {
   const [stream, setStream] = useState<MediaStream | null>(null);

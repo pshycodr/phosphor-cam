@@ -118,7 +118,7 @@ Before submitting a PR:
 
 ## Code Style
 
-- **Formatting**: Run `npm run format` before committing (if Prettier is configured)
+- **Formatting**: Run `npm run format` before committing (Oxfmt handles formatting and import sorting)
 - **Naming**: Use camelCase for variables, PascalCase for components
 - **Imports**: Group by external libraries, then internal modules
 - **Comments**: Explain "why" not "what" for complex logic
