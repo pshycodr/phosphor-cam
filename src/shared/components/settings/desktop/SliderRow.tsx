@@ -3,7 +3,10 @@ import { memo, useId } from "react";
 import { SLIDER_CONFIGS } from "@/shared/constants/settings";
 import type { AsciiSettings } from "@/shared/types";
 
-import { useSettingsActions, useSettingsSelector } from "./useSettingsControls";
+import {
+  useSettingsActions,
+  useSettingsSelector,
+} from "../common/useSettingsControls";
 
 export type SliderKey = keyof typeof SLIDER_CONFIGS;
 

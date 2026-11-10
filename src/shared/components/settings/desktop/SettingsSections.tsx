@@ -7,18 +7,21 @@ import {
   LuType,
 } from "react-icons/lu";
 
+import EffectsPanel from "../common/EffectsPanel";
+import ToggleRow from "../common/ToggleRow";
+import {
+  useSettingsActions,
+  useSettingsSelector,
+} from "../common/useSettingsControls";
 import Accordion from "./Accordion";
 import AppearanceBadge from "./AppearanceBadge";
 import AppearanceMode from "./AppearanceMode";
 import CaptureScale from "./CaptureScale";
 import CharacterSet from "./CharacterSet";
 import Codec from "./Codec";
-import EffectsPanel from "./EffectsPanel";
 import LinesDirectionPicker from "./LinesDirectionPicker";
 import RenderMode from "./RenderMode";
 import AdjustmentsContent from "./SliderRow";
-import ToggleRow from "./ToggleRow";
-import { useSettingsActions, useSettingsSelector } from "./useSettingsControls";
 
 export interface ExtraSettingsSection {
   id: string;

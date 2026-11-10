@@ -1,7 +1,10 @@
 import { type ChangeEvent, memo, useCallback, useId, useMemo } from "react";
 import { IoWarningOutline } from "react-icons/io5";
 
-import { useSettingsActions, useSettingsSelector } from "./useSettingsControls";
+import {
+  useSettingsActions,
+  useSettingsSelector,
+} from "../common/useSettingsControls";
 
 const MIN = 1;
 const MAX = 20;

@@ -1,7 +1,7 @@
 import { memo } from "react";
 import { LuChevronDown } from "react-icons/lu";
 
-import Collapse from "./Collapse";
+import Collapse from "../common/Collapse";
 
 interface AccordionSectionProps {
   id: string;

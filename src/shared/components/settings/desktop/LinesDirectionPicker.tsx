@@ -1,7 +1,10 @@
 import { memo, type ReactNode, useCallback } from "react";
 import { LuColumns3, LuRows3 } from "react-icons/lu";
 
-import { useSettingsActions, useSettingsSelector } from "./useSettingsControls";
+import {
+  useSettingsActions,
+  useSettingsSelector,
+} from "../common/useSettingsControls";
 
 const FOCUS_RING =
   "outline-none focus-visible:ring-2 focus-visible:ring-green-400/70";

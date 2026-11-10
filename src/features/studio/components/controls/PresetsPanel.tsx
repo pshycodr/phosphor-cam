@@ -2,7 +2,7 @@ import { memo, useMemo } from "react";
 
 import { Check } from "lucide-react";
 
-import { useSettingsSelector } from "@/shared/components/settings/useSettingsControls";
+import { useSettingsSelector } from "@/shared/components/settings/common/useSettingsControls";
 
 import { STUDIO_PRESETS, type StudioPreset } from "../../constants/presets";
 import { useStudioStore } from "../../store/studioStore";

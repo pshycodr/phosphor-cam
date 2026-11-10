@@ -3,7 +3,10 @@ import { memo } from "react";
 import { CHAR_SETS, CHARACTER_SETS } from "@/shared/constants/characterSets";
 import type { AsciiSettings } from "@/shared/types";
 
-import { useSettingsActions, useSettingsSelector } from "./useSettingsControls";
+import {
+  useSettingsActions,
+  useSettingsSelector,
+} from "../common/useSettingsControls";
 
 const CharacterSet = () => {
   const characterSet = useSettingsSelector((settings) => settings.characterSet);

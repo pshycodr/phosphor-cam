@@ -1,7 +1,7 @@
 import { memo, useId, useState } from "react";
 import { LuChevronDown } from "react-icons/lu";
 
-import Collapse from "./Collapse";
+import Collapse from "../common/Collapse";
 import ColorPicker from "./ColorPicker";
 
 interface ColorSwitchProps {

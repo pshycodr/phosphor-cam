@@ -2,11 +2,11 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { SlidersHorizontal, Sparkles, X } from "lucide-react";
 
-import type { SettingsControlsValue } from "@/shared/components/settings/SettingsControls";
-import { SettingsControlsProvider } from "@/shared/components/settings/SettingsControlsProvider";
+import type { SettingsControlsValue } from "@/shared/components/settings/common/SettingsControls";
+import { SettingsControlsProvider } from "@/shared/components/settings/common/SettingsControlsProvider";
 import SettingsSections, {
   type ExtraSettingsSection,
-} from "@/shared/components/settings/SettingsSections";
+} from "@/shared/components/settings/desktop/SettingsSections";
 import { useSheetDrag } from "@/shared/hooks/useSheetDrag";
 
 import { STUDIO_PRESETS } from "../constants/presets";

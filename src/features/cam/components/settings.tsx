@@ -3,9 +3,9 @@ import { FaGithub } from "react-icons/fa";
 import { IoClose } from "react-icons/io5";
 import { LuSettings2 } from "react-icons/lu";
 
-import type { SettingsControlsValue } from "@/shared/components/settings/SettingsControls";
-import { SettingsControlsProvider } from "@/shared/components/settings/SettingsControlsProvider";
-import SettingsSections from "@/shared/components/settings/SettingsSections";
+import type { SettingsControlsValue } from "@/shared/components/settings/common/SettingsControls";
+import { SettingsControlsProvider } from "@/shared/components/settings/common/SettingsControlsProvider";
+import SettingsSections from "@/shared/components/settings/desktop/SettingsSections";
 import { useSheetDrag } from "@/shared/hooks/useSheetDrag";
 
 import { VERSION } from "../constants/version";

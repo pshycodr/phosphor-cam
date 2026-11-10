@@ -1,6 +1,6 @@
 import { memo } from "react";
 
-import { useSettingsSelector } from "./useSettingsControls";
+import { useSettingsSelector } from "../common/useSettingsControls";
 
 const AppearanceBadge = () => {
   const colorMode = useSettingsSelector((settings) => settings.colorMode);

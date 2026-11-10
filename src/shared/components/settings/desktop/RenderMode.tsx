@@ -2,7 +2,10 @@ import { memo } from "react";
 
 import { RENDER_MODES } from "@/shared/constants/settings";
 
-import { useSettingsActions, useSettingsSelector } from "./useSettingsControls";
+import {
+  useSettingsActions,
+  useSettingsSelector,
+} from "../common/useSettingsControls";
 
 const RenderMode = () => {
   const renderMode = useSettingsSelector((settings) => settings.renderMode);

@@ -3,9 +3,12 @@ import { LuArrowLeftRight, LuDices } from "react-icons/lu";
 
 import { COLOR_PRESETS } from "@/shared/constants/colorPresets";
 
+import ToggleRow from "../common/ToggleRow";
+import {
+  useSettingsActions,
+  useSettingsSelector,
+} from "../common/useSettingsControls";
 import ColorSwitch from "./ColorSwitch";
-import ToggleRow from "./ToggleRow";
-import { useSettingsActions, useSettingsSelector } from "./useSettingsControls";
 
 /* ----------------------------- random colors ---------------------------- */
 

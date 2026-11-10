@@ -2,7 +2,10 @@ import { memo, useCallback } from "react";
 
 import type { Codecs } from "@/shared/types";
 
-import { useSettingsActions, useSettingsSelector } from "./useSettingsControls";
+import {
+  useSettingsActions,
+  useSettingsSelector,
+} from "../common/useSettingsControls";
 
 const CODECS: Codecs[] = ["png", "jpeg", "webp"];
 
