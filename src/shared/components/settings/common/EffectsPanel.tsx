@@ -2,72 +2,9 @@ import { type ChangeEvent, memo, useCallback } from "react";
 
 import type { EffectKey } from "@/shared/types";
 
+import { EFFECT_GROUPS } from "./effectGroups";
 import ToggleRow from "./ToggleRow";
 import { useSettingsActions, useSettingsSelector } from "./useSettingsControls";
-
-interface EffectConfig {
-  key: EffectKey;
-  label: string;
-  description: string;
-}
-
-interface EffectGroup {
-  label: string;
-  items: EffectConfig[];
-}
-
-const EFFECT_GROUPS: EffectGroup[] = [
-  {
-    label: "Light",
-    items: [
-      {
-        key: "glow",
-        label: "Glow",
-        description: "Soft ambient lift across the whole frame.",
-      },
-      {
-        key: "bloom",
-        label: "Bloom",
-        description: "Wider glow that favors the brightest areas.",
-      },
-      {
-        key: "halation",
-        label: "Halation",
-        description: "Warm halo around highlights, like film.",
-      },
-    ],
-  },
-  {
-    label: "Lens",
-    items: [
-      {
-        key: "chromaticAberration",
-        label: "Chromatic Aberration",
-        description: "Splits color channels apart for a glitchy fringe.",
-      },
-      {
-        key: "vignette",
-        label: "Vignette",
-        description: "Darkens the corners.",
-      },
-    ],
-  },
-  {
-    label: "Texture",
-    items: [
-      {
-        key: "scanlines",
-        label: "Scanlines",
-        description: "Repeating dark lines, like a CRT screen.",
-      },
-      {
-        key: "grain",
-        label: "Grain",
-        description: "Flickering film-style noise.",
-      },
-    ],
-  },
-];
 
 interface EffectRowProps {
   effectKey: EffectKey;
