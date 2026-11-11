@@ -26,12 +26,14 @@ function Cam() {
   const [clipboardSuccess, setClipboardSuccess] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const native = isNative();
 
   // Only one ref into the render layer now, instead of a ref threaded
   // through AsciiView into whichever renderer happened to be mounted.
   const viewportRef = useRef<ViewportHandle>(null);
+  const settingsButtonRef = useRef<HTMLButtonElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const recordedChunksRef = useRef<Blob[]>([]);
   const recordingTimerRef = useRef<number | null>(null);
@@ -79,6 +81,9 @@ function Cam() {
   const toggleCamera = useCallback(() => {
     setFacingMode((prev) => (prev === "user" ? "environment" : "user"));
   }, []);
+
+  const openSettings = useCallback(() => setSettingsOpen(true), []);
+  const closeSettings = useCallback(() => setSettingsOpen(false), []);
 
   const takeSnapshot = useCallback(async () => {
     if (!viewportRef.current) return;
@@ -206,7 +211,12 @@ function Cam() {
 
       {/* No settings/stats props - Header and Settings read straight from their stores */}
       <Header width={windowSize.width} height={windowSize.height} />
-      <Settings />
+      <Settings
+        open={settingsOpen}
+        onOpen={openSettings}
+        onClose={closeSettings}
+        triggerRef={settingsButtonRef}
+      />
 
       {flash && (
         <div className="animate-out fade-out pointer-events-none fixed inset-0 z-50 bg-white duration-150" />
@@ -246,9 +256,12 @@ function Cam() {
         onShot={takeSnapshot}
         onCopy={copyToClipboard}
         onToggleRecording={toggleRecording}
+        onOpenSettings={openSettings}
         isRecording={isRecording}
         formatTime={formatTime}
         recordingTime={recordingTime}
+        settingsOpen={settingsOpen}
+        settingsButtonRef={settingsButtonRef}
       />
     </div>
   );
