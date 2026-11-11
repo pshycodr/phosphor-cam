@@ -3,11 +3,11 @@ import { IoWarningOutline } from "react-icons/io5";
 
 import type { Codecs } from "@/shared/types";
 
+import { SliderField } from "../../common/EditorSlider";
 import {
   useSettingsActions,
   useSettingsSelector,
 } from "../../common/useSettingsControls";
-import { SliderField } from "../EditorSlider";
 import { Segmented } from "../primitives";
 
 const MIN = 1;

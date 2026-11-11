@@ -3,12 +3,12 @@ import { LuArrowLeftRight, LuDices, LuBlend, LuVideo } from "react-icons/lu";
 
 import { COLOR_PRESETS } from "@/shared/constants/colorPresets";
 
+import { randomPair, sameColor } from "../../common/colorMath";
+import ColorSliders from "../../common/ColorSliders";
 import {
   useSettingsActions,
   useSettingsSelector,
 } from "../../common/useSettingsControls";
-import { randomPair, sameColor } from "../colorMath";
-import ColorSliders from "../ColorSliders";
 import { Chip, ScrollRow } from "../primitives";
 
 type PickerKey = "foreground" | "background";

@@ -5,11 +5,11 @@ import { LuContrast, LuSun, LuType } from "react-icons/lu";
 import { SLIDER_CONFIGS } from "@/shared/constants/settings";
 import type { AsciiSettings } from "@/shared/types";
 
+import { SliderField } from "../../common/EditorSlider";
 import {
   useSettingsActions,
   useSettingsSelector,
 } from "../../common/useSettingsControls";
-import { SliderField } from "../EditorSlider";
 import { Chip, ScrollRow } from "../primitives";
 
 type SliderKey = keyof typeof SLIDER_CONFIGS;

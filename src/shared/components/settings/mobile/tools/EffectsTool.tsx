@@ -2,13 +2,13 @@ import { memo, useState } from "react";
 
 import type { EffectKey } from "@/shared/types";
 
+import { SliderField } from "../../common/EditorSlider";
 import { EFFECT_GROUPS } from "../../common/effectGroups";
 import {
   useSettingsActions,
   useSettingsControls,
   useSettingsSelector,
 } from "../../common/useSettingsControls";
-import { SliderField } from "../EditorSlider";
 import { Chip, ScrollRow, Switch } from "../primitives";
 
 const ALL_EFFECTS = EFFECT_GROUPS.flatMap((g) => g.items);
