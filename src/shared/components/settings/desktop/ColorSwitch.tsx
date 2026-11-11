@@ -2,7 +2,7 @@ import { memo, useId, useState } from "react";
 import { LuChevronDown } from "react-icons/lu";
 
 import Collapse from "../common/Collapse";
-import ColorPicker from "./ColorPicker";
+import ColorSliders from "../common/ColorSliders";
 
 interface ColorSwitchProps {
   label: string;
@@ -61,7 +61,7 @@ const ColorSwitch = ({
       <Collapse id={panelId} open={open}>
         <div className="px-3 pt-2 pb-4">
           {mounted && (
-            <ColorPicker
+            <ColorSliders
               value={value}
               onChange={onChange}
               onCommit={onCommit}
