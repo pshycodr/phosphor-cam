@@ -1,0 +1,9 @@
+Version: v1.3.0
+
+- New mobile editor dock: change style, adjustments, effects, characters,
+  color and capture settings without leaving the camera preview
+- Camera controls now include an EDIT button, with a compact shutter, flip
+  and mode cluster floating above the dock
+- Color settings are now H/S/B sliders with a hex field on desktop and mobile
+- Fixed UI pinch-zoom, the Studio header position, and the preview
+  overlapping the editor dock
