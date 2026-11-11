@@ -3,65 +3,13 @@ import { LuArrowLeftRight, LuDices } from "react-icons/lu";
 
 import { COLOR_PRESETS } from "@/shared/constants/colorPresets";
 
+import { randomPair, sameColor } from "../common/colorMath";
 import ToggleRow from "../common/ToggleRow";
 import {
   useSettingsActions,
   useSettingsSelector,
 } from "../common/useSettingsControls";
 import ColorSwitch from "./ColorSwitch";
-
-/* ----------------------------- random colors ---------------------------- */
-
-/** Returns a vivid random hex color (HSV with s,v in a mid-high range). */
-function randomHex(): string {
-  const h = Math.random() * 360;
-  const s = 0.55 + Math.random() * 0.45;
-  const v = 0.55 + Math.random() * 0.45;
-
-  const c = v * s;
-  const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
-  const m = v - c;
-  let r, g, b;
-
-  if (h < 60) [r, g, b] = [c, x, 0];
-  else if (h < 120) [r, g, b] = [x, c, 0];
-  else if (h < 180) [r, g, b] = [0, c, x];
-  else if (h < 240) [r, g, b] = [0, x, c];
-  else if (h < 300) [r, g, b] = [x, 0, c];
-  else [r, g, b] = [c, 0, x];
-
-  const to = (n: number) =>
-    Math.round((n + m) * 255)
-      .toString(16)
-      .padStart(2, "0");
-  return `#${to(r)}${to(g)}${to(b)}`;
-}
-
-/** Relative luminance of a hex color (0..1), for contrast checks. */
-function luminance(hex: string): number {
-  const h = hex.replace("#", "");
-  const n = parseInt(h.length === 3 ? h.replace(/(.)/g, "$1$1") : h, 16);
-  const r = ((n >> 16) & 0xff) / 255;
-  const g = ((n >> 8) & 0xff) / 255;
-  const b = (n & 0xff) / 255;
-  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
-}
-
-function randomPair(): { foreground: string; background: string } {
-  const MIN_GAP = 0.35;
-  for (let attempt = 0; attempt < 20; attempt++) {
-    const fg = randomHex();
-    const bg = randomHex();
-    if (Math.abs(luminance(fg) - luminance(bg)) >= MIN_GAP) {
-      return { foreground: fg, background: bg };
-    }
-  }
-  // Fallback: pair a dark background with a bright foreground
-  const dark = randomHex();
-  return { foreground: "#f5f5f5", background: dark };
-}
-
-const sameColor = (a: string, b: string) => a.toLowerCase() === b.toLowerCase();
 
 const SMALL_ACTION =
   "flex min-h-10 items-center gap-1.5 rounded-md border border-green-500/40 px-3 text-xs font-medium text-green-400 outline-none transition-colors hover:bg-green-900/20 focus-visible:ring-2 focus-visible:ring-green-400/70";
