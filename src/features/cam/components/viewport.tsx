@@ -118,7 +118,11 @@ const Viewport = forwardRef<ViewportHandle, ViewportProps>(
     return (
       <div
         className="fixed inset-0 flex items-center justify-center overflow-hidden bg-black"
-        style={{ transform: mirrored ? "scaleX(-1)" : undefined }}
+        style={{
+          transform: mirrored ? "scaleX(-1)" : undefined,
+          // Keeps the preview clear of the mobile editor dock (0px when closed).
+          paddingBottom: "var(--editor-dock-h, 0px)",
+        }}
       >
         <video
           ref={videoRef}
