@@ -44,9 +44,9 @@ const Viewport = forwardRef<ViewportHandle, ViewportProps>(
       const canvas = document.createElement("canvas");
       canvas.width = sizeRef.current.width;
       canvas.height = sizeRef.current.height;
-      canvas.className = "-z-10 max-h-full max-w-full bg-transparent";
+      canvas.className = "max-h-full max-w-full";
       canvas.setAttribute("role", "img");
-      canvas.setAttribute("aria-label", "Live ASCII camera preview");
+      canvas.setAttribute("aria-label", "Live Phosphor camera preview");
       container.appendChild(canvas);
       canvasRef.current = canvas;
 
@@ -117,7 +117,7 @@ const Viewport = forwardRef<ViewportHandle, ViewportProps>(
 
     return (
       <div
-        className="fixed inset-0 flex items-center justify-center overflow-hidden bg-black"
+        className="fixed inset-0 flex items-center justify-center overflow-hidden bg-ink"
         style={{
           transform: mirrored ? "scaleX(-1)" : undefined,
           // Keeps the preview clear of the mobile editor dock (0px when closed).

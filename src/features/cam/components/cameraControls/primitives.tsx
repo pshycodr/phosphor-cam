@@ -10,7 +10,7 @@ export const Label = ({
   className?: string;
 }) => (
   <span
-    className={`text-[10px] font-bold tracking-widest transition-colors md:text-[11px] ${HIDE_WHEN_SHORT} ${className}`}
+    className={`text-[9px] font-medium tracking-[0.16em] uppercase transition-colors ${HIDE_WHEN_SHORT} ${className}`}
   >
     {children}
   </span>
@@ -43,13 +43,13 @@ export const SideButton = ({
     onClick={onClick}
     disabled={disabled}
     aria-label={ariaLabel}
-    className={`group flex flex-col items-center gap-1.5 rounded-2xl disabled:cursor-not-allowed disabled:opacity-40 ${FOCUS_RING} ${className}`}
+    className={`group flex flex-col items-center gap-1.5 rounded-2xl disabled:opacity-40 ${FOCUS_RING} ${className}`}
   >
     <span
-      className={`flex items-center justify-center rounded-full border backdrop-blur transition-all group-active:scale-95 ${SIDE_SIZE} ${
+      className={`flex items-center justify-center rounded-full border backdrop-blur-md transition-all duration-200 group-active:scale-95 ${SIDE_SIZE} ${
         active
-          ? "scale-110 border-green-400 bg-green-900/40"
-          : "border-green-500/30 bg-black/40 group-hover:border-green-400 group-hover:bg-green-900/30"
+          ? "border-signal/70 bg-signal/10 text-signal"
+          : "border-line/80 bg-ink-2/70 text-muted group-hover:border-line-strong group-hover:bg-ink-3 group-hover:text-paper"
       }`}
     >
       {children}
@@ -76,7 +76,8 @@ export const MiniButton = ({
     onClick={onClick}
     disabled={disabled}
     aria-label={label}
-    className={`flex size-11 items-center justify-center rounded-full border border-green-500/30 bg-black/60 text-white backdrop-blur transition-all active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 ${FOCUS_RING}`}
+    title={label}
+    className={`press flex size-11 items-center justify-center rounded-full border border-line/80 bg-ink-2/85 text-muted backdrop-blur-md hover:border-line-strong hover:bg-ink-3 hover:text-paper disabled:opacity-40 ${FOCUS_RING}`}
   >
     {children}
   </button>

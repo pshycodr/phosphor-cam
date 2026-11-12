@@ -26,22 +26,36 @@ export const Shutter = ({
   const dot = compact ? "size-12" : SHUTTER_DOT;
   const stop = compact ? "size-5" : STOP_DOT;
 
+  const caption = isRecording ? (
+    <Label className="text-signal">
+      <span className="flex items-center gap-1.5">
+        <span
+          aria-hidden="true"
+          className="recording-dot size-1.5 rounded-full bg-signal"
+        />
+        <span className="tabular-nums">{recordingLabel}</span>
+      </span>
+    </Label>
+  ) : (
+    <Label className={IDLE_LABEL}>{isVideo ? "Record" : "Capture"}</Label>
+  );
+
   if (!isVideo) {
     return (
       <button
         type="button"
         onClick={onShot}
         aria-label="Capture photo"
-        className={`group flex flex-col items-center gap-1.5 rounded-full ${FOCUS_RING}`}
+        className={`group flex flex-col items-center gap-2 rounded-full ${FOCUS_RING}`}
       >
         <span
-          className={`flex items-center justify-center rounded-full border-[3px] border-white/80 bg-white/10 backdrop-blur transition-all group-hover:scale-105 group-hover:bg-white/20 group-active:scale-95 ${ring}`}
+          className={`flex items-center justify-center rounded-full border-2 border-paper/60 bg-ink-2/50 transition-all duration-150 group-hover:border-paper group-active:scale-95 ${ring}`}
         >
           <span
-            className={`rounded-full bg-white opacity-90 transition-opacity group-hover:opacity-100 ${dot}`}
+            className={`rounded-full bg-paper opacity-95 transition-all duration-150 group-hover:bg-white group-hover:opacity-100 ${dot}`}
           />
         </span>
-        {!compact && <Label className={IDLE_LABEL}>CAPTURE</Label>}
+        {!compact && caption}
       </button>
     );
   }
@@ -52,38 +66,30 @@ export const Shutter = ({
       onClick={onToggleRecording}
       aria-label={isRecording ? "Stop recording" : "Start recording"}
       aria-pressed={isRecording}
-      className={`group flex flex-col items-center gap-1.5 rounded-full ${FOCUS_RING}`}
+      className={`group flex flex-col items-center gap-2 rounded-full ${FOCUS_RING}`}
     >
       <span
-        className={`flex items-center justify-center rounded-full border-[3px] backdrop-blur transition-all ${ring} ${
+        className={`flex items-center justify-center rounded-full border-2 transition-all duration-150 ${ring} ${
           isRecording
-            ? "border-red-500 bg-red-900/30 group-hover:bg-red-900/40"
-            : "border-red-500/80 bg-red-500/10 group-hover:scale-105 group-hover:bg-red-500/20 group-active:scale-95"
+            ? "border-signal/80 bg-signal/10"
+            : "border-paper/60 bg-ink-2/50 group-hover:border-paper group-active:scale-95"
         }`}
       >
         <span
-          className={`bg-red-500 transition-all ${
+          className={`transition-all duration-200 ${
             isRecording
-              ? `animate-pulse rounded-lg ${stop}`
-              : `rounded-full opacity-90 group-hover:opacity-100 ${dot}`
+              ? `rounded-[5px] bg-signal ${stop}`
+              : `rounded-full bg-paper opacity-95 group-hover:bg-white group-hover:opacity-100 ${dot}`
           }`}
         />
       </span>
-      {compact ? (
-        isRecording && (
-          <span className="rounded-full bg-black/70 px-2 py-0.5 font-mono text-[10px] font-bold text-red-400 tabular-nums">
-            {recordingLabel}
-          </span>
-        )
-      ) : (
-        <Label
-          className={
-            isRecording ? "font-mono text-red-400 tabular-nums" : IDLE_LABEL
-          }
-        >
-          {isRecording ? recordingLabel : "RECORD"}
-        </Label>
-      )}
+      {compact
+        ? isRecording && (
+            <span className="rounded-full border border-line/80 bg-ink-2/85 px-2 py-0.5 font-mono text-[10px] text-signal tabular-nums backdrop-blur-md">
+              {recordingLabel}
+            </span>
+          )
+        : caption}
     </button>
   );
 };

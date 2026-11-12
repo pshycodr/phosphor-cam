@@ -1,93 +1,104 @@
-import { memo } from "react";
+import { memo, type RefObject } from "react";
 import { Link } from "react-router";
 
-import { Sparkles } from "lucide-react";
+import { SlidersHorizontal, Sparkles } from "lucide-react";
 
 import { useStatsStore } from "../store/statsStore";
 
 interface HeaderProps {
   width: number;
   height: number;
+  settingsButtonRef: RefObject<HTMLButtonElement | null>;
 }
 
 const FPSValue = memo(function FPSValue() {
   const fps = useStatsStore((s) => s.fps);
-
-  return <span className="font-semibold tabular-nums">{Math.floor(fps)}</span>;
+  return <>{Math.floor(fps)}</>;
 });
 
 const RenderTimeValue = memo(function RenderTimeValue() {
   const renderTime = useStatsStore((s) => s.renderTime);
-
-  return (
-    <span className="font-semibold tabular-nums">
-      {Math.floor(renderTime)}ms
-    </span>
-  );
+  return <>{Math.floor(renderTime)}</>;
 });
 
 const Divider = () => (
-  <span aria-hidden="true" className="h-3 w-px shrink-0 bg-green-500/40" />
+  <span aria-hidden="true" className="h-4 w-px shrink-0 bg-line" />
 );
 
-function Header({ width, height }: HeaderProps) {
+function Header({ width, height, settingsButtonRef }: HeaderProps) {
   return (
-    <>
-      <div className="pointer-events-none fixed top-[max(1rem,env(safe-area-inset-top))] left-[max(1rem,env(safe-area-inset-left))] z-10 flex max-w-[calc(100vw-5.5rem)] flex-col items-start gap-2 select-none">
-        <div className="flex items-center gap-2 rounded-lg border border-green-500/30 bg-black/40 px-3 py-2 shadow-lg backdrop-blur-sm">
-          <img
-            src="/assets/logo.png"
-            alt=""
-            width={32}
-            height={32}
-            draggable={false}
-            className="size-7 object-contain md:size-8"
+    <header className="pointer-events-none fixed inset-x-0 top-0 z-30 flex items-center justify-between gap-2 px-[max(0.75rem,env(safe-area-inset-left))] pt-[max(0.75rem,env(safe-area-inset-top))] select-none">
+      <div className="pointer-events-auto flex h-11 min-w-0 items-center gap-3 rounded-full border border-line/80 bg-ink-2/80 pr-3.5 pl-2.5 backdrop-blur-xl">
+        <img
+          src="/assets/logo.png"
+          alt=""
+          width={26}
+          height={26}
+          draggable={false}
+          className="size-6 object-contain"
+        />
+
+        <span className="truncate text-[11px] font-semibold tracking-[0.16em] text-paper uppercase">
+          Phosphor Cam
+        </span>
+
+        <Divider />
+
+        <span className="flex items-center gap-1.5 font-mono text-[10px] text-muted">
+          <span
+            aria-hidden="true"
+            className="recording-dot size-1.5 rounded-full bg-signal"
           />
+          LIVE
+        </span>
 
-          <h1 className="text-base leading-none font-bold tracking-tight whitespace-nowrap text-green-400 sm:text-lg md:text-xl">
-            PHOSPHOR CAM
-          </h1>
-        </div>
-
-        <div
-          className="flex flex-wrap items-center gap-x-2.5 gap-y-1 rounded-lg border border-green-500/30 bg-black/40 px-3 py-2 font-mono text-[10px] text-green-400 shadow-lg backdrop-blur-sm sm:gap-x-3 md:text-xs"
-          aria-label="Live stats"
+        <span
+          className="hidden font-mono text-[10px] text-faint tabular-nums min-[420px]:inline"
+          aria-label="Live frame rate"
         >
-          <span className="flex items-center gap-1">
-            <span className="opacity-60">FPS</span>
-            <FPSValue />
-          </span>
-
-          <Divider />
-
-          <span className="flex items-center gap-1">
-            <span className="hidden opacity-60 sm:inline">RENDER</span>
-            <RenderTimeValue />
-          </span>
-
-          <Divider />
-
-          <span className="flex items-center gap-1 whitespace-nowrap">
-            <span className="hidden opacity-60 sm:inline">RES</span>
-            <span className="font-semibold tabular-nums">
-              {width}×{height}
-            </span>
-          </span>
-        </div>
+          <FPSValue />
+          <span className="ml-1 text-[9px] tracking-wide">FPS</span>
+        </span>
       </div>
 
-      {/* Secondary mode entry, pinned beside the settings trigger:
-          settings right inset + 58px (50px button + 8px gap). */}
-      <Link
-        to="/studio"
-        aria-label="Open Phosphor Studio"
-        title="Open Phosphor Studio"
-        className="pointer-events-auto fixed top-[max(1rem,env(safe-area-inset-top))] right-[calc(max(1rem,env(safe-area-inset-right))+3.625rem)] z-30 flex h-[50px] items-center gap-1.5 rounded-lg border border-green-500/30 bg-black/40 px-3.5 font-mono text-xs font-bold text-green-400 shadow-lg backdrop-blur-sm transition-colors hover:border-green-400 hover:bg-green-900/30 focus-visible:ring-2 focus-visible:ring-green-400/70 focus-visible:outline-none"
-      >
-        <Sparkles size={17} />
-        <span className="hidden min-[380px]:inline">Studio</span>
-      </Link>
-    </>
+      <div className="pointer-events-auto hidden h-11 items-center gap-3 rounded-full border border-line/80 bg-ink-2/80 px-3.5 font-mono text-[10px] text-faint tabular-nums backdrop-blur-xl md:flex">
+        <span>
+          <span className="text-faint">render</span>{" "}
+          <span className="text-paper">
+            <RenderTimeValue />
+            ms
+          </span>
+        </span>
+        <Divider />
+        <span>
+          <span className="text-faint">frame</span>{" "}
+          <span className="text-paper">
+            {width}×{height}
+          </span>
+        </span>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <Link
+          to="/studio"
+          aria-label="Open Phosphor Studio"
+          className="press pointer-events-auto flex h-11 items-center gap-2 rounded-full border border-line/80 bg-ink-2/80 px-4 text-[11px] font-medium tracking-wide text-paper uppercase backdrop-blur-xl hover:border-line-strong hover:bg-ink-3"
+        >
+          <Sparkles size={14} strokeWidth={1.75} aria-hidden="true" />
+          <span className="hidden min-[380px]:inline">Studio</span>
+        </Link>
+
+        <button
+          ref={settingsButtonRef}
+          type="button"
+          aria-label="Open settings"
+          title="Open settings"
+          className="press pointer-events-auto hidden size-11 items-center justify-center rounded-full border border-line/80 bg-ink-2/80 text-muted backdrop-blur-xl hover:border-line-strong hover:bg-ink-3 hover:text-paper sm:flex"
+        >
+          <SlidersHorizontal size={16} strokeWidth={1.75} aria-hidden="true" />
+        </button>
+      </div>
+    </header>
   );
 }
 

@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import toast, { Toaster } from "react-hot-toast";
-import { MdCancel } from "react-icons/md";
+import toast from "react-hot-toast";
 
-import { isNative } from "@/shared/utils/isNative";
+import { Button } from "@/shared/ui/buttons";
+import { Toaster } from "@/shared/ui/toaster";
 import { saveImage } from "@/shared/utils/saveImage";
 
 import CameraControls from "./components/cameraControls";
@@ -23,17 +23,14 @@ function Cam() {
     height: window.innerHeight,
   });
   const [flash, setFlash] = useState(false);
-  const [clipboardSuccess, setClipboardSuccess] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
-  const [error, setError] = useState<string | null>(null);
+  const [cameraError, setCameraError] = useState<string | null>(null);
+  const [cameraAttempt, setCameraAttempt] = useState(0);
   const [settingsOpen, setSettingsOpen] = useState(false);
 
-  const native = isNative();
-
-  // Only one ref into the render layer now, instead of a ref threaded
-  // through AsciiView into whichever renderer happened to be mounted.
   const viewportRef = useRef<ViewportHandle>(null);
-  const settingsButtonRef = useRef<HTMLButtonElement>(null);
+  const desktopSettingsRef = useRef<HTMLButtonElement>(null);
+  const mobileSettingsRef = useRef<HTMLButtonElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const recordedChunksRef = useRef<Blob[]>([]);
   const recordingTimerRef = useRef<number | null>(null);
@@ -41,6 +38,7 @@ function Cam() {
   useEffect(() => {
     let active = true;
     let currentStream: MediaStream | null = null;
+
     const start = async () => {
       try {
         const video = await navigator.mediaDevices.getUserMedia({
@@ -56,11 +54,12 @@ function Cam() {
           return;
         }
         currentStream = video;
+        setCameraError(null);
         setStream(video);
       } catch (err) {
         console.error(err);
-        setError(
-          "Unable to access camera. Please ensure permissions are granted."
+        setCameraError(
+          "Allow camera access in your browser, then try again. The camera may also be in use by another app."
         );
       }
     };
@@ -76,7 +75,20 @@ function Cam() {
       setStream(null);
       window.removeEventListener("resize", handleResize);
     };
-  }, [facingMode]);
+  }, [facingMode, cameraAttempt]);
+
+  useEffect(
+    () => () => {
+      if (recordingTimerRef.current) {
+        clearInterval(recordingTimerRef.current);
+      }
+      const recorder = mediaRecorderRef.current;
+      if (recorder && recorder.state !== "inactive") {
+        recorder.stop();
+      }
+    },
+    []
+  );
 
   const toggleCamera = useCallback(() => {
     setFacingMode((prev) => (prev === "user" ? "environment" : "user"));
@@ -88,16 +100,16 @@ function Cam() {
   const takeSnapshot = useCallback(async () => {
     if (!viewportRef.current) return;
     setFlash(true);
-    setTimeout(() => setFlash(false), 200);
+    setTimeout(() => setFlash(false), 220);
 
     try {
       const imageUrl = await viewportRef.current.captureImage();
       const fileName = `ascii-capture-${Date.now()}.png`;
       await saveImage(imageUrl, fileName);
-      toast("image saved");
+      toast.success("Image saved");
     } catch (err) {
       console.error("Capture failed", err);
-      setError("Capture isn't supported for this render mode yet.");
+      toast.error("Capture isn't supported for this render mode yet.");
     }
   }, []);
 
@@ -105,14 +117,12 @@ function Cam() {
     if (!viewportRef.current) return;
     try {
       const copyContent = await viewportRef.current.getAsciiText();
-      if (!copyContent) throw new Error();
-      navigator.clipboard.writeText(copyContent).then(() => {
-        setClipboardSuccess(true);
-        setTimeout(() => setClipboardSuccess(false), 2000);
-      });
+      if (!copyContent) throw new Error("No text available");
+      await navigator.clipboard.writeText(copyContent);
+      toast.success("ASCII copied");
     } catch (err) {
-      console.log("Copy Failed:", err);
-      setError("Failed to Copy. Please try again");
+      console.log("Copy failed:", err);
+      toast.error("Couldn't copy ASCII text");
     }
   }, []);
 
@@ -131,7 +141,7 @@ function Cam() {
 
     const canvas = viewportRef.current?.getCanvas();
     if (!canvas || !canvas.width || !canvas.height) {
-      setError("Renderer not ready for recording.");
+      toast.error("Renderer isn't ready for recording.");
       return;
     }
 
@@ -159,30 +169,28 @@ function Cam() {
           });
 
           const extension = mimeType.includes("mp4") ? "mp4" : "webm";
-
           const fileName = `ascii-video-${Date.now()}.${extension}`;
 
           await saveVideo(blob, fileName);
-          toast("video saved");
+          toast.success("Video saved");
           setRecordingTime(0);
         } catch (err) {
           console.error("Failed to save recording:", err);
-          setError("Failed to save recording.");
+          toast.error("Failed to save recording");
         }
       };
 
       recorder.start();
       mediaRecorderRef.current = recorder;
       setIsRecording(true);
+      setRecordingTime(0);
 
       recordingTimerRef.current = window.setInterval(() => {
         setRecordingTime((t) => t + 1);
       }, 1000);
     } catch (err) {
       console.error("Recording failed to start", err);
-      setError(
-        "Failed to start recording. Browser might not support this format."
-      );
+      toast.error("Recording isn't supported in this browser.");
     }
   }, [isRecording]);
 
@@ -193,54 +201,38 @@ function Cam() {
   };
 
   return (
-    <div className="h-screen w-screen overflow-hidden">
-      <Toaster
-        position="top-center"
-        containerStyle={{
-          top: native ? "calc(env(safe-area-inset-top, 0px) + 16px)" : 20,
-        }}
-        toastOptions={{
-          duration: 1000,
-          className: "border border-green-500 font-bold text-green-400",
-          style: {
-            background: "#000000",
-            color: "#05df72",
-          },
-        }}
-      />
+    <div className="h-screen w-screen overflow-hidden bg-ink">
+      <Toaster />
 
-      {/* No settings/stats props - Header and Settings read straight from their stores */}
-      <Header width={windowSize.width} height={windowSize.height} />
+      <Header
+        width={windowSize.width}
+        height={windowSize.height}
+        settingsButtonRef={desktopSettingsRef}
+      />
       <Settings
         open={settingsOpen}
-        onOpen={openSettings}
         onClose={closeSettings}
-        triggerRef={settingsButtonRef}
+        triggerRef={mobileSettingsRef}
+        desktopTriggerRef={desktopSettingsRef}
       />
 
       {flash && (
-        <div className="animate-out fade-out pointer-events-none fixed inset-0 z-50 bg-white duration-150" />
+        <div className="flash-layer pointer-events-none fixed inset-0 z-50 bg-paper" />
       )}
 
-      {clipboardSuccess && (
-        <div className="animate-in zoom-in fixed top-1/2 left-1/2 z-50 -translate-x-1/2 -translate-y-1/2 rounded border border-green-500 bg-black/80 px-6 py-3 font-bold text-green-400 backdrop-blur duration-200">
-          ASCII COPIED TO CLIPBOARD
-        </div>
-      )}
-
-      {error && (
-        <div className="animate-in zoom-in fixed top-1/2 left-1/2 z-50 -translate-x-1/2 -translate-y-1/2 rounded border border-red-500 bg-black/80 px-6 py-4 font-bold text-red-500 backdrop-blur duration-200">
-          <button
-            onClick={() => setError(null)}
-            className="absolute top-3 right-3 text-xl leading-none text-red-500 hover:text-red-400"
-            aria-label="Close error"
-          >
-            <MdCancel />
-          </button>
-          <div>
-            <h1 className="mb-4 text-4xl">SYSTEM ERROR</h1>
-            <p>{error}</p>
-          </div>
+      {isRecording && (
+        <div
+          role="status"
+          className="notice-enter fixed top-[calc(env(safe-area-inset-top)+4.75rem)] left-1/2 z-30 flex -translate-x-1/2 items-center gap-2 rounded-full border border-signal/40 bg-ink-2/90 px-3 py-1.5 font-mono text-[10px] backdrop-blur-xl"
+        >
+          <span
+            aria-hidden="true"
+            className="recording-dot size-1.5 rounded-full bg-signal"
+          />
+          <span className="tracking-[0.16em] text-signal">REC</span>
+          <span className="text-paper tabular-nums">
+            {formatTime(recordingTime)}
+          </span>
         </div>
       )}
 
@@ -250,6 +242,64 @@ function Cam() {
         canvasSize={windowSize}
         mirrored={facingMode === "user"}
       />
+
+      {!stream && !cameraError && (
+        <div className="pointer-events-none fixed inset-0 z-10 flex items-center justify-center">
+          <div className="flex flex-col items-center gap-3">
+            <span
+              aria-hidden="true"
+              className="relative h-px w-40 overflow-hidden bg-line"
+            >
+              <span className="request-line absolute inset-y-0 w-1/3 bg-signal" />
+            </span>
+            <p className="font-mono text-[10px] tracking-[0.24em] text-faint uppercase">
+              Initialising camera
+            </p>
+          </div>
+        </div>
+      )}
+
+      {cameraError && (
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-ink/85 p-6 backdrop-blur-md">
+          <div
+            role="alertdialog"
+            aria-labelledby="camera-error-title"
+            aria-describedby="camera-error-copy"
+            className="notice-enter w-full max-w-sm rounded-2xl border border-line bg-ink-2 p-6"
+          >
+            <p className="font-mono text-[10px] tracking-[0.2em] text-alert uppercase">
+              Camera offline
+            </p>
+            <h1
+              id="camera-error-title"
+              className="mt-2 text-lg font-medium text-paper"
+            >
+              No camera signal
+            </h1>
+            <p
+              id="camera-error-copy"
+              className="mt-2 text-xs leading-relaxed text-muted"
+            >
+              {cameraError}
+            </p>
+
+            <div className="mt-5 flex gap-2">
+              <Button
+                variant="primary"
+                onClick={() => {
+                  setCameraError(null);
+                  setCameraAttempt((n) => n + 1);
+                }}
+              >
+                Try again
+              </Button>
+              <Button variant="ghost" onClick={() => setCameraError(null)}>
+                Dismiss
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <CameraControls
         onFlip={toggleCamera}
@@ -261,7 +311,7 @@ function Cam() {
         formatTime={formatTime}
         recordingTime={recordingTime}
         settingsOpen={settingsOpen}
-        settingsButtonRef={settingsButtonRef}
+        settingsButtonRef={mobileSettingsRef}
       />
     </div>
   );

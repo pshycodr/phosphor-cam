@@ -1,5 +1,7 @@
 import { memo } from "react";
 
+import { Switch } from "@/shared/ui/controls";
+
 interface ToggleRowProps {
   label: string;
   description: string;
@@ -14,23 +16,15 @@ const ToggleRow = ({
   onChange,
 }: ToggleRowProps) => {
   return (
-    <label className="flex min-h-11 cursor-pointer items-start justify-between gap-4">
+    <div className="flex min-h-11 items-start justify-between gap-4">
       <span className="min-w-0">
-        <span className="block text-sm font-medium text-green-300">
-          {label}
-        </span>
-        <span className="mt-0.5 block text-xs leading-relaxed text-green-500/70">
+        <span className="block text-xs font-medium text-paper">{label}</span>
+        <span className="mt-0.5 block text-[11px] leading-relaxed text-faint">
           {description}
         </span>
       </span>
-      <input
-        type="checkbox"
-        role="switch"
-        checked={checked}
-        onChange={onChange}
-        className="settings-toggle mt-0.5 shrink-0"
-      />
-    </label>
+      <Switch checked={checked} onChange={onChange} label={label} />
+    </div>
   );
 };
 

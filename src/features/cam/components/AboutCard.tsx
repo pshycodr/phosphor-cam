@@ -4,17 +4,21 @@ import { VERSION } from "../constants/version";
 
 export function AboutCard() {
   return (
-    <div className="flex items-center justify-between">
-      <div className="flex items-center gap-3">
+    <div className="flex items-center justify-between gap-3">
+      <div className="flex min-w-0 items-center gap-3">
         <img
           src="/assets/logo.png"
-          alt="Phosphor Cam"
-          className="size-8 rounded-lg object-contain"
+          alt=""
+          className="size-8 shrink-0 rounded-lg object-contain"
         />
 
-        <div className="leading-tight">
-          <p className="text-sm font-medium text-green-400">Phosphor Cam</p>
-          <p className="text-[10px] text-green-500/50">{VERSION}</p>
+        <div className="min-w-0 leading-tight">
+          <p className="truncate text-xs font-medium text-paper">
+            Phosphor Cam
+          </p>
+          <p className="mt-0.5 font-mono text-[10px] text-faint tabular-nums">
+            {VERSION}
+          </p>
         </div>
       </div>
 
@@ -23,9 +27,9 @@ export function AboutCard() {
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Phosphor Cam on GitHub"
-        className="rounded-lg p-2 text-green-400/70 transition-colors hover:bg-green-500/10 hover:text-green-400 focus-visible:ring-2 focus-visible:ring-green-400/60 focus-visible:outline-none"
+        className="press flex size-9 shrink-0 items-center justify-center rounded-full text-faint hover:bg-ink-3 hover:text-paper"
       >
-        <FaGithub size={20} />
+        <FaGithub size={18} aria-hidden="true" />
       </a>
     </div>
   );
