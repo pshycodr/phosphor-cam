@@ -12,14 +12,11 @@ interface ColorSlidersProps {
   onCommit?: () => void;
 }
 
-/** Compact HSB picker: three gradient sliders and a hex field. */
 const ColorSliders = ({ value, onChange, onCommit }: ColorSlidersProps) => {
   const [hsv, setHsv] = useState<HSV>(() => hexToHsv(value));
   const [hexInput, setHexInput] = useState(value);
   const [seen, setSeen] = useState(value);
 
-  // External change (preset, swap, random): re-sync, but keep our hue when the
-  // new value is just the color we emitted ourselves.
   if (value.toLowerCase() !== seen.toLowerCase()) {
     setSeen(value);
     if (value.toLowerCase() !== hsvToHex(hsv)) {
@@ -80,9 +77,7 @@ const ColorSliders = ({ value, onChange, onCommit }: ColorSlidersProps) => {
           key={r.key}
           className="grid grid-cols-[1rem_1fr_2.5rem] items-center gap-2"
         >
-          <span className="text-[11px] font-bold text-green-500/70">
-            {r.label}
-          </span>
+          <span className="font-mono text-[10px] text-faint">{r.label}</span>
           <EditorSlider
             label={r.name}
             min={r.min}
@@ -94,7 +89,7 @@ const ColorSliders = ({ value, onChange, onCommit }: ColorSlidersProps) => {
             onChange={r.set}
             onCommit={onCommit}
           />
-          <span className="text-right font-mono text-[11px] text-green-300/80 tabular-nums">
+          <span className="text-right font-mono text-[10px] text-muted tabular-nums">
             {r.text}
           </span>
         </div>
@@ -102,7 +97,7 @@ const ColorSliders = ({ value, onChange, onCommit }: ColorSlidersProps) => {
 
       <div className="flex items-center gap-2 pt-1">
         <span
-          className="size-9 shrink-0 rounded-full border-2 border-green-500/40"
+          className="size-8 shrink-0 rounded-full border border-line-strong"
           style={{ backgroundColor: current }}
         />
         <input
@@ -140,7 +135,7 @@ const ColorSliders = ({ value, onChange, onCommit }: ColorSlidersProps) => {
           onKeyDown={(e) => {
             if (e.key === "Enter") e.currentTarget.blur();
           }}
-          className="h-10 min-w-0 flex-1 rounded-lg border border-green-500/40 bg-black/40 px-3 font-mono text-base text-green-300 uppercase outline-none focus:border-green-400"
+          className="h-9 min-w-0 flex-1 rounded-lg border border-line/80 bg-ink-3/60 px-3 font-mono text-xs text-paper uppercase focus:border-signal/60 focus:outline-none"
         />
       </div>
     </div>

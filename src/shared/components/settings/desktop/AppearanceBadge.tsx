@@ -6,7 +6,7 @@ const AppearanceBadge = () => {
   const colorMode = useSettingsSelector((settings) => settings.colorMode);
   const color = useSettingsSelector((settings) => settings.color);
 
-  if (colorMode) return <>Live camera color</>;
+  if (colorMode) return <>Live color</>;
 
   return (
     <span
@@ -15,11 +15,11 @@ const AppearanceBadge = () => {
       aria-label={`Foreground ${color.foreground}, background ${color.background}`}
     >
       <span
-        className="size-3.5 rounded-full border border-green-500/40"
+        className="size-3 rounded-full border border-line-strong"
         style={{ backgroundColor: color.foreground }}
       />
       <span
-        className="size-3.5 rounded-full border border-green-500/40"
+        className="size-3 rounded-full border border-line-strong"
         style={{ backgroundColor: color.background }}
       />
     </span>

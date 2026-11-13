@@ -52,7 +52,7 @@ const CaptureBadge = memo(() => {
 
   return (
     <span>
-      {captureScale}X, {captureCodec}
+      {captureScale}x · {captureCodec.toUpperCase()}
     </span>
   );
 });
@@ -66,7 +66,7 @@ const EffectsBadge = memo(() => {
   const activeEffects = useSettingsSelector((settings) => {
     const effects = Object.values(settings.effects);
     const activeCount = effects.filter((effect) => effect.enabled).length;
-    return activeCount > 0 ? `${activeCount}/${effects.length} active` : "Off";
+    return activeCount > 0 ? `${activeCount}/${effects.length}` : "Off";
   });
 
   return <>{activeEffects}</>;

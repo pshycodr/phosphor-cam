@@ -2,6 +2,7 @@ import { memo, useId } from "react";
 
 import { SLIDER_CONFIGS } from "@/shared/constants/settings";
 import type { AsciiSettings } from "@/shared/types";
+import { Range } from "@/shared/ui/controls";
 
 import {
   useSettingsActions,
@@ -35,17 +36,19 @@ const SliderRow = memo(function SliderRow({
 
   return (
     <div>
-      <div className="mb-1.5 flex items-baseline justify-between gap-3 text-xs font-medium">
-        <label htmlFor={id} className="text-green-300">
+      <div className="mb-0.5 flex items-baseline justify-between gap-3">
+        <label htmlFor={id} className="text-[11px] text-muted">
           {config.label}
         </label>
-        <output htmlFor={id} className="font-mono text-green-400 tabular-nums">
+        <output
+          htmlFor={id}
+          className="font-mono text-[11px] text-paper tabular-nums"
+        >
           {text}
         </output>
       </div>
-      <input
+      <Range
         id={id}
-        type="range"
         min={config.min}
         max={config.max}
         step={config.step}
@@ -62,7 +65,6 @@ const SliderRow = memo(function SliderRow({
         onPointerUp={commit}
         onKeyUp={commit}
         onBlur={commit}
-        className="settings-slider w-full"
       />
     </div>
   );

@@ -33,14 +33,14 @@ const EffectChip = memo(function EffectChip({
     <Chip active={active} pressed={active} onClick={() => onSelect(effectKey)}>
       <span
         aria-hidden="true"
-        className={`size-2 rounded-full ${
+        className={`size-1.5 rounded-full ${
           enabled
             ? active
-              ? "bg-black"
-              : "bg-green-400 shadow-[0_0_6px_#4ade80]"
+              ? "bg-signal"
+              : "bg-signal/70"
             : active
-              ? "bg-black/30"
-              : "bg-green-500/25"
+              ? "bg-current opacity-30"
+              : "bg-line-strong"
         }`}
       />
       {SHORT_LABELS[effectKey] ?? label}
@@ -64,8 +64,8 @@ const EffectDetail = memo(function EffectDetail({
     <div className="space-y-1">
       <div className="flex items-center justify-between gap-4 px-0.5">
         <div className="min-w-0">
-          <p className="text-sm font-semibold text-green-300">{config.label}</p>
-          <p className="text-xs leading-snug text-green-500/70">
+          <p className="text-xs font-medium text-paper">{config.label}</p>
+          <p className="text-[11px] leading-snug text-faint">
             {config.description}
           </p>
         </div>
@@ -76,7 +76,7 @@ const EffectDetail = memo(function EffectDetail({
         />
       </div>
 
-      <div className={enabled ? "" : "opacity-60"}>
+      <div className={enabled ? "" : "opacity-50"}>
         <SliderField
           label="Intensity"
           display={percent}
@@ -85,7 +85,6 @@ const EffectDetail = memo(function EffectDetail({
           max={1}
           step={0.05}
           value={intensity}
-          // Dragging a dimmed slider switches the effect on.
           onChange={(v) =>
             updateEffect(
               effectKey,
@@ -130,14 +129,13 @@ const EffectsTool = () => {
 
 export default memo(EffectsTool);
 
-/** Count of active effects, drawn on the tab icon. */
 export const EffectsTabBadge = memo(function EffectsTabBadge() {
   const count = useSettingsSelector(
     (s) => Object.values(s.effects).filter((e) => e.enabled).length
   );
   if (count === 0) return null;
   return (
-    <span className="absolute -top-1.5 -right-2.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-green-500 px-1 text-[9px] leading-none font-bold text-black">
+    <span className="absolute -top-1.5 -right-2.5 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-signal px-1 font-mono text-[8px] leading-none text-ink">
       {count}
     </span>
   );

@@ -1,5 +1,5 @@
 import { memo, useCallback, useState } from "react";
-import { LuArrowLeftRight, LuDices, LuBlend, LuVideo } from "react-icons/lu";
+import { LuArrowLeftRight, LuBlend, LuDices, LuVideo } from "react-icons/lu";
 
 import { COLOR_PRESETS } from "@/shared/constants/colorPresets";
 
@@ -42,7 +42,7 @@ const PaletteTool = () => {
           active={colorMode}
           onClick={() => updateSettings({ colorMode: !colorMode })}
         >
-          <LuVideo size={15} aria-hidden="true" />
+          <LuVideo size={14} aria-hidden="true" />
           Live color
         </Chip>
         <Chip
@@ -50,14 +50,14 @@ const PaletteTool = () => {
           active={invert}
           onClick={() => updateSettings({ invert: !invert })}
         >
-          <LuBlend size={15} aria-hidden="true" />
+          <LuBlend size={14} aria-hidden="true" />
           Invert
         </Chip>
         <Chip
           disabled={colorMode}
           onClick={() => updateSettings({ color: randomPair() })}
         >
-          <LuDices size={15} aria-hidden="true" />
+          <LuDices size={14} aria-hidden="true" />
           Random
         </Chip>
         <Chip
@@ -71,16 +71,16 @@ const PaletteTool = () => {
             })
           }
         >
-          <LuArrowLeftRight size={15} aria-hidden="true" />
+          <LuArrowLeftRight size={14} aria-hidden="true" />
           Swap
         </Chip>
       </ScrollRow>
 
       {colorMode ? (
-        <p className="rounded-xl border border-green-500/20 bg-black/30 px-3 py-3 text-xs leading-relaxed text-green-500/80">
+        <p className="rounded-xl border border-line/80 bg-ink-3/40 px-3 py-3 text-[11px] leading-relaxed text-muted">
           Characters use the camera's real colors. Turn off{" "}
-          <span className="font-semibold text-green-300">Live color</span> to
-          pick your own foreground and background.
+          <span className="text-paper">Live color</span> to pick your own
+          foreground and background.
         </p>
       ) : (
         <>
@@ -93,21 +93,21 @@ const PaletteTool = () => {
                   type="button"
                   aria-expanded={open}
                   onClick={() => setPicker(open ? null : key)}
-                  className={`flex min-h-12 items-center gap-2.5 rounded-xl border px-2.5 text-left transition-colors outline-none focus-visible:ring-2 focus-visible:ring-green-400/70 ${
+                  className={`flex min-h-12 items-center gap-2.5 rounded-xl border px-2.5 text-left transition-colors ${
                     open
-                      ? "border-green-400 bg-green-900/30"
-                      : "border-green-500/30 bg-black/40 active:bg-green-900/30"
+                      ? "border-line-strong bg-ink-3"
+                      : "border-line/80 bg-ink-3/40 active:bg-ink-3"
                   }`}
                 >
                   <span
-                    className="size-7 shrink-0 rounded-full border-2 border-green-500/40"
+                    className="size-7 shrink-0 rounded-full border border-line-strong"
                     style={{ backgroundColor: color[key] }}
                   />
                   <span className="min-w-0">
-                    <span className="block text-[11px] font-semibold text-green-300">
+                    <span className="block text-[10px] text-muted">
                       {label}
                     </span>
-                    <span className="block truncate font-mono text-[10px] text-green-500/70 uppercase">
+                    <span className="block truncate font-mono text-[10px] text-faint uppercase">
                       {color[key]}
                     </span>
                   </span>
@@ -143,13 +143,13 @@ const PaletteTool = () => {
                         },
                       })
                     }
-                    className="flex w-16 shrink-0 snap-start flex-col items-center gap-1.5 rounded-xl py-1 outline-none focus-visible:ring-2 focus-visible:ring-green-400/70"
+                    className="flex w-16 shrink-0 snap-start flex-col items-center gap-1.5 rounded-xl py-1"
                   >
                     <span
-                      className={`relative size-12 overflow-hidden rounded-full border-2 transition-all ${
+                      className={`relative size-11 overflow-hidden rounded-full border-2 transition-all ${
                         active
-                          ? "border-green-400 ring-2 ring-green-400/40"
-                          : "border-green-500/30"
+                          ? "border-signal ring-2 ring-signal/25"
+                          : "border-line-strong"
                       }`}
                       style={{ backgroundColor: preset.background }}
                     >
@@ -159,8 +159,8 @@ const PaletteTool = () => {
                       />
                     </span>
                     <span
-                      className={`w-full truncate text-center text-[10px] font-semibold ${
-                        active ? "text-green-400" : "text-green-500/70"
+                      className={`w-full truncate text-center text-[9px] ${
+                        active ? "text-signal" : "text-faint"
                       }`}
                     >
                       {preset.name}

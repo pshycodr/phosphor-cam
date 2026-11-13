@@ -1,6 +1,7 @@
 import { memo } from "react";
 
 import { RENDER_MODES } from "@/shared/constants/settings";
+import { GroupLabel } from "@/shared/ui/controls";
 
 import {
   useSettingsActions,
@@ -12,31 +13,40 @@ const RenderMode = () => {
   const { updateSettings } = useSettingsActions();
 
   return (
-    <section className="border-b border-green-500/15 py-5">
-      <h3 className="mb-3 text-xs font-semibold text-green-400">
-        Render engine
-      </h3>
+    <section className="border-b border-line/70 py-5">
+      <GroupLabel>Render engine</GroupLabel>
 
       <div
         role="group"
         aria-label="Render engine"
-        className="flex flex-wrap gap-1 rounded-2xl border border-green-500/30 bg-black/30 p-1"
+        className="mt-3 grid grid-cols-2 gap-1.5"
       >
-        {RENDER_MODES.map(({ key, label }) => {
+        {RENDER_MODES.map(({ key, label }, index) => {
           const active = renderMode === key;
+          const wide =
+            index === RENDER_MODES.length - 1 && RENDER_MODES.length % 2 === 1;
+
           return (
             <button
               key={key}
               type="button"
               onClick={() => updateSettings({ renderMode: key })}
               aria-pressed={active}
-              className={`min-h-10 grow basis-20 rounded-full px-3 text-xs font-bold tracking-wide whitespace-nowrap transition-colors outline-none focus-visible:ring-2 focus-visible:ring-green-400/70 ${
+              className={`press flex min-h-10 items-center justify-between gap-2 rounded-lg border px-3 text-[10px] font-medium tracking-[0.12em] uppercase ${wide ? "col-span-2" : ""} ${
                 active
-                  ? "bg-green-600 text-black"
-                  : "text-green-400 hover:bg-green-900/30"
+                  ? "border-signal/60 bg-signal/10 text-signal"
+                  : "border-line/80 bg-ink-3/40 text-muted hover:border-line-strong hover:text-paper"
               }`}
             >
               {label}
+              <span
+                aria-hidden="true"
+                className={`font-mono text-[9px] ${
+                  active ? "text-signal/60" : "text-faint"
+                }`}
+              >
+                {String(index + 1).padStart(2, "0")}
+              </span>
             </button>
           );
         })}

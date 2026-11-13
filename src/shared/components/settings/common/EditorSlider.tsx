@@ -22,26 +22,16 @@ export interface EditorSliderProps {
   max: number;
   step?: number;
   onChange: (value: number) => void;
-  /** Called once when a drag or key press ends (one gesture = one undo step). */
   onCommit?: () => void;
   label: string;
   valueText?: string;
-  /** Fill grows from the zero point instead of the left edge. */
   bipolar?: boolean;
-  /** Color of the fill and thumb ring. */
   accent?: string;
-  /** Replaces the fill with a custom gradient (used by the color sliders). */
   trackBackground?: string;
-  /** Values that get a small tick on the track. */
   marks?: number[];
   disabled?: boolean;
 }
 
-/**
- * Touch-first slider: 44px tall hit area, 24px thumb, no native range input,
- * so it looks the same on every phone and never fights the browser's own
- * horizontal-scroll gestures.
- */
 const EditorSlider = memo(function EditorSlider({
   value,
   min,
@@ -52,7 +42,7 @@ const EditorSlider = memo(function EditorSlider({
   label,
   valueText,
   bipolar = false,
-  accent = "#22c55e",
+  accent = "#38f370",
   trackBackground,
   marks,
   disabled = false,
@@ -178,7 +168,7 @@ const EditorSlider = memo(function EditorSlider({
     >
       <div
         ref={trackRef}
-        className="absolute inset-x-3 top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-green-500/20"
+        className="absolute inset-x-3 top-1/2 h-0.5 -translate-y-1/2 rounded-full bg-line-strong"
         style={trackBackground ? { background: trackBackground } : undefined}
       >
         {!trackBackground && (
@@ -195,7 +185,7 @@ const EditorSlider = memo(function EditorSlider({
         {bipolar && (
           <span
             aria-hidden="true"
-            className="absolute top-1/2 h-3.5 w-px -translate-y-1/2 bg-green-300/50"
+            className="absolute top-1/2 h-3 w-px -translate-y-1/2 bg-faint"
             style={{ left: `${origin}%` }}
           />
         )}
@@ -204,18 +194,18 @@ const EditorSlider = memo(function EditorSlider({
           <span
             key={m}
             aria-hidden="true"
-            className="absolute top-1/2 h-3.5 w-px -translate-y-1/2 bg-red-400/70"
+            className="absolute top-1/2 h-3 w-px -translate-y-1/2 bg-alert/70"
             style={{ left: `${pct(m)}%` }}
           />
         ))}
 
         <div
           aria-hidden="true"
-          className="absolute top-1/2 size-6 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 bg-white transition-transform group-focus-visible:ring-4 group-focus-visible:ring-green-400/40 group-active:scale-110 motion-reduce:transition-none"
+          className="absolute top-1/2 size-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 bg-paper transition-transform ease-[var(--ease-out)] group-focus-visible:ring-4 group-focus-visible:ring-signal/30 group-active:scale-110 motion-reduce:transition-none"
           style={{
             left: `${current}%`,
             borderColor: accent,
-            boxShadow: `0 0 12px color-mix(in srgb, ${accent} 55%, transparent)`,
+            boxShadow: "0 0 0 3px var(--color-ink-2)",
           }}
         />
       </div>
@@ -225,10 +215,7 @@ const EditorSlider = memo(function EditorSlider({
 
 export default EditorSlider;
 
-/* ----------------------- labelled slider with big readout ----------------------- */
-
 interface SliderFieldProps extends EditorSliderProps {
-  /** Text shown as the large live readout. */
   display: ReactNode;
 }
 
@@ -236,8 +223,8 @@ export function SliderField({ display, label, ...slider }: SliderFieldProps) {
   return (
     <div>
       <div className="flex items-baseline justify-between gap-3 px-0.5">
-        <span className="text-xs font-semibold text-green-300">{label}</span>
-        <output className="font-mono text-xl leading-none font-bold text-green-400 tabular-nums">
+        <span className="text-[11px] text-muted">{label}</span>
+        <output className="font-mono text-sm text-paper tabular-nums">
           {display}
         </output>
       </div>
