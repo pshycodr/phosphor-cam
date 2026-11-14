@@ -146,13 +146,13 @@ The palette is a graphite stack with a single phosphor-green accent. There is no
 
 The camera is a fixed, full-viewport stage. A slim top bar carries the wordmark, status readouts, and the Studio/settings actions. The capture controls float at the bottom center on desktop and tablet, inside a floating card.
 
-Below 640 px the camera switches to a phone composition: a single compact stats bar with the phosphor logo and a Studio pill at the top, an inset preview card with a 26 px radius and a faint signal glow, and a bottom row of four labeled actions (Flip, Capture, Copy, Edit) with Photo/Video above it. The capture card fills the space between the top bar and the control row, and its rendered frame size follows the card, so the preview and the saved capture match.
+Below 640 px the camera switches to a phone composition: a single compact stats bar with the phosphor logo and Studio then Settings islands at the top, an inset preview card with a 26 px radius and a faint signal glow, and a control stack lifted 32 px off the bottom edge: Photo/Video above, then Flip, the centered shutter, and the Copy/Edit pair. The capture card fills the space between the top bar and the control stack, and its rendered frame size follows the card, so the preview and the saved capture match.
 
 On screens 640 px and wider, settings open as a 360 px right rail with a hairline left border and a soft cast shadow; the capture bar shifts left of the rail at 1024 px and hides below that width while settings are open. Below 640 px, settings open as a bottom sheet with a 22 px top radius, a drag handle, and a seven-tool tab bar sized to fit 360 px.
 
-Studio uses a three-part layout: a 56 px header, a flexible viewport, and a 344 px inspector on the right at desktop sizes. Below 1024 px the inspector becomes a persistent, draggable bottom sheet with the same tab bar.
+Studio uses a three-part layout: a header that starts below the camera safe area, a flexible viewport, and a 344 px inspector on the right at desktop sizes. Below 1024 px the inspector becomes a persistent, draggable bottom sheet with the same tab bar. Capture format and scale live in the Export popover, not in the inspector.
 
-Spacing is tight and rhythmic: 4 px inside controls, 8–12 px between related items, 16–24 px between groups. Panels use 16 px horizontal padding; the mobile sheet uses 16 px with safe-area insets on all sides.
+Spacing is tight and rhythmic: 4 px inside controls, 8–12 px between related items, 16–24 px between groups. The phone control stack keeps 16 px between the mode switch and the action row, 32 px below the row, and 12 px side insets, all in addition to safe-area insets. Panels use 16 px horizontal padding; the mobile sheet uses 16 px with safe-area insets on all sides.
 
 ## Elevation & Depth
 
@@ -161,6 +161,23 @@ Depth is tonal first and shadowed second. Floating chrome sits on translucent `i
 ### Named Rules
 
 **The Flat-At-Rest Rule.** Controls never sit on their own cards. A control is a border, a fill, or a line, not a raised tile.
+
+## Motion
+
+Motion is quiet and directional: 120–160 ms for feedback, 160–200 ms for popovers and dialogs, 240–280 ms for sheets and rails. Entrances use `cubic-bezier(0.23, 1, 0.32, 1)`; sheets use `cubic-bezier(0.32, 0.72, 0, 1)` so a long slide still settles softly. Only `opacity`, `transform` and `translate` animate, except the viewfinder frame, whose width and height tween because a transform would distort the crop.
+
+- **Popovers** rise 6 px and scale from 0.97, anchored at their top-right corner, over 160 ms.
+- **Dialogs** rise 10 px and scale from 0.97 over 200 ms; the backdrop fades.
+- **Rails** enter from their own edge over 260 ms; they animate `translate` so the open and close both run.
+- **Sheets** slide on `translate` over 280 ms in both directions, staying mounted while they exit, then becoming hidden.
+- **Aspect changes** tween the frame's width and height over 240 ms while the canvas keeps `object-fit: cover`, so the picture is revealed or cropped instead of stretched.
+- **Gestures** are additive, not the only path: on phones, a horizontal swipe on the viewfinder steps through the ratios and a double tap flips the camera. Both are off while the editor is open or while recording. The settings popover dismisses on an upward drag of its header, after 96 px or 0.6 velocity.
+
+### Named Rules
+
+**The One-Source Rule.** Overlay fades derive from the same drag value as the surface they belong to; they are never animated on a separate timeline.
+
+**The Symmetry Rule.** A surface leaves the way it arrived. A sheet that rises from the bottom dismisses downward.
 
 ## Shapes
 
@@ -197,18 +214,18 @@ The form language is the pill and the hairline. Buttons, switches, segmented con
 
 ### Navigation
 
-- **Camera header:** logo, wordmark, optional FPS/render/resolution readout pill, Studio action, settings action. All actions are 44 px pills or icon buttons on translucent surfaces. On phones the readouts sit in one compact pill on the left — plain logo, then `FPS`, render ms and frame size — and one row on the right: a round, icon-only Settings island with a gear, immediately left of the Studio pill. Both islands are 44 px tall and fully rounded.
-- **Mobile settings menu:** a popover anchored under the Settings island holding aspect ratio (`1:1`, `3:4`, `Full`, defaulting to `3:4`), capture format and capture scale, and About. Choosing a ratio applies and closes it; it also closes on outside press or `Esc` and returns focus to the gear. It is separate from the editing sheet.
-- **Mobile capture row:** four labeled actions on the bare ink surface, no card. Flip sits close to the centered shutter; Copy and Edit share a two-cell grid to its right. Copy is shown only for the ASCII renderer, and Edit slides into Copy's cell whenever the renderer is not ASCII. Side targets are 48 px with 9 px tracked labels; the shutter is 80 px.
-- **Studio header:** back-to-camera link, logo, Studio wordmark, centered file metadata at desktop, Compare and Export actions. Mobile shows icon-plus-label actions and hides non-essential metadata.
-- **Mobile dock:** up to seven icon-and-label tabs, `basis-[50px]`, active tab in signal green with a small top indicator; when the dock is dismissible a 48 px close button sits at its far left, and the open sheet keeps a collapse chevron.
+- **Camera header:** logo, wordmark, optional FPS/render/resolution readout pill, Studio action, settings action. All actions are 44 px pills or icon buttons on translucent surfaces. On phones the readouts sit in one compact pill on the left — plain logo, then `FPS`, render ms and frame size — and one row on the right: the Studio pill followed by the round, icon-only Settings island with a gear. Both islands are 44 px tall and fully rounded.
+- **Mobile settings menu:** a popover anchored under the Settings island holding aspect ratio (`1:1`, `3:4`, `Full`, defaulting to `3:4`), capture format and capture scale, and About. Choosing a ratio applies and closes it; it also closes on outside press, `Esc`, or a downward drag of its header, and returns focus to the gear. It is separate from the editing sheet.
+- **Mobile capture stack:** the mode switch sits on its own above the action row, both centered over the frame. Flip is a 56 px target on the left of a full-width row, the shutter is centered, and Copy/Edit form a fixed 120 px two-cell group on the right so Copy's slot never shifts. Copy is shown only for the ASCII renderer, and Edit slides into Copy's cell whenever the renderer is not ASCII. The stack is lifted 32 px above the bottom safe-area edge. Side labels are 9 px tracked captions; the shutter uses an 80 px ring.
+- **Studio header:** a safe-area wrapper above a 56 px row. Back-to-camera link, logo, Studio wordmark, centered file metadata at desktop, Compare and Export actions. The header starts below any camera cutout, and its side padding follows the safe-area insets. Mobile shows icon-plus-label actions and hides non-essential metadata.
+- **Mobile dock:** up to seven icon-and-label tabs, `basis-[50px]`, active tab in signal green with a small top indicator; when the dock is dismissible a 48 px close button sits at its far left, and the open sheet keeps a collapse chevron. The sheet is always mounted and slides on `translate`, so opening and closing both animate.
 
 ### Signature Components
 
 - **Shutter:** 78–84 px double ring on desktop and 80 px on phones; paper inner disc for photo, square for video, signal outer ring with a soft glow while recording or pressed.
 - **Viewfinder:** the frame is a window onto the stream, never a scaled stream. The camera is drawn through a center crop (`object-fit: cover` math) into a canvas at the frame's ratio, mirrored after the crop, and every renderer, photo capture, recording and copied ASCII samples that same cropped canvas. Only the visible area changes between ratios; people and objects keep their shape. Below 640 px the frame is an inset rounded card with a hairline signal border and a faint outer glow for `1:1` and `3:4`; `Full` fills `100vw × 100dvh` and the header and dock overlay it.
 - **Compare control:** press-and-hold crossfade to the original; signal border and text while held, 140 ms opacity crossfade.
-- **Export dialog:** centered panel over a dimmed backdrop, 44 px close target, focus trapped, `Esc` closes, focus returns to the trigger.
+- **Export dialog:** centered panel over a dimmed backdrop, 44 px close target, focus trapped, `Esc` closes, focus returns to the trigger. It owns capture output: the format segmented control, the scale slider with a live output-size readout, and a warning above 12×, followed by Save image, Copy image and Copy ASCII.
 
 ## Do's and Don'ts
 
