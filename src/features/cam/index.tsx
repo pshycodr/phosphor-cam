@@ -12,14 +12,13 @@ import Settings from "./components/settings";
 import type { ViewportHandle } from "./components/viewport";
 import Viewport from "./components/viewport";
 import { useSettingsControlsValue } from "./hooks/useSettingsControlsValue";
-import type { AspectRatio, CameraFacingMode } from "./types";
+import type { CameraFacingMode } from "./types";
 import { getSupportedMediaRecorderMimeType } from "./utils/mediaRecorder";
 import { saveVideo } from "./utils/saveVideo";
 
 function Cam() {
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [facingMode, setFacingMode] = useState<CameraFacingMode>("user");
-  const [aspect, setAspect] = useState<AspectRatio>("portrait");
   const [isRecording, setIsRecording] = useState(false);
   const [windowSize, setWindowSize] = useState({
     width: window.innerWidth,
@@ -228,8 +227,6 @@ function Cam() {
           settingsButtonRef={desktopSettingsRef}
           onOpenSettings={openSettings}
           settingsOpen={settingsOpen}
-          aspect={aspect}
-          onAspectChange={setAspect}
         />
         <Settings
           open={settingsOpen}
@@ -262,7 +259,6 @@ function Cam() {
           ref={viewportRef}
           stream={stream}
           canvasSize={windowSize}
-          aspect={aspect}
           mirrored={facingMode === "user"}
           onStageSize={handleStageSize}
         />

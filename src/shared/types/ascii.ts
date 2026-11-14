@@ -10,6 +10,9 @@ export type EffectsSettings = Record<EffectKey, EffectProps>;
 
 export type Codecs = "png" | "jpeg" | "webp";
 
+/** Shape of the camera viewport. The stream is center-cropped to it, never scaled. */
+export type AspectRatio = "1:1" | "3:4" | "full";
+
 export interface AsciiSettings {
   voxel3d: boolean;
   resolution: number;
@@ -25,6 +28,7 @@ export interface AsciiSettings {
     background: string;
   };
   captureScale: number;
+  aspectRatio: AspectRatio;
   lineDirection: "horizontal" | "vertical";
   effects: EffectsSettings;
   captureCodec: Codecs;

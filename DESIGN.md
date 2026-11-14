@@ -197,8 +197,8 @@ The form language is the pill and the hairline. Buttons, switches, segmented con
 
 ### Navigation
 
-- **Camera header:** logo, wordmark, optional FPS/render/resolution readout pill, Studio action, settings action. All actions are 44 px pills or icon buttons on translucent surfaces. On phones the readouts sit in one compact pill on the left — plain logo, then `FPS`, render ms and frame size — with the Studio pill and a Settings pill stacked, left-aligned, on the right. Both are 44 px tall and fully rounded.
-- **Mobile settings menu:** a popover under the Settings pill holding aspect ratio (`1:1`, `3:4`, `Full`, defaulting to `3:4`), capture format and capture scale, and About. It closes on outside press or `Esc` and returns focus to its trigger.
+- **Camera header:** logo, wordmark, optional FPS/render/resolution readout pill, Studio action, settings action. All actions are 44 px pills or icon buttons on translucent surfaces. On phones the readouts sit in one compact pill on the left — plain logo, then `FPS`, render ms and frame size — and one row on the right: a round, icon-only Settings island with a gear, immediately left of the Studio pill. Both islands are 44 px tall and fully rounded.
+- **Mobile settings menu:** a popover anchored under the Settings island holding aspect ratio (`1:1`, `3:4`, `Full`, defaulting to `3:4`), capture format and capture scale, and About. Choosing a ratio applies and closes it; it also closes on outside press or `Esc` and returns focus to the gear. It is separate from the editing sheet.
 - **Mobile capture row:** four labeled actions on the bare ink surface, no card. Flip sits close to the centered shutter; Copy and Edit share a two-cell grid to its right. Copy is shown only for the ASCII renderer, and Edit slides into Copy's cell whenever the renderer is not ASCII. Side targets are 48 px with 9 px tracked labels; the shutter is 80 px.
 - **Studio header:** back-to-camera link, logo, Studio wordmark, centered file metadata at desktop, Compare and Export actions. Mobile shows icon-plus-label actions and hides non-essential metadata.
 - **Mobile dock:** up to seven icon-and-label tabs, `basis-[50px]`, active tab in signal green with a small top indicator; when the dock is dismissible a 48 px close button sits at its far left, and the open sheet keeps a collapse chevron.
@@ -206,7 +206,7 @@ The form language is the pill and the hairline. Buttons, switches, segmented con
 ### Signature Components
 
 - **Shutter:** 78–84 px double ring on desktop and 80 px on phones; paper inner disc for photo, square for video, signal outer ring with a soft glow while recording or pressed.
-- **Viewfinder card:** inset rounded preview with a hairline signal border and a faint outer glow, used only below 640 px. Its box is measured against the available space and the chosen aspect ratio (square, 3:4, or full height), so the rendered frame and the saved capture always match the shape on screen.
+- **Viewfinder:** the frame is a window onto the stream, never a scaled stream. The camera is drawn through a center crop (`object-fit: cover` math) into a canvas at the frame's ratio, mirrored after the crop, and every renderer, photo capture, recording and copied ASCII samples that same cropped canvas. Only the visible area changes between ratios; people and objects keep their shape. Below 640 px the frame is an inset rounded card with a hairline signal border and a faint outer glow for `1:1` and `3:4`; `Full` fills `100vw × 100dvh` and the header and dock overlay it.
 - **Compare control:** press-and-hold crossfade to the original; signal border and text while held, 140 ms opacity crossfade.
 - **Export dialog:** centered panel over a dimmed backdrop, 44 px close target, focus trapped, `Esc` closes, focus returns to the trigger.
 

@@ -1,8 +1,9 @@
-import { memo, type RefObject } from "react";
+import { memo, type RefObject, useCallback, useRef, useState } from "react";
 import { Link } from "react-router";
 
-import { SlidersHorizontal, Sparkles } from "lucide-react";
+import { Settings, SlidersHorizontal, Sparkles } from "lucide-react";
 
+import { useSettingsStore } from "../store/settingsStore";
 import { useStatsStore } from "../store/statsStore";
 import type { AspectRatio } from "../types";
 import { MobileSettingsMenu } from "./mobileSettingsMenu";
@@ -13,8 +14,6 @@ interface HeaderProps {
   settingsButtonRef: RefObject<HTMLButtonElement | null>;
   onOpenSettings: () => void;
   settingsOpen: boolean;
-  aspect: AspectRatio;
-  onAspectChange: (aspect: AspectRatio) => void;
 }
 
 const FPSValue = memo(function FPSValue() {
@@ -28,7 +27,7 @@ const RenderTimeValue = memo(function RenderTimeValue() {
 });
 
 const Divider = () => (
-  <span aria-hidden="true" className="h-4 w-px shrink-0 bg-line" />
+  <span aria-hidden="true" className="h-3.5 w-px shrink-0 bg-line" />
 );
 
 interface StatsProps {
@@ -86,17 +85,17 @@ const MobileStats = memo(function MobileStats({
   height: number;
 }) {
   return (
-    <div className="pointer-events-auto flex h-11 min-w-0 items-center gap-2.5 rounded-full border border-line/80 bg-ink-2/85 px-3 backdrop-blur-xl">
+    <div className="pointer-events-auto flex h-11 min-w-0 items-center gap-2 overflow-hidden rounded-full border border-line/80 bg-ink-2/85 px-2.5 backdrop-blur-xl">
       <img
         src="/assets/logo.png"
         alt=""
-        width={20}
-        height={20}
+        width={18}
+        height={18}
         draggable={false}
-        className="size-5 shrink-0 object-contain"
+        className="size-[18px] shrink-0 object-contain"
       />
 
-      <div className="flex min-w-0 items-center gap-2 overflow-hidden font-mono text-[10px] text-faint tabular-nums">
+      <div className="flex min-w-0 items-center gap-1.5 overflow-hidden font-mono text-[10px] text-faint tabular-nums">
         <span aria-label="Live frame rate" className="whitespace-nowrap">
           <span className="mr-1 text-[9px] tracking-wide text-faint">FPS</span>
           <span className="text-paper">
@@ -151,24 +150,67 @@ const StudioLink = memo(function StudioLink({
   );
 });
 
+const MOBILE_MENU_ID = "camera-settings-menu";
+
+const MobileHeaderActions = memo(function MobileHeaderActions() {
+  const aspect = useSettingsStore((s) => s.settings.aspectRatio);
+  const updateSettings = useSettingsStore((s) => s.updateSettings);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const clusterRef = useRef<HTMLDivElement>(null);
+  const gearRef = useRef<HTMLButtonElement>(null);
+
+  const closeMenu = useCallback(() => setMenuOpen(false), []);
+
+  const changeAspect = useCallback(
+    (next: AspectRatio) => updateSettings({ aspectRatio: next }),
+    [updateSettings]
+  );
+
+  return (
+    <div
+      ref={clusterRef}
+      className="pointer-events-auto relative flex shrink-0 items-center gap-2"
+    >
+      <button
+        ref={gearRef}
+        type="button"
+        aria-label="Settings"
+        aria-haspopup="dialog"
+        aria-expanded={menuOpen}
+        aria-controls={MOBILE_MENU_ID}
+        onClick={() => setMenuOpen((open) => !open)}
+        className="press pointer-events-auto flex size-11 shrink-0 items-center justify-center rounded-full border border-line/80 bg-ink-2/85 text-muted backdrop-blur-xl hover:border-signal/40 hover:bg-ink-3 hover:text-paper"
+      >
+        <Settings size={17} strokeWidth={1.75} aria-hidden="true" />
+      </button>
+
+      <StudioLink compact />
+
+      <MobileSettingsMenu
+        id={MOBILE_MENU_ID}
+        open={menuOpen}
+        onClose={closeMenu}
+        anchorRef={clusterRef}
+        triggerRef={gearRef}
+        aspect={aspect}
+        onAspectChange={changeAspect}
+      />
+    </div>
+  );
+});
+
 function Header({
   width,
   height,
   settingsButtonRef,
   onOpenSettings,
   settingsOpen,
-  aspect,
-  onAspectChange,
 }: HeaderProps) {
   return (
     <header className="pointer-events-none fixed inset-x-0 top-0 z-30 flex items-start justify-between gap-2 pt-[max(0.75rem,env(safe-area-inset-top))] pr-[max(0.75rem,env(safe-area-inset-right))] pl-[max(0.75rem,env(safe-area-inset-left))] select-none">
       <div className="flex w-full items-start justify-between gap-2 sm:hidden">
         <MobileStats width={width} height={height} />
-
-        <div className="pointer-events-auto relative flex shrink-0 flex-col items-start gap-1.5">
-          <StudioLink compact />
-          <MobileSettingsMenu aspect={aspect} onAspectChange={onAspectChange} />
-        </div>
+        <MobileHeaderActions />
       </div>
 
       <div className="hidden w-full items-center justify-between gap-2 sm:flex">

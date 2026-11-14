@@ -2,6 +2,8 @@ import {
   forwardRef,
   useEffect,
   useImperativeHandle,
+  useLayoutEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -23,21 +25,18 @@ interface ViewportProps {
   stream: MediaStream | null;
   canvasSize: { width: number; height: number };
   mirrored?: boolean;
-  aspect?: AspectRatio;
   onStageSize?: (size: { width: number; height: number }) => void;
 }
 
+/** null means "fill whatever space the frame was given". */
 const RATIOS: Record<AspectRatio, number | null> = {
-  square: 1,
-  portrait: 3 / 4,
+  "1:1": 1,
+  "3:4": 3 / 4,
   full: null,
 };
 
 const Viewport = forwardRef<ViewportHandle, ViewportProps>(
-  (
-    { stream, canvasSize, mirrored = false, aspect = "full", onStageSize },
-    ref
-  ) => {
+  ({ stream, canvasSize, mirrored = false, onStageSize }, ref) => {
     const wrapperRef = useRef<HTMLDivElement>(null);
     const stageRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -46,8 +45,19 @@ const Viewport = forwardRef<ViewportHandle, ViewportProps>(
     const controllerRef = useRef<RenderWorkerController | null>(null);
     const [stageSize, setStageSize] = useState(canvasSize);
     const isMobile = useMediaQuery("(max-width: 639px)");
+    const aspect = useSettingsStore((s) => s.settings.aspectRatio);
+    const fullBleed = !isMobile || aspect === "full";
 
-    const source = useCameraSource(stream, videoRef);
+    const box = useMemo(
+      () => ({
+        width: stageSize.width,
+        height: stageSize.height,
+        mirrored,
+      }),
+      [stageSize.width, stageSize.height, mirrored]
+    );
+
+    const source = useCameraSource(stream, videoRef, box);
 
     const sourceRef = useRef(source);
 
@@ -64,7 +74,7 @@ const Viewport = forwardRef<ViewportHandle, ViewportProps>(
       onStageSize?.(stageSize);
     }, [onStageSize, stageSize]);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
       const wrapper = wrapperRef.current;
 
       if (!wrapper) return;
@@ -80,6 +90,7 @@ const Viewport = forwardRef<ViewportHandle, ViewportProps>(
         let height = rect.height;
 
         if (ratio) {
+          // Fit the ratio inside the available box, shrinking both sides.
           width = Math.min(rect.width, rect.height * ratio);
           height = width / ratio;
         }
@@ -93,7 +104,12 @@ const Viewport = forwardRef<ViewportHandle, ViewportProps>(
       update();
       const observer = new ResizeObserver(update);
       observer.observe(wrapper);
-      return () => observer.disconnect();
+      window.addEventListener("orientationchange", update);
+
+      return () => {
+        observer.disconnect();
+        window.removeEventListener("orientationchange", update);
+      };
     }, [aspect, isMobile]);
 
     useEffect(() => {
@@ -142,7 +158,7 @@ const Viewport = forwardRef<ViewportHandle, ViewportProps>(
         const controller = controllerRef.current;
         const src = sourceRef.current;
 
-        if (!controller || !src.isReady()) return;
+        if (!controller || !controller.isIdle() || !src.isReady()) return;
 
         const frame = src.getFrame();
 
@@ -178,15 +194,27 @@ const Viewport = forwardRef<ViewportHandle, ViewportProps>(
     return (
       <div
         ref={wrapperRef}
-        className="fixed inset-0 flex items-center justify-center overflow-hidden bg-ink max-sm:top-[calc(env(safe-area-inset-top)+7rem)] max-sm:right-[max(0.5rem,env(safe-area-inset-right))] max-sm:bottom-[calc(env(safe-area-inset-bottom)+12rem)] max-sm:left-[max(0.5rem,env(safe-area-inset-left))] max-sm:bg-transparent"
+        className={
+          fullBleed
+            ? "fixed inset-0 flex items-center justify-center overflow-hidden bg-ink"
+            : "fixed inset-0 flex items-center justify-center overflow-hidden bg-ink max-sm:top-[calc(env(safe-area-inset-top)+7rem)] max-sm:right-[max(0.5rem,env(safe-area-inset-right))] max-sm:bottom-[calc(env(safe-area-inset-bottom)+12rem)] max-sm:left-[max(0.5rem,env(safe-area-inset-left))] max-sm:bg-transparent"
+        }
+        style={
+          fullBleed && isMobile
+            ? { width: "100vw", height: "100dvh" }
+            : undefined
+        }
       >
         <div
           ref={stageRef}
-          className="frame-in relative flex items-center justify-center overflow-hidden bg-ink max-sm:rounded-[26px] max-sm:border max-sm:border-signal/15 max-sm:shadow-[0_0_50px_-18px_rgba(56,243,112,0.45)]"
+          className={
+            fullBleed
+              ? "frame-in relative flex items-center justify-center overflow-hidden bg-ink"
+              : "frame-in relative flex items-center justify-center overflow-hidden bg-ink max-sm:rounded-[26px] max-sm:border max-sm:border-signal/15 max-sm:shadow-[0_0_50px_-18px_rgba(56,243,112,0.45)]"
+          }
           style={{
             width: stageSize.width,
             height: stageSize.height,
-            transform: mirrored ? "scaleX(-1)" : undefined,
           }}
         >
           <video
