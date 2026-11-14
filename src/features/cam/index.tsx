@@ -260,6 +260,8 @@ function Cam() {
           stream={stream}
           canvasSize={windowSize}
           mirrored={facingMode === "user"}
+          onFlip={toggleCamera}
+          gesturesDisabled={isRecording || settingsOpen}
           onStageSize={handleStageSize}
         />
 

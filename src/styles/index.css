@@ -181,24 +181,44 @@
 
   .rail-panel {
     transition:
-      transform 260ms var(--ease-out),
+      translate 260ms var(--ease-out),
       visibility 0s linear 260ms;
   }
 
   .rail-panel[data-open="true"] {
     transition:
-      transform 260ms var(--ease-out),
+      translate 260ms var(--ease-out),
       visibility 0s linear 0s;
   }
 
   .sheet-panel {
-    transition: transform 260ms var(--ease-drawer);
+    transition: translate 260ms var(--ease-drawer);
   }
 
   .modal-panel {
     transition:
       opacity 180ms var(--ease-out),
       transform 200ms var(--ease-out);
+  }
+
+  .ratio-tween {
+    transition:
+      width 240ms var(--ease-out),
+      height 240ms var(--ease-out);
+  }
+
+  .sheet-shell {
+    visibility: hidden;
+    transition:
+      translate 280ms var(--ease-drawer),
+      visibility 0s linear 280ms;
+  }
+
+  .sheet-shell[data-open="true"] {
+    visibility: visible;
+    transition:
+      translate 280ms var(--ease-drawer),
+      visibility 0s linear 0s;
   }
 
   .crossfade {
@@ -329,6 +349,39 @@
   }
 }
 
+@keyframes popover-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes rail-in {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
 @keyframes frame-in {
   from {
     opacity: 0;
@@ -359,6 +412,19 @@
   animation: fade-up 180ms var(--ease-out) both;
 }
 
+.popover-enter {
+  transform-origin: top right;
+  animation: popover-in 160ms var(--ease-out) backwards;
+}
+
+.modal-enter {
+  animation: modal-in 200ms var(--ease-out) backwards;
+}
+
+.rail-enter {
+  animation: rail-in 260ms var(--ease-out) backwards;
+}
+
 .pop-in {
   animation: pop-in 180ms var(--ease-out) both;
 }
@@ -387,6 +453,14 @@
   .modal-panel {
     transition-property:
       opacity, background-color, color, border-color, visibility !important;
+  }
+
+  .sheet-shell {
+    transition: none !important;
+  }
+
+  .ratio-tween {
+    transition: none !important;
   }
 
   .press:active:not(:disabled) {

@@ -1,4 +1,5 @@
 import {
+  type PointerEvent as ReactPointerEvent,
   type ReactNode,
   type RefObject,
   useCallback,
@@ -9,6 +10,7 @@ import {
 import { X } from "lucide-react";
 
 import CaptureTool from "@/shared/components/settings/mobile/tools/CaptureTool";
+import { useSheetDrag } from "@/shared/hooks/useSheetDrag";
 import { Segmented } from "@/shared/ui/controls";
 
 import type { AspectRatio } from "../types";
@@ -82,6 +84,16 @@ export function MobileSettingsMenu({
     [onClose, triggerRef]
   );
 
+  const { panelRef, handlers } = useSheetDrag(onClose);
+
+  const dragHandlers = {
+    ...handlers,
+    onPointerDown: (e: ReactPointerEvent<HTMLDivElement>) => {
+      if ((e.target as HTMLElement).closest("button, a, input")) return;
+      handlers.onPointerDown(e);
+    },
+  };
+
   useEffect(() => {
     if (!open) return;
 
@@ -119,12 +131,16 @@ export function MobileSettingsMenu({
 
   return (
     <div
+      ref={panelRef}
       id={id}
       role="dialog"
       aria-label="Camera settings"
-      className="notice-enter absolute top-full right-0 z-40 mt-2 flex max-h-[calc(100dvh-4.5rem)] w-[min(19rem,calc(100vw-1.5rem))] flex-col overflow-hidden rounded-[18px] border border-line-strong bg-ink-2/95 shadow-[0_24px_60px_rgba(0,0,0,0.65)] backdrop-blur-2xl"
+      className="popover-enter absolute top-full right-0 z-40 mt-2 flex max-h-[calc(100dvh-4.5rem)] w-[min(19rem,calc(100vw-1.5rem))] flex-col overflow-hidden rounded-[18px] border border-line-strong bg-ink-2/95 shadow-[0_24px_60px_rgba(0,0,0,0.65)] backdrop-blur-2xl"
     >
-      <div className="flex items-center justify-between border-b border-line/60 py-1.5 pr-2 pl-4">
+      <div
+        {...dragHandlers}
+        className="flex cursor-grab touch-none items-center justify-between border-b border-line/60 py-1.5 pr-2 pl-4 active:cursor-grabbing"
+      >
         <h2 className="text-[10px] font-semibold tracking-[0.2em] text-paper uppercase">
           Settings
         </h2>

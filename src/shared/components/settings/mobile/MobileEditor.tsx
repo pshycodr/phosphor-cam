@@ -150,8 +150,6 @@ function MobileEditor({
     }
   };
 
-  if (!visible) return null;
-
   const panelId = `${uid}-panel`;
 
   return (
@@ -159,8 +157,12 @@ function MobileEditor({
       ref={setDockEl}
       role="region"
       aria-label="Editing tools"
+      aria-hidden={!visible}
+      data-open={visible}
       onKeyDown={onKeyDown}
-      className="translucent fixed inset-x-0 bottom-0 z-40 rounded-t-[22px] border-t border-line/80 bg-ink-2/95 pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] shadow-[0_-20px_50px_rgba(0,0,0,0.5)] backdrop-blur-2xl select-none"
+      className={`sheet-shell translucent fixed inset-x-0 bottom-0 z-40 rounded-t-[22px] border-t border-line/80 bg-ink-2/95 pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] shadow-[0_-20px_50px_rgba(0,0,0,0.5)] backdrop-blur-2xl select-none ${
+        visible ? "translate-y-0" : "pointer-events-none translate-y-full"
+      }`}
     >
       <Collapse open={panelOpen} id={panelId}>
         <div

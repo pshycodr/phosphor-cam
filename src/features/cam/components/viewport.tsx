@@ -1,5 +1,6 @@
 import {
   forwardRef,
+  useCallback,
   useEffect,
   useImperativeHandle,
   useLayoutEffect,
@@ -11,6 +12,7 @@ import {
 import { useMediaQuery } from "@/shared/components/settings/common/useMediaQuery";
 
 import { useCameraSource } from "../hooks/useCameraSource";
+import { useViewfinderGestures } from "../hooks/useViewfinderGestures";
 import { useSettingsStore } from "../store/settingsStore";
 import { useStatsStore } from "../store/statsStore";
 import type { AspectRatio } from "../types";
@@ -25,6 +27,8 @@ interface ViewportProps {
   stream: MediaStream | null;
   canvasSize: { width: number; height: number };
   mirrored?: boolean;
+  onFlip?: () => void;
+  gesturesDisabled?: boolean;
   onStageSize?: (size: { width: number; height: number }) => void;
 }
 
@@ -35,8 +39,20 @@ const RATIOS: Record<AspectRatio, number | null> = {
   full: null,
 };
 
+const ASPECT_ORDER: readonly AspectRatio[] = ["1:1", "3:4", "full"];
+
 const Viewport = forwardRef<ViewportHandle, ViewportProps>(
-  ({ stream, canvasSize, mirrored = false, onStageSize }, ref) => {
+  (
+    {
+      stream,
+      canvasSize,
+      mirrored = false,
+      onFlip,
+      gesturesDisabled = false,
+      onStageSize,
+    },
+    ref
+  ) => {
     const wrapperRef = useRef<HTMLDivElement>(null);
     const stageRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -50,6 +66,22 @@ const Viewport = forwardRef<ViewportHandle, ViewportProps>(
     // A rotated phone has no vertical room for an inset card, so the frame
     // takes the whole screen there and the chrome overlays it.
     const fillScreen = !isMobile || aspect === "full" || isLandscape;
+
+    const cycleAspect = useCallback((direction: 1 | -1) => {
+      const { settings, updateSettings } = useSettingsStore.getState();
+      const index = ASPECT_ORDER.indexOf(settings.aspectRatio);
+      const next =
+        ASPECT_ORDER[
+          (index + direction + ASPECT_ORDER.length) % ASPECT_ORDER.length
+        ];
+      updateSettings({ aspectRatio: next });
+    }, []);
+
+    const gestures = useViewfinderGestures({
+      onFlip: onFlip ?? (() => {}),
+      onCycleAspect: cycleAspect,
+      enabled: isMobile && !gesturesDisabled && !!onFlip,
+    });
 
     const box = useMemo(
       () => ({
@@ -123,7 +155,7 @@ const Viewport = forwardRef<ViewportHandle, ViewportProps>(
       const canvas = document.createElement("canvas");
       canvas.width = sizeRef.current.width;
       canvas.height = sizeRef.current.height;
-      canvas.className = "h-full w-full";
+      canvas.className = "h-full w-full object-cover";
       canvas.setAttribute("role", "img");
       canvas.setAttribute("aria-label", "Live Phosphor camera preview");
       container.appendChild(canvas);
@@ -197,10 +229,11 @@ const Viewport = forwardRef<ViewportHandle, ViewportProps>(
     return (
       <div
         ref={wrapperRef}
+        {...gestures}
         className={
           fillScreen
-            ? "fixed inset-0 flex items-center justify-center overflow-hidden bg-ink"
-            : "fixed inset-0 flex items-center justify-center overflow-hidden bg-ink max-sm:top-[calc(env(safe-area-inset-top)+7rem)] max-sm:right-[max(0.5rem,env(safe-area-inset-right))] max-sm:bottom-[calc(env(safe-area-inset-bottom)+12rem)] max-sm:left-[max(0.5rem,env(safe-area-inset-left))] max-sm:bg-transparent"
+            ? "fixed inset-0 flex touch-pan-y items-center justify-center overflow-hidden bg-ink"
+            : "fixed inset-0 flex touch-pan-y items-center justify-center overflow-hidden bg-ink max-sm:top-[calc(env(safe-area-inset-top)+7rem)] max-sm:right-[max(0.5rem,env(safe-area-inset-right))] max-sm:bottom-[calc(env(safe-area-inset-bottom)+12rem)] max-sm:left-[max(0.5rem,env(safe-area-inset-left))] max-sm:bg-transparent"
         }
         style={
           fillScreen && isMobile
@@ -210,11 +243,11 @@ const Viewport = forwardRef<ViewportHandle, ViewportProps>(
       >
         <div
           ref={stageRef}
-          className={
+          className={`ratio-tween frame-in relative flex items-center justify-center overflow-hidden bg-ink motion-reduce:transition-none ${
             fillScreen
-              ? "frame-in relative flex items-center justify-center overflow-hidden bg-ink"
-              : "frame-in relative flex items-center justify-center overflow-hidden bg-ink max-sm:rounded-[26px] max-sm:border max-sm:border-signal/15 max-sm:shadow-[0_0_50px_-18px_rgba(56,243,112,0.45)]"
-          }
+              ? ""
+              : "max-sm:rounded-[26px] max-sm:border max-sm:border-signal/15 max-sm:shadow-[0_0_50px_-18px_rgba(56,243,112,0.45)]"
+          }`}
           style={{
             width: stageSize.width,
             height: stageSize.height,
