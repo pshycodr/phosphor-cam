@@ -45,8 +45,11 @@ const Viewport = forwardRef<ViewportHandle, ViewportProps>(
     const controllerRef = useRef<RenderWorkerController | null>(null);
     const [stageSize, setStageSize] = useState(canvasSize);
     const isMobile = useMediaQuery("(max-width: 639px)");
+    const isLandscape = useMediaQuery("(orientation: landscape)");
     const aspect = useSettingsStore((s) => s.settings.aspectRatio);
-    const fullBleed = !isMobile || aspect === "full";
+    // A rotated phone has no vertical room for an inset card, so the frame
+    // takes the whole screen there and the chrome overlays it.
+    const fillScreen = !isMobile || aspect === "full" || isLandscape;
 
     const box = useMemo(
       () => ({
@@ -195,12 +198,12 @@ const Viewport = forwardRef<ViewportHandle, ViewportProps>(
       <div
         ref={wrapperRef}
         className={
-          fullBleed
+          fillScreen
             ? "fixed inset-0 flex items-center justify-center overflow-hidden bg-ink"
             : "fixed inset-0 flex items-center justify-center overflow-hidden bg-ink max-sm:top-[calc(env(safe-area-inset-top)+7rem)] max-sm:right-[max(0.5rem,env(safe-area-inset-right))] max-sm:bottom-[calc(env(safe-area-inset-bottom)+12rem)] max-sm:left-[max(0.5rem,env(safe-area-inset-left))] max-sm:bg-transparent"
         }
         style={
-          fullBleed && isMobile
+          fillScreen && isMobile
             ? { width: "100vw", height: "100dvh" }
             : undefined
         }
@@ -208,7 +211,7 @@ const Viewport = forwardRef<ViewportHandle, ViewportProps>(
         <div
           ref={stageRef}
           className={
-            fullBleed
+            fillScreen
               ? "frame-in relative flex items-center justify-center overflow-hidden bg-ink"
               : "frame-in relative flex items-center justify-center overflow-hidden bg-ink max-sm:rounded-[26px] max-sm:border max-sm:border-signal/15 max-sm:shadow-[0_0_50px_-18px_rgba(56,243,112,0.45)]"
           }

@@ -122,7 +122,7 @@ export function MobileSettingsMenu({
       id={id}
       role="dialog"
       aria-label="Camera settings"
-      className="notice-enter absolute top-full right-0 z-40 mt-2 w-[min(19rem,calc(100vw-1.5rem))] overflow-hidden rounded-[18px] border border-line-strong bg-ink-2/95 shadow-[0_24px_60px_rgba(0,0,0,0.65)] backdrop-blur-2xl"
+      className="notice-enter absolute top-full right-0 z-40 mt-2 flex max-h-[calc(100dvh-4.5rem)] w-[min(19rem,calc(100vw-1.5rem))] flex-col overflow-hidden rounded-[18px] border border-line-strong bg-ink-2/95 shadow-[0_24px_60px_rgba(0,0,0,0.65)] backdrop-blur-2xl"
     >
       <div className="flex items-center justify-between border-b border-line/60 py-1.5 pr-2 pl-4">
         <h2 className="text-[10px] font-semibold tracking-[0.2em] text-paper uppercase">
@@ -139,7 +139,7 @@ export function MobileSettingsMenu({
         </button>
       </div>
 
-      <div className="max-h-[min(62dvh,26rem)] overflow-y-auto overscroll-contain">
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
         <section className="space-y-2 border-b border-line/60 px-4 py-3.5">
           <p className="text-[9px] font-medium tracking-[0.2em] text-faint uppercase">
             Aspect ratio
