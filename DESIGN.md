@@ -144,7 +144,9 @@ The palette is a graphite stack with a single phosphor-green accent. There is no
 
 ## Layout
 
-The camera is a fixed, full-viewport stage. A slim top bar carries the wordmark, status readouts, and the Studio/settings actions. The capture controls float at the bottom center on desktop and tablet; on phones they collapse into a right-side dock cluster plus a bottom tool dock.
+The camera is a fixed, full-viewport stage. A slim top bar carries the wordmark, status readouts, and the Studio/settings actions. The capture controls float at the bottom center on desktop and tablet, inside a floating card.
+
+Below 640 px the camera switches to a phone composition: a single compact stats bar with the phosphor logo and a Studio pill at the top, an inset preview card with a 26 px radius and a faint signal glow, and a bottom row of four labeled actions (Flip, Capture, Copy, Edit) with Photo/Video above it. The capture card fills the space between the top bar and the control row, and its rendered frame size follows the card, so the preview and the saved capture match.
 
 On screens 640 px and wider, settings open as a 360 px right rail with a hairline left border and a soft cast shadow; the capture bar shifts left of the rail at 1024 px and hides below that width while settings are open. Below 640 px, settings open as a bottom sheet with a 22 px top radius, a drag handle, and a seven-tool tab bar sized to fit 360 px.
 
@@ -195,13 +197,15 @@ The form language is the pill and the hairline. Buttons, switches, segmented con
 
 ### Navigation
 
-- **Camera header:** logo, wordmark, optional FPS/render/resolution readout pill, Studio action, settings action. All actions are 44 px pills or icon buttons on translucent surfaces.
+- **Camera header:** logo, wordmark, optional FPS/render/resolution readout pill, Studio action, settings action. All actions are 44 px pills or icon buttons on translucent surfaces. On phones the readouts sit in one full-width pill with a signal-ringed logo and a pulsing live dot.
+- **Mobile capture row:** four labeled actions on the bare ink surface, no card. Flip sits close to the centered shutter, Copy and Edit group to its right. Side targets are 48 px with 9 px tracked labels; the shutter is 80 px.
 - **Studio header:** back-to-camera link, logo, Studio wordmark, centered file metadata at desktop, Compare and Export actions. Mobile shows icon-plus-label actions and hides non-essential metadata.
 - **Mobile dock:** up to seven icon-and-label tabs, `basis-[50px]`, active tab in signal green with a small top indicator; the camera sheet adds a closable header with 44 px X and collapse controls.
 
 ### Signature Components
 
-- **Shutter:** 76 px double ring; paper inner disc for photo, square for video, signal outer ring while recording.
+- **Shutter:** 78–84 px double ring on desktop and 80 px on phones; paper inner disc for photo, square for video, signal outer ring with a soft glow while recording or pressed.
+- **Viewfinder card:** inset rounded preview with a hairline signal border and a faint outer glow, used only below 640 px.
 - **Compare control:** press-and-hold crossfade to the original; signal border and text while held, 140 ms opacity crossfade.
 - **Export dialog:** centered panel over a dimmed backdrop, 44 px close target, focus trapped, `Esc` closes, focus returns to the trigger.
 

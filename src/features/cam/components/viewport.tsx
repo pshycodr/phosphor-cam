@@ -1,4 +1,10 @@
-import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
 
 import { useCameraSource } from "../hooks/useCameraSource";
 import { useSettingsStore } from "../store/settingsStore";
@@ -14,14 +20,17 @@ interface ViewportProps {
   stream: MediaStream | null;
   canvasSize: { width: number; height: number };
   mirrored?: boolean;
+  onStageSize?: (size: { width: number; height: number }) => void;
 }
 
 const Viewport = forwardRef<ViewportHandle, ViewportProps>(
-  ({ stream, canvasSize, mirrored = false }, ref) => {
+  ({ stream, canvasSize, mirrored = false, onStageSize }, ref) => {
+    const stageRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const controllerRef = useRef<RenderWorkerController | null>(null);
+    const [stageSize, setStageSize] = useState(canvasSize);
 
     const source = useCameraSource(stream, videoRef);
 
@@ -33,8 +42,38 @@ const Viewport = forwardRef<ViewportHandle, ViewportProps>(
     }, [source]);
 
     useEffect(() => {
-      sizeRef.current = canvasSize;
-    }, [canvasSize]);
+      sizeRef.current = stageSize;
+    }, [stageSize]);
+
+    useEffect(() => {
+      onStageSize?.(stageSize);
+    }, [onStageSize, stageSize]);
+
+    useEffect(() => {
+      const stage = stageRef.current;
+
+      if (!stage) return;
+
+      const update = () => {
+        const styles = getComputedStyle(stage);
+        const rect = stage.getBoundingClientRect();
+        const height =
+          rect.height - (Number.parseFloat(styles.paddingBottom) || 0);
+        const width = rect.width;
+
+        if (width < 2 || height < 2) return;
+
+        const next = { width: Math.round(width), height: Math.round(height) };
+        setStageSize((prev) =>
+          prev.width === next.width && prev.height === next.height ? prev : next
+        );
+      };
+
+      update();
+      const observer = new ResizeObserver(update);
+      observer.observe(stage);
+      return () => observer.disconnect();
+    }, []);
 
     useEffect(() => {
       const container = containerRef.current;
@@ -44,7 +83,7 @@ const Viewport = forwardRef<ViewportHandle, ViewportProps>(
       const canvas = document.createElement("canvas");
       canvas.width = sizeRef.current.width;
       canvas.height = sizeRef.current.height;
-      canvas.className = "max-h-full max-w-full";
+      canvas.className = "h-full w-full";
       canvas.setAttribute("role", "img");
       canvas.setAttribute("aria-label", "Live Phosphor camera preview");
       container.appendChild(canvas);
@@ -68,11 +107,11 @@ const Viewport = forwardRef<ViewportHandle, ViewportProps>(
         canvas.remove();
         canvasRef.current = null;
       };
-    }, [canvasSize]);
+    }, []);
 
     useEffect(() => {
-      controllerRef.current?.resize(canvasSize.width, canvasSize.height);
-    }, [canvasSize.width, canvasSize.height]);
+      controllerRef.current?.resize(stageSize.width, stageSize.height);
+    }, [stageSize.width, stageSize.height]);
 
     useEffect(() => {
       let raf = 0;
@@ -117,11 +156,10 @@ const Viewport = forwardRef<ViewportHandle, ViewportProps>(
 
     return (
       <div
-        className="fixed inset-0 flex items-center justify-center overflow-hidden bg-ink"
+        ref={stageRef}
+        className="frame-in fixed inset-0 flex items-center justify-center overflow-hidden bg-ink max-sm:top-[calc(env(safe-area-inset-top)+5.5rem)] max-sm:right-[max(0.5rem,env(safe-area-inset-right))] max-sm:bottom-[calc(env(safe-area-inset-bottom)+12rem)] max-sm:left-[max(0.5rem,env(safe-area-inset-left))] max-sm:rounded-[26px] max-sm:border max-sm:border-signal/15 max-sm:shadow-[0_0_50px_-18px_rgba(56,243,112,0.45)]"
         style={{
           transform: mirrored ? "scaleX(-1)" : undefined,
-          // Keeps the preview clear of the mobile editor dock (0px when closed).
-          paddingBottom: "var(--editor-dock-h, 0px)",
         }}
       >
         <video

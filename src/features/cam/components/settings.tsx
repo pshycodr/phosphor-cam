@@ -76,7 +76,8 @@ function Settings({
         : (triggerRef?.current ?? null);
 
     if (target) {
-      requestAnimationFrame(() => target.focus({ preventScroll: true }));
+      const timer = setTimeout(() => target.focus({ preventScroll: true }), 40);
+      return () => clearTimeout(timer);
     }
   }, [open, isDesktop, triggerRef, desktopTriggerRef]);
 

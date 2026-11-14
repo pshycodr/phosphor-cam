@@ -11,6 +11,7 @@ export const Shutter = ({
   isVideo,
   isRecording,
   compact = false,
+  mobile = false,
   recordingLabel,
   onShot,
   onToggleRecording,
@@ -18,13 +19,14 @@ export const Shutter = ({
   isVideo: boolean;
   isRecording: boolean;
   compact?: boolean;
+  mobile?: boolean;
   recordingLabel: string;
   onShot: () => void;
   onToggleRecording: () => void;
 }) => {
-  const ring = compact ? "size-16" : SHUTTER_SIZE;
-  const dot = compact ? "size-12" : SHUTTER_DOT;
-  const stop = compact ? "size-5" : STOP_DOT;
+  const ring = compact ? "size-16" : mobile ? "size-[80px]" : SHUTTER_SIZE;
+  const dot = compact ? "size-12" : mobile ? "size-[64px]" : SHUTTER_DOT;
+  const stop = compact ? "size-5" : mobile ? "size-6" : STOP_DOT;
 
   const caption = isRecording ? (
     <Label className="text-signal">
@@ -49,7 +51,7 @@ export const Shutter = ({
         className={`group flex flex-col items-center gap-2 rounded-full ${FOCUS_RING}`}
       >
         <span
-          className={`flex items-center justify-center rounded-full border-2 border-paper/60 bg-ink-2/50 transition-all duration-150 group-hover:border-paper group-active:scale-95 ${ring}`}
+          className={`flex items-center justify-center rounded-full border-2 border-paper/60 bg-ink-2/50 transition-all duration-150 group-hover:border-paper group-active:scale-95 group-active:shadow-[0_0_36px_-8px_rgba(56,243,112,0.65)] ${ring}`}
         >
           <span
             className={`rounded-full bg-paper opacity-95 transition-all duration-150 group-hover:bg-white group-hover:opacity-100 ${dot}`}
@@ -71,8 +73,8 @@ export const Shutter = ({
       <span
         className={`flex items-center justify-center rounded-full border-2 transition-all duration-150 ${ring} ${
           isRecording
-            ? "border-signal/80 bg-signal/10"
-            : "border-paper/60 bg-ink-2/50 group-hover:border-paper group-active:scale-95"
+            ? "border-signal/80 bg-signal/10 shadow-[0_0_30px_-8px_rgba(56,243,112,0.6)]"
+            : "border-paper/60 bg-ink-2/50 group-hover:border-paper group-active:scale-95 group-active:shadow-[0_0_36px_-8px_rgba(56,243,112,0.65)]"
         }`}
       >
         <span

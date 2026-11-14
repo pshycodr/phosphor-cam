@@ -22,6 +22,10 @@ function Cam() {
     width: window.innerWidth,
     height: window.innerHeight,
   });
+  const [frameSize, setFrameSize] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
   const [flash, setFlash] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [cameraError, setCameraError] = useState<string | null>(null);
@@ -96,6 +100,15 @@ function Cam() {
 
   const openSettings = useCallback(() => setSettingsOpen(true), []);
   const closeSettings = useCallback(() => setSettingsOpen(false), []);
+
+  const handleStageSize = useCallback(
+    (size: { width: number; height: number }) => {
+      setFrameSize((prev) =>
+        prev.width === size.width && prev.height === size.height ? prev : size
+      );
+    },
+    []
+  );
 
   const takeSnapshot = useCallback(async () => {
     if (!viewportRef.current) return;
@@ -205,8 +218,8 @@ function Cam() {
       <Toaster />
 
       <Header
-        width={windowSize.width}
-        height={windowSize.height}
+        width={frameSize.width}
+        height={frameSize.height}
         settingsButtonRef={desktopSettingsRef}
         onOpenSettings={openSettings}
         settingsOpen={settingsOpen}
@@ -243,6 +256,7 @@ function Cam() {
         stream={stream}
         canvasSize={windowSize}
         mirrored={facingMode === "user"}
+        onStageSize={handleStageSize}
       />
 
       {!stream && !cameraError && (

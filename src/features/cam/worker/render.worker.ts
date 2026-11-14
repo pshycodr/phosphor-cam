@@ -86,6 +86,10 @@ self.onmessage = async (event: MessageEvent<ToWorker>) => {
         break;
 
       case "resize":
+        if (canvas) {
+          canvas.width = msg.width;
+          canvas.height = msg.height;
+        }
         targetSize = { width: msg.width, height: msg.height };
         break;
 

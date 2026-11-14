@@ -318,6 +318,26 @@
   }
 }
 
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes frame-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 @keyframes request-line {
   0% {
     transform: translateX(-100%);
@@ -337,6 +357,16 @@
 
 .notice-enter {
   animation: fade-up 180ms var(--ease-out) both;
+}
+
+.pop-in {
+  animation: pop-in 180ms var(--ease-out) both;
+}
+
+@media (max-width: 639px) {
+  .frame-in {
+    animation: frame-in 260ms var(--ease-out) both;
+  }
 }
 
 .request-line {
