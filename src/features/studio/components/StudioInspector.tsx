@@ -59,7 +59,7 @@ function StudioInspector() {
       {isDesktop ? (
         <aside
           aria-label="Editing controls"
-          className="flex h-full w-[344px] shrink-0 flex-col border-l border-line/80 bg-ink-2/50 select-none"
+          className="rail-enter flex h-full w-[344px] shrink-0 flex-col border-l border-line/80 bg-ink-2/50 select-none"
         >
           <header className="flex h-14 shrink-0 items-center gap-2.5 border-b border-line/80 px-5">
             <SlidersHorizontal
@@ -78,6 +78,7 @@ function StudioInspector() {
               idPrefix="studio-desktop"
               leadingSections={LEADING_SECTIONS}
               defaultOpenSection="presets"
+              showCapture={false}
             />
           </div>
         </aside>
@@ -86,6 +87,7 @@ function StudioInspector() {
           persistent
           defaultTool="presets"
           leadingTools={LEADING_TOOLS}
+          showCapture={false}
         />
       )}
     </SettingsControlsProvider>

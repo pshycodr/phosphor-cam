@@ -4,8 +4,10 @@ import toast from "react-hot-toast";
 import { Check, Clipboard, Download, FileText, Loader2, X } from "lucide-react";
 
 import { RENDERERS } from "@/core/renderers/registry";
+import { SliderField } from "@/shared/components/settings/common/EditorSlider";
 import type { Codecs } from "@/shared/types";
 import { Button, IconButton } from "@/shared/ui/buttons";
+import { Segmented } from "@/shared/ui/controls";
 import { saveImage } from "@/shared/utils/saveImage";
 
 import { useStudioStore } from "../../store/studioStore";
@@ -13,11 +15,25 @@ import { useStudioStore } from "../../store/studioStore";
 const FOCUSABLE =
   'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])';
 
+const MIN_SCALE = 1;
+const MAX_SCALE = 20;
+const WARN_SCALE = 12;
+const CODECS = [
+  { key: "png", label: "PNG" },
+  { key: "jpeg", label: "JPEG" },
+  { key: "webp", label: "WEBP" },
+] as const satisfies readonly { key: Codecs; label: string }[];
+
+const clampScale = (value: number) =>
+  Math.min(MAX_SCALE, Math.max(MIN_SCALE, Math.round(value)));
+
 function ExportModal() {
   const isOpen = useStudioStore((s) => s.isExportModalOpen);
   const setIsOpen = useStudioStore((s) => s.setIsExportModalOpen);
   const image = useStudioStore((s) => s.image);
   const settings = useStudioStore((s) => s.settings);
+  const updateSettings = useStudioStore((s) => s.updateSettings);
+  const commitHistory = useStudioStore((s) => s.commitHistory);
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [copiedAscii, setCopiedAscii] = useState(false);
@@ -81,7 +97,7 @@ function ExportModal() {
 
   if (!isOpen || !image) return null;
 
-  const currentScale = settings.captureScale || 4;
+  const currentScale = clampScale(settings.captureScale || 4);
   const currentCodec = settings.captureCodec || "png";
 
   const exportWidth = Math.round(image.width * currentScale);
@@ -236,7 +252,7 @@ function ExportModal() {
         aria-modal="true"
         aria-labelledby="export-title"
         aria-describedby="export-desc"
-        className="notice-enter w-full max-w-[400px] overflow-hidden rounded-2xl border border-line bg-ink-2 shadow-[0_30px_80px_rgba(0,0,0,0.65)]"
+        className="modal-enter w-full max-w-[400px] overflow-hidden rounded-2xl border border-line bg-ink-2 shadow-[0_30px_80px_rgba(0,0,0,0.65)]"
       >
         <header className="flex h-14 items-center justify-between border-b border-line/80 pr-4 pl-5">
           <div className="flex items-center gap-2.5">
@@ -265,30 +281,45 @@ function ExportModal() {
 
         <div className="space-y-2.5 px-5 pt-4">
           <p id="export-desc" className="sr-only">
-            Save the current render, copy it to the clipboard, or copy its ASCII
-            text.
+            Choose a capture format and scale, then save the current render,
+            copy it to the clipboard, or copy its ASCII text.
           </p>
 
-          <div className="flex items-center justify-between gap-4 rounded-lg border border-line/80 bg-ink-3/40 px-3 py-2.5">
-            <div>
-              <p className="text-[11px] text-paper">Target size</p>
-              <p className="text-[10px] text-faint">{currentScale}x scale</p>
+          <div className="space-y-3 rounded-xl border border-line/80 bg-ink-3/40 px-3.5 py-3">
+            <div className="flex items-baseline justify-between gap-3">
+              <p className="text-[11px] text-paper">Capture</p>
+              <span className="font-mono text-[11px] text-faint tabular-nums">
+                {exportWidth} × {exportHeight}
+              </span>
             </div>
-            <span className="font-mono text-[11px] text-paper tabular-nums">
-              {exportWidth} × {exportHeight}
-            </span>
-          </div>
 
-          <div className="flex items-center justify-between gap-4 rounded-lg border border-line/80 bg-ink-3/40 px-3 py-2.5">
-            <div>
-              <p className="text-[11px] text-paper">Format</p>
-              <p className="text-[10px] text-faint">
-                Set scale and codec in Capture
+            <Segmented
+              label="Image format"
+              options={CODECS}
+              value={currentCodec}
+              onChange={(codec) => updateSettings({ captureCodec: codec })}
+            />
+
+            <SliderField
+              label="Scale"
+              display={`${currentScale}x`}
+              min={MIN_SCALE}
+              max={MAX_SCALE}
+              step={1}
+              value={currentScale}
+              accent={currentScale > WARN_SCALE ? "#ff6b5a" : "#38f370"}
+              marks={[WARN_SCALE]}
+              onChange={(value) =>
+                updateSettings({ captureScale: clampScale(value) }, false)
+              }
+              onCommit={() => commitHistory()}
+            />
+
+            {currentScale > WARN_SCALE && (
+              <p className="text-[10px] leading-relaxed text-alert">
+                Above {WARN_SCALE}x takes longer and may fail on large canvases.
               </p>
-            </div>
-            <span className="font-mono text-[11px] text-paper uppercase tabular-nums">
-              {currentCodec} · {currentScale}x
-            </span>
+            )}
           </div>
         </div>
 
