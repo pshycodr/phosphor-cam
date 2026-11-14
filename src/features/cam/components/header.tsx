@@ -171,6 +171,8 @@ const MobileHeaderActions = memo(function MobileHeaderActions() {
       ref={clusterRef}
       className="pointer-events-auto relative flex shrink-0 items-center gap-2"
     >
+      <StudioLink compact />
+
       <button
         ref={gearRef}
         type="button"
@@ -183,8 +185,6 @@ const MobileHeaderActions = memo(function MobileHeaderActions() {
       >
         <Settings size={17} strokeWidth={1.75} aria-hidden="true" />
       </button>
-
-      <StudioLink compact />
 
       <MobileSettingsMenu
         id={MOBILE_MENU_ID}
