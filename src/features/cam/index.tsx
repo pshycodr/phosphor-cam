@@ -208,6 +208,8 @@ function Cam() {
         width={windowSize.width}
         height={windowSize.height}
         settingsButtonRef={desktopSettingsRef}
+        onOpenSettings={openSettings}
+        settingsOpen={settingsOpen}
       />
       <Settings
         open={settingsOpen}

@@ -91,7 +91,7 @@ export function Segmented<T extends string>({
             aria-pressed={active}
             onClick={() => onChange(option.key)}
             className={cx(
-              "relative z-10 flex min-h-9 items-center justify-center rounded-full px-3 text-xs font-medium transition-colors duration-150",
+              "relative z-10 flex min-h-9 items-center justify-center rounded-full px-3 text-xs font-medium transition-colors duration-150 before:absolute before:-inset-y-1 before:inset-x-0 before:content-['']",
               active ? "text-ink" : "text-muted hover:text-paper"
             )}
           >

@@ -1,13 +1,17 @@
-import { memo, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
 import { Check, Clipboard, Download, FileText, Loader2, X } from "lucide-react";
 
 import { RENDERERS } from "@/core/renderers/registry";
 import type { Codecs } from "@/shared/types";
+import { Button, IconButton } from "@/shared/ui/buttons";
 import { saveImage } from "@/shared/utils/saveImage";
 
 import { useStudioStore } from "../../store/studioStore";
+
+const FOCUSABLE =
+  'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])';
 
 function ExportModal() {
   const isOpen = useStudioStore((s) => s.isExportModalOpen);
@@ -18,6 +22,62 @@ function ExportModal() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [copiedAscii, setCopiedAscii] = useState(false);
   const [copiedImage, setCopiedImage] = useState(false);
+
+  const panelRef = useRef<HTMLDivElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const previous = document.activeElement as HTMLElement | null;
+    const focusTimer = requestAnimationFrame(() =>
+      closeRef.current?.focus({ preventScroll: true })
+    );
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        setIsOpen(false);
+        return;
+      }
+
+      if (e.key !== "Tab") return;
+
+      const panel = panelRef.current;
+      if (!panel) return;
+
+      const nodes = Array.from(
+        panel.querySelectorAll<HTMLElement>(FOCUSABLE)
+      ).filter((node) => node.offsetParent !== null);
+
+      if (nodes.length === 0) {
+        e.preventDefault();
+        return;
+      }
+
+      const first = nodes[0];
+      const last = nodes[nodes.length - 1];
+      const active = document.activeElement;
+
+      if (!panel.contains(active)) {
+        e.preventDefault();
+        first.focus();
+      } else if (e.shiftKey && active === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      cancelAnimationFrame(focusTimer);
+      document.removeEventListener("keydown", onKeyDown);
+      previous?.focus({ preventScroll: true });
+    };
+  }, [isOpen, setIsOpen]);
 
   if (!isOpen || !image) return null;
 
@@ -36,7 +96,6 @@ function ExportModal() {
       });
     }
 
-    // Fallback if controller is not yet ready
     const img = new Image();
     img.crossOrigin = "anonymous";
     img.src = image.url;
@@ -95,7 +154,6 @@ function ExportModal() {
   const handleCopyImageToClipboard = async () => {
     setIsProcessing(true);
     try {
-      // Clipboard API generally requires image/png
       const img = new Image();
       img.crossOrigin = "anonymous";
       img.src = image.url;
@@ -167,103 +225,123 @@ function ExportModal() {
 
   return (
     <div
-      role="dialog"
-      aria-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm select-none"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-ink/80 p-4 backdrop-blur-sm"
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget) setIsOpen(false);
+      }}
     >
-      <div className="relative flex w-full max-w-md flex-col overflow-hidden rounded-2xl border border-green-500/30 bg-zinc-950 p-6 shadow-2xl shadow-green-950/40">
-        {/* Header */}
-        <div className="mb-5 flex items-center justify-between border-b border-zinc-800 pb-3">
-          <div className="flex items-center gap-2">
-            <Download size={18} className="text-green-400" />
-            <h3 className="text-base font-bold text-white">Export & Save</h3>
+      <div
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="export-title"
+        aria-describedby="export-desc"
+        className="notice-enter w-full max-w-[400px] overflow-hidden rounded-2xl border border-line bg-ink-2 shadow-[0_30px_80px_rgba(0,0,0,0.65)]"
+      >
+        <header className="flex h-14 items-center justify-between border-b border-line/80 pr-4 pl-5">
+          <div className="flex items-center gap-2.5">
+            <Download
+              size={15}
+              strokeWidth={1.75}
+              aria-hidden="true"
+              className="text-signal"
+            />
+            <h2
+              id="export-title"
+              className="text-[11px] font-semibold tracking-[0.18em] text-paper uppercase"
+            >
+              Export
+            </h2>
           </div>
-          <button
-            type="button"
+          <IconButton
+            ref={closeRef}
+            label="Close export"
+            size="md"
             onClick={() => setIsOpen(false)}
-            className="flex size-7 items-center justify-center rounded-lg text-zinc-400 hover:bg-zinc-800 hover:text-white"
           >
-            <X size={18} />
-          </button>
-        </div>
+            <X size={17} strokeWidth={1.75} aria-hidden="true" />
+          </IconButton>
+        </header>
 
-        {/* Export Dimensions Badge */}
-        <div className="mb-4 flex items-center justify-between rounded-xl border border-zinc-800 bg-zinc-900/60 p-3 text-xs">
-          <div className="flex flex-col">
-            <span className="font-semibold text-white">Target Dimensions</span>
-            <span className="text-[11px] text-zinc-400">
-              {currentScale}x scale factor
+        <div className="space-y-2.5 px-5 pt-4">
+          <p id="export-desc" className="sr-only">
+            Save the current render, copy it to the clipboard, or copy its ASCII
+            text.
+          </p>
+
+          <div className="flex items-center justify-between gap-4 rounded-lg border border-line/80 bg-ink-3/40 px-3 py-2.5">
+            <div>
+              <p className="text-[11px] text-paper">Target size</p>
+              <p className="text-[10px] text-faint">{currentScale}x scale</p>
+            </div>
+            <span className="font-mono text-[11px] text-paper tabular-nums">
+              {exportWidth} × {exportHeight}
             </span>
           </div>
-          <span className="font-mono text-xs font-bold text-green-400 tabular-nums">
-            {exportWidth} × {exportHeight} px
-          </span>
-        </div>
 
-        <div className="mb-6 flex items-center justify-between rounded-xl border border-zinc-800 bg-zinc-900/60 p-3 text-xs">
-          <div className="flex flex-col">
-            <span className="font-semibold text-white">Format</span>
-            <span className="text-[11px] text-zinc-400">
-              Set format and scale in the Capture & export panel.
+          <div className="flex items-center justify-between gap-4 rounded-lg border border-line/80 bg-ink-3/40 px-3 py-2.5">
+            <div>
+              <p className="text-[11px] text-paper">Format</p>
+              <p className="text-[10px] text-faint">
+                Set scale and codec in Capture
+              </p>
+            </div>
+            <span className="font-mono text-[11px] text-paper uppercase tabular-nums">
+              {currentCodec} · {currentScale}x
             </span>
           </div>
-          <span className="font-mono text-xs font-bold text-green-400 uppercase tabular-nums">
-            {currentCodec} · {currentScale}x
-          </span>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex flex-col gap-2.5">
-          <button
-            type="button"
+        <div className="space-y-2 px-5 pt-4 pb-5">
+          <Button
+            variant="primary"
+            className="w-full"
             onClick={handleSaveImage}
             disabled={isProcessing}
-            className="flex w-full items-center justify-center gap-2 rounded-xl border border-green-400 bg-green-500 py-3 text-sm font-bold text-black shadow-lg shadow-green-950/50 transition-all hover:bg-green-400 active:scale-95 disabled:pointer-events-none disabled:opacity-50"
           >
             {isProcessing ? (
-              <Loader2 size={18} className="animate-spin text-black" />
+              <Loader2
+                size={16}
+                aria-hidden="true"
+                className="animate-spin motion-reduce:animate-none"
+              />
             ) : (
-              <Download size={18} strokeWidth={2.5} />
+              <Download size={15} strokeWidth={2} aria-hidden="true" />
             )}
-            <span>Save to Device / Download</span>
-          </button>
+            Save image
+          </Button>
 
           <div className="grid grid-cols-2 gap-2">
-            <button
-              type="button"
+            <Button
+              variant="outline"
               onClick={handleCopyImageToClipboard}
               disabled={isProcessing}
-              className="flex items-center justify-center gap-1.5 rounded-xl border border-zinc-800 bg-zinc-900 py-2.5 text-xs font-semibold text-zinc-300 transition-colors hover:border-zinc-700 hover:bg-zinc-800 hover:text-white"
             >
               {copiedImage ? (
-                <Check size={14} className="text-green-400" />
+                <Check size={13} aria-hidden="true" className="text-signal" />
               ) : (
-                <Clipboard size={14} />
+                <Clipboard size={13} aria-hidden="true" />
               )}
-              <span>{copiedImage ? "Copied!" : "Copy Image"}</span>
-            </button>
+              {copiedImage ? "Copied" : "Copy image"}
+            </Button>
 
             {settings.renderMode === "ascii" ? (
-              <button
-                type="button"
+              <Button
+                variant="outline"
                 onClick={handleCopyAsciiText}
-                className="flex items-center justify-center gap-1.5 rounded-xl border border-zinc-800 bg-zinc-900 py-2.5 text-xs font-semibold text-zinc-300 transition-colors hover:border-zinc-700 hover:bg-zinc-800 hover:text-white"
+                disabled={isProcessing}
               >
                 {copiedAscii ? (
-                  <Check size={14} className="text-green-400" />
+                  <Check size={13} aria-hidden="true" className="text-signal" />
                 ) : (
-                  <FileText size={14} />
+                  <FileText size={13} aria-hidden="true" />
                 )}
-                <span>{copiedAscii ? "Copied Text!" : "Copy ASCII"}</span>
-              </button>
+                {copiedAscii ? "Copied" : "Copy ASCII"}
+              </Button>
             ) : (
-              <button
-                type="button"
-                onClick={() => setIsOpen(false)}
-                className="flex items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900 py-2.5 text-xs font-semibold text-zinc-400 hover:bg-zinc-800 hover:text-white"
-              >
+              <Button variant="ghost" onClick={() => setIsOpen(false)}>
                 Cancel
-              </button>
+              </Button>
             )}
           </div>
         </div>

@@ -1,5 +1,7 @@
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 
+import { useMediaQuery } from "@/shared/components/settings/common/useMediaQuery";
+
 import { useSettingsStore } from "../../store/settingsStore";
 import { ControlBar } from "./ControlBar";
 import { DockCluster } from "./DockCluster";
@@ -20,6 +22,7 @@ const CameraControls = ({
   const [mode, setMode] = useState<CaptureMode>("photo");
   const [flipTurns, setFlipTurns] = useState(0);
   const [isCopied, setIsCopied] = useState(false);
+  const isLarge = useMediaQuery("(min-width: 1024px)");
   const copyTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
     undefined
   );
@@ -43,7 +46,7 @@ const CameraControls = ({
 
   return (
     <div className="pointer-events-none fixed inset-0 z-20">
-      <div className={settingsOpen ? "max-sm:hidden" : ""}>
+      <div className={settingsOpen ? "hidden lg:block" : ""}>
         <div className="absolute inset-x-0 bottom-0 h-48 bg-linear-to-t from-black/60 via-black/25 to-transparent" />
 
         <ControlBar
@@ -60,6 +63,7 @@ const CameraControls = ({
           onToggleRecording={onToggleRecording}
           onOpenSettings={onOpenSettings}
           settingsButtonRef={settingsButtonRef}
+          rightInset={settingsOpen && isLarge}
         />
       </div>
 

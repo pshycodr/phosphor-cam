@@ -36,7 +36,7 @@ export function Chip({
       disabled={disabled}
       aria-pressed={pressed}
       aria-label={ariaLabel}
-      className={`press flex min-h-10 shrink-0 snap-start items-center gap-1.5 rounded-full border px-3.5 text-[11px] font-medium whitespace-nowrap disabled:opacity-40 ${
+      className={`press flex min-h-11 shrink-0 snap-start items-center gap-1.5 rounded-full border px-3.5 text-[11px] font-medium whitespace-nowrap disabled:opacity-40 ${
         active
           ? "border-signal/60 bg-signal/10 text-signal"
           : "border-line/80 bg-ink-3/60 text-muted hover:border-line-strong hover:text-paper"

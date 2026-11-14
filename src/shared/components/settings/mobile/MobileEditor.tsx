@@ -160,7 +160,7 @@ function MobileEditor({
       role="region"
       aria-label="Editing tools"
       onKeyDown={onKeyDown}
-      className="translucent fixed inset-x-0 bottom-0 z-40 border-t border-line/80 bg-ink-2/95 pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] shadow-[0_-20px_50px_rgba(0,0,0,0.5)] backdrop-blur-2xl select-none"
+      className="translucent fixed inset-x-0 bottom-0 z-40 rounded-t-[22px] border-t border-line/80 bg-ink-2/95 pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] shadow-[0_-20px_50px_rgba(0,0,0,0.5)] backdrop-blur-2xl select-none"
     >
       <Collapse open={panelOpen} id={panelId}>
         <div
@@ -180,14 +180,26 @@ function MobileEditor({
             <h2 className="text-[10px] font-medium tracking-[0.2em] text-signal uppercase">
               {shown?.label}
             </h2>
-            <button
-              type="button"
-              onClick={collapse}
-              aria-label="Collapse panel"
-              className="press -mr-2 flex size-9 items-center justify-center rounded-full text-faint hover:bg-ink-3 hover:text-paper"
-            >
-              <LuChevronDown size={17} aria-hidden="true" />
-            </button>
+            <div className="flex items-center">
+              {onClose && (
+                <button
+                  type="button"
+                  onClick={onClose}
+                  aria-label="Close editor"
+                  className="press flex size-11 items-center justify-center rounded-full text-faint hover:bg-ink-3 hover:text-paper"
+                >
+                  <LuX size={18} aria-hidden="true" />
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={collapse}
+                aria-label="Collapse panel"
+                className="press -mr-2 flex size-11 items-center justify-center rounded-full text-faint hover:bg-ink-3 hover:text-paper"
+              >
+                <LuChevronDown size={17} aria-hidden="true" />
+              </button>
+            </div>
           </div>
 
           <div
@@ -201,17 +213,6 @@ function MobileEditor({
       </Collapse>
 
       <div className="flex items-stretch border-t border-line/60">
-        {onClose && (
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Close editor"
-            className="press flex w-12 shrink-0 items-center justify-center border-r border-line/60 text-faint hover:text-paper"
-          >
-            <LuX size={18} aria-hidden="true" />
-          </button>
-        )}
-
         <div
           role="tablist"
           aria-label="Editing tools"
@@ -228,7 +229,7 @@ function MobileEditor({
                 aria-selected={selected}
                 aria-controls={panelId}
                 onClick={() => toggle(tool.id)}
-                className={`relative flex h-14 shrink-0 grow basis-14 snap-start flex-col items-center justify-center gap-1 rounded-xl px-2 transition-colors ${
+                className={`relative flex h-14 shrink-0 grow basis-[50px] snap-start flex-col items-center justify-center gap-1 rounded-xl px-0.5 transition-colors ${
                   selected
                     ? "text-signal"
                     : "text-faint hover:text-muted active:bg-ink-3"

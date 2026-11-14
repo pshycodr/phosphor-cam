@@ -23,6 +23,7 @@ interface ControlBarProps {
   onToggleRecording: () => void;
   onOpenSettings: () => void;
   settingsButtonRef: RefObject<HTMLButtonElement | null>;
+  rightInset?: boolean;
 }
 
 export const ControlBar = ({
@@ -39,11 +40,15 @@ export const ControlBar = ({
   onToggleRecording,
   onOpenSettings,
   settingsButtonRef,
+  rightInset = false,
 }: ControlBarProps) => {
   const isVideo = mode === "video";
 
   return (
-    <div className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-3 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+    <div
+      style={rightInset ? { right: "360px" } : undefined}
+      className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-3 pr-[max(0.75rem,env(safe-area-inset-right))] pb-[max(0.75rem,env(safe-area-inset-bottom))] pl-[max(0.75rem,env(safe-area-inset-left))]"
+    >
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-0 bottom-0 h-48 bg-linear-to-t from-ink/80 via-ink/30 to-transparent"

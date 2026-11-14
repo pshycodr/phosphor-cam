@@ -9,6 +9,8 @@ interface HeaderProps {
   width: number;
   height: number;
   settingsButtonRef: RefObject<HTMLButtonElement | null>;
+  onOpenSettings: () => void;
+  settingsOpen: boolean;
 }
 
 const FPSValue = memo(function FPSValue() {
@@ -25,9 +27,15 @@ const Divider = () => (
   <span aria-hidden="true" className="h-4 w-px shrink-0 bg-line" />
 );
 
-function Header({ width, height, settingsButtonRef }: HeaderProps) {
+function Header({
+  width,
+  height,
+  settingsButtonRef,
+  onOpenSettings,
+  settingsOpen,
+}: HeaderProps) {
   return (
-    <header className="pointer-events-none fixed inset-x-0 top-0 z-30 flex items-center justify-between gap-2 px-[max(0.75rem,env(safe-area-inset-left))] pt-[max(0.75rem,env(safe-area-inset-top))] select-none">
+    <header className="pointer-events-none fixed inset-x-0 top-0 z-30 flex items-center justify-between gap-2 pt-[max(0.75rem,env(safe-area-inset-top))] pr-[max(0.75rem,env(safe-area-inset-right))] pl-[max(0.75rem,env(safe-area-inset-left))] select-none">
       <div className="pointer-events-auto flex h-11 min-w-0 items-center gap-3 rounded-full border border-line/80 bg-ink-2/80 pr-3.5 pl-2.5 backdrop-blur-xl">
         <img
           src="/assets/logo.png"
@@ -61,7 +69,11 @@ function Header({ width, height, settingsButtonRef }: HeaderProps) {
         </span>
       </div>
 
-      <div className="pointer-events-auto hidden h-11 items-center gap-3 rounded-full border border-line/80 bg-ink-2/80 px-3.5 font-mono text-[10px] text-faint tabular-nums backdrop-blur-xl md:flex">
+      <div
+        className={`${
+          settingsOpen ? "hidden lg:flex" : "hidden md:flex"
+        } pointer-events-auto h-11 items-center gap-3 rounded-full border border-line/80 bg-ink-2/80 px-3.5 font-mono text-[10px] text-faint tabular-nums backdrop-blur-xl`}
+      >
         <span>
           <span className="text-faint">render</span>{" "}
           <span className="text-paper">
@@ -93,6 +105,7 @@ function Header({ width, height, settingsButtonRef }: HeaderProps) {
           type="button"
           aria-label="Open settings"
           title="Open settings"
+          onClick={onOpenSettings}
           className="press pointer-events-auto hidden size-11 items-center justify-center rounded-full border border-line/80 bg-ink-2/80 text-muted backdrop-blur-xl hover:border-line-strong hover:bg-ink-3 hover:text-paper sm:flex"
         >
           <SlidersHorizontal size={16} strokeWidth={1.75} aria-hidden="true" />

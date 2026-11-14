@@ -6,7 +6,7 @@ export function Toaster({ duration = 1800 }: { duration?: number }) {
       position="top-center"
       gutter={8}
       containerStyle={{
-        top: "calc(env(safe-area-inset-top, 0px) + 16px)",
+        top: "calc(env(safe-area-inset-top, 0px) + 4.5rem)",
       }}
       toastOptions={{
         duration,

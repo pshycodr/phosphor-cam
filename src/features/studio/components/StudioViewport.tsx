@@ -38,13 +38,12 @@ function StudioViewport() {
   const panStart = useRef<PanStart | null>(null);
   const pinchStart = useRef<{ dist: number; zoom: number } | null>(null);
 
-  // Create the canvas and its background worker
   useEffect(() => {
     const mount = canvasMountRef.current;
     if (!mount) return;
 
     const canvas = document.createElement("canvas");
-    canvas.className = "rounded-sm shadow-2xl";
+    canvas.className = "block max-h-full max-w-full";
     canvas.style.maxWidth = "100%";
     canvas.style.maxHeight = "100%";
     mount.appendChild(canvas);
@@ -66,7 +65,6 @@ function StudioViewport() {
     };
   }, [setWorkerController]);
 
-  // Keep the worker sized to the container
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -79,12 +77,10 @@ function StudioViewport() {
     return () => ro.disconnect();
   }, []);
 
-  // Push settings to the worker
   useEffect(() => {
     controllerRef.current?.setSettings(settings);
   }, [settings]);
 
-  // Decode new images and hand the bitmap to the worker
   useEffect(() => {
     if (!image?.url) return;
 
@@ -162,60 +158,70 @@ function StudioViewport() {
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
       onDoubleClick={() => (zoom > 1 ? resetZoomAndPan() : setZoom(2))}
-      className={`relative flex h-full w-full flex-1 items-center justify-center overflow-hidden bg-black select-none ${cursor}`}
+      style={{ paddingBottom: "var(--editor-dock-h, 0px)" }}
+      className={`relative flex h-full w-full flex-1 items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_center,#141715_0%,#080908_72%)] select-none ${cursor}`}
     >
       <div
         style={{
           transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
-          transition: isPanning ? "none" : "transform 0.15s ease-out",
+          transition: isPanning ? "none" : "transform 150ms var(--ease-out)",
         }}
         className="relative flex items-center justify-center"
       >
         <div
           ref={canvasMountRef}
           style={{ opacity: isComparing ? 0 : 1 }}
-          className="contents"
+          className="crossfade relative flex items-center justify-center"
         />
 
-        {isComparing && image && (
+        {image && (
           <img
             src={image.url}
             alt="Original"
-            className="absolute inset-0 m-auto max-h-full max-w-full rounded-sm object-contain"
+            draggable={false}
+            style={{ opacity: isComparing ? 1 : 0 }}
+            className="crossfade pointer-events-none absolute inset-0 m-auto max-h-full max-w-full object-contain"
           />
         )}
       </div>
 
       {isComparing && (
-        <span className="absolute top-3 left-3 font-mono text-[11px] text-zinc-400">
-          ORIGINAL
+        <span className="pointer-events-none absolute top-4 left-4 flex items-center gap-2 rounded-full border border-line/80 bg-ink-2/85 px-2.5 py-1 font-mono text-[9px] tracking-[0.16em] text-muted uppercase backdrop-blur-md">
+          <span
+            aria-hidden="true"
+            className="size-1.5 rounded-full bg-signal"
+          />
+          Original
         </span>
       )}
 
-      <div className="absolute bottom-4 left-4 z-20 flex items-center rounded-lg bg-zinc-950/80 text-zinc-400">
+      <div
+        className="absolute left-4 z-20 flex items-center rounded-full border border-line/80 bg-ink-2/85 text-muted backdrop-blur-md"
+        style={{ bottom: "calc(var(--editor-dock-h, 0px) + 1rem)" }}
+      >
         <button
           type="button"
           onClick={() => setZoom((z) => clampZoom(z - 0.25))}
-          className="flex size-8 items-center justify-center rounded-lg hover:text-white"
-          title="Zoom out"
+          aria-label="Zoom out"
+          className="press flex size-9 items-center justify-center rounded-full hover:text-paper"
         >
-          <ZoomOut size={14} />
+          <ZoomOut size={14} aria-hidden="true" />
         </button>
         <button
           type="button"
           onClick={resetZoomAndPan}
-          className="w-12 text-center font-mono text-[11px] tabular-nums hover:text-white"
           title="Reset zoom"
+          className="w-12 text-center font-mono text-[10px] text-paper tabular-nums hover:text-signal"
         >
           {Math.round(zoom * 100)}%
         </button>
         <button
           type="button"
           onClick={() => setZoom((z) => clampZoom(z + 0.25))}
-          className="flex size-8 items-center justify-center rounded-lg hover:text-white"
-          title="Zoom in"
+          aria-label="Zoom in"
+          className="press flex size-9 items-center justify-center rounded-full hover:text-paper"
         >
-          <ZoomIn size={14} />
+          <ZoomIn size={14} aria-hidden="true" />
         </button>
       </div>
     </div>
