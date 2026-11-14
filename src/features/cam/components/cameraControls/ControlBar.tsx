@@ -88,7 +88,7 @@ export const ControlBar = ({
   const isVideo = mode === "video";
 
   return (
-    <div className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-1.5 pr-[max(0.75rem,env(safe-area-inset-right))] pb-[calc(1.75rem+env(safe-area-inset-bottom))] pl-[max(0.75rem,env(safe-area-inset-left))] sm:gap-3 sm:pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
+    <div className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-4 pr-[max(0.75rem,env(safe-area-inset-right))] pb-[calc(2rem+env(safe-area-inset-bottom))] pl-[max(0.75rem,env(safe-area-inset-left))] sm:gap-3 sm:pb-[calc(1.25rem+env(safe-area-inset-bottom))]">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-0 bottom-0 h-48 bg-linear-to-t from-ink/90 via-ink/35 to-transparent"
@@ -96,8 +96,8 @@ export const ControlBar = ({
 
       <ModeSwitch mode={mode} disabled={isRecording} onChange={onModeChange} />
 
-      <div className="pointer-events-auto grid w-full max-w-[340px] grid-cols-[1fr_auto_1fr] items-end sm:hidden">
-        <div className="flex justify-end pr-3">
+      <div className="pointer-events-auto grid w-full max-w-[420px] grid-cols-[1fr_auto_1fr] items-end sm:hidden">
+        <div className="flex justify-center">
           <div className="w-14">
             <MobileAction
               ariaLabel="Flip camera"
@@ -115,7 +115,7 @@ export const ControlBar = ({
           </div>
         </div>
 
-        <div className="flex shrink-0 items-end px-0.5">
+        <div className="shrink-0">
           <Shutter
             mobile
             isVideo={isVideo}
@@ -128,48 +128,44 @@ export const ControlBar = ({
 
         <div className="mx-auto grid w-[120px] grid-cols-2 gap-2">
           {renderMode === "ascii" && (
-            <div className="w-14">
-              <MobileAction
-                ariaLabel="Copy ASCII text"
-                caption={isCopied ? "Copied" : "Copy"}
-                active={isCopied}
-                onClick={onCopy}
-              >
-                {isCopied ? (
-                  <Check
-                    size={20}
-                    strokeWidth={2}
-                    aria-hidden="true"
-                    className="pop-in text-signal"
-                  />
-                ) : (
-                  <Copy
-                    size={20}
-                    strokeWidth={1.5}
-                    aria-hidden="true"
-                    className="text-muted"
-                  />
-                )}
-              </MobileAction>
-            </div>
+            <MobileAction
+              ariaLabel="Copy ASCII text"
+              caption={isCopied ? "Copied" : "Copy"}
+              active={isCopied}
+              onClick={onCopy}
+            >
+              {isCopied ? (
+                <Check
+                  size={20}
+                  strokeWidth={2}
+                  aria-hidden="true"
+                  className="pop-in text-signal"
+                />
+              ) : (
+                <Copy
+                  size={20}
+                  strokeWidth={1.5}
+                  aria-hidden="true"
+                  className="text-muted"
+                />
+              )}
+            </MobileAction>
           )}
 
-          <div className="w-14">
-            <MobileAction
-              ariaLabel="Open settings"
-              caption="Edit"
-              buttonRef={settingsButtonRef}
-              disabled={isRecording}
-              onClick={onOpenSettings}
-            >
-              <Settings2
-                size={20}
-                strokeWidth={1.5}
-                aria-hidden="true"
-                className="text-muted"
-              />
-            </MobileAction>
-          </div>
+          <MobileAction
+            ariaLabel="Open settings"
+            caption="Edit"
+            buttonRef={settingsButtonRef}
+            disabled={isRecording}
+            onClick={onOpenSettings}
+          >
+            <Settings2
+              size={20}
+              strokeWidth={1.5}
+              aria-hidden="true"
+              className="text-muted"
+            />
+          </MobileAction>
         </div>
       </div>
 
