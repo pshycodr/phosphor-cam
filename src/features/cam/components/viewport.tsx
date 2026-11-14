@@ -6,9 +6,12 @@ import {
   useState,
 } from "react";
 
+import { useMediaQuery } from "@/shared/components/settings/common/useMediaQuery";
+
 import { useCameraSource } from "../hooks/useCameraSource";
 import { useSettingsStore } from "../store/settingsStore";
 import { useStatsStore } from "../store/statsStore";
+import type { AspectRatio } from "../types";
 import { RenderWorkerController } from "../worker/Renderworkercontroller";
 
 export interface ViewportHandle {
@@ -20,17 +23,29 @@ interface ViewportProps {
   stream: MediaStream | null;
   canvasSize: { width: number; height: number };
   mirrored?: boolean;
+  aspect?: AspectRatio;
   onStageSize?: (size: { width: number; height: number }) => void;
 }
 
+const RATIOS: Record<AspectRatio, number | null> = {
+  square: 1,
+  portrait: 3 / 4,
+  full: null,
+};
+
 const Viewport = forwardRef<ViewportHandle, ViewportProps>(
-  ({ stream, canvasSize, mirrored = false, onStageSize }, ref) => {
+  (
+    { stream, canvasSize, mirrored = false, aspect = "full", onStageSize },
+    ref
+  ) => {
+    const wrapperRef = useRef<HTMLDivElement>(null);
     const stageRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const controllerRef = useRef<RenderWorkerController | null>(null);
     const [stageSize, setStageSize] = useState(canvasSize);
+    const isMobile = useMediaQuery("(max-width: 639px)");
 
     const source = useCameraSource(stream, videoRef);
 
@@ -50,18 +65,24 @@ const Viewport = forwardRef<ViewportHandle, ViewportProps>(
     }, [onStageSize, stageSize]);
 
     useEffect(() => {
-      const stage = stageRef.current;
+      const wrapper = wrapperRef.current;
 
-      if (!stage) return;
+      if (!wrapper) return;
+
+      const ratio = isMobile ? RATIOS[aspect] : null;
 
       const update = () => {
-        const styles = getComputedStyle(stage);
-        const rect = stage.getBoundingClientRect();
-        const height =
-          rect.height - (Number.parseFloat(styles.paddingBottom) || 0);
-        const width = rect.width;
+        const rect = wrapper.getBoundingClientRect();
 
-        if (width < 2 || height < 2) return;
+        if (rect.width < 2 || rect.height < 2) return;
+
+        let width = rect.width;
+        let height = rect.height;
+
+        if (ratio) {
+          width = Math.min(rect.width, rect.height * ratio);
+          height = width / ratio;
+        }
 
         const next = { width: Math.round(width), height: Math.round(height) };
         setStageSize((prev) =>
@@ -71,9 +92,9 @@ const Viewport = forwardRef<ViewportHandle, ViewportProps>(
 
       update();
       const observer = new ResizeObserver(update);
-      observer.observe(stage);
+      observer.observe(wrapper);
       return () => observer.disconnect();
-    }, []);
+    }, [aspect, isMobile]);
 
     useEffect(() => {
       const container = containerRef.current;
@@ -156,21 +177,28 @@ const Viewport = forwardRef<ViewportHandle, ViewportProps>(
 
     return (
       <div
-        ref={stageRef}
-        className="frame-in fixed inset-0 flex items-center justify-center overflow-hidden bg-ink max-sm:top-[calc(env(safe-area-inset-top)+5.5rem)] max-sm:right-[max(0.5rem,env(safe-area-inset-right))] max-sm:bottom-[calc(env(safe-area-inset-bottom)+12rem)] max-sm:left-[max(0.5rem,env(safe-area-inset-left))] max-sm:rounded-[26px] max-sm:border max-sm:border-signal/15 max-sm:shadow-[0_0_50px_-18px_rgba(56,243,112,0.45)]"
-        style={{
-          transform: mirrored ? "scaleX(-1)" : undefined,
-        }}
+        ref={wrapperRef}
+        className="fixed inset-0 flex items-center justify-center overflow-hidden bg-ink max-sm:top-[calc(env(safe-area-inset-top)+7rem)] max-sm:right-[max(0.5rem,env(safe-area-inset-right))] max-sm:bottom-[calc(env(safe-area-inset-bottom)+12rem)] max-sm:left-[max(0.5rem,env(safe-area-inset-left))] max-sm:bg-transparent"
       >
-        <video
-          ref={videoRef}
-          style={{ display: "none" }}
-          playsInline
-          muted
-          aria-hidden="true"
-        />
-        {/* Canvas is injected by the effect above */}
-        <div ref={containerRef} className="contents" />
+        <div
+          ref={stageRef}
+          className="frame-in relative flex items-center justify-center overflow-hidden bg-ink max-sm:rounded-[26px] max-sm:border max-sm:border-signal/15 max-sm:shadow-[0_0_50px_-18px_rgba(56,243,112,0.45)]"
+          style={{
+            width: stageSize.width,
+            height: stageSize.height,
+            transform: mirrored ? "scaleX(-1)" : undefined,
+          }}
+        >
+          <video
+            ref={videoRef}
+            style={{ display: "none" }}
+            playsInline
+            muted
+            aria-hidden="true"
+          />
+          {/* Canvas is injected by the effect above */}
+          <div ref={containerRef} className="contents" />
+        </div>
       </div>
     );
   }

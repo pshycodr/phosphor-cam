@@ -9,6 +9,9 @@ export type RenderModeConfig = {
 
 export type CameraFacingMode = "user" | "environment";
 
+/** Preview shape on phones. `full` fills the space between the header and the dock. */
+export type AspectRatio = "square" | "portrait" | "full";
+
 export type ProcessingStats = {
   fps: number;
   renderTime: number;

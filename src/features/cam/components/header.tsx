@@ -4,6 +4,8 @@ import { Link } from "react-router";
 import { SlidersHorizontal, Sparkles } from "lucide-react";
 
 import { useStatsStore } from "../store/statsStore";
+import type { AspectRatio } from "../types";
+import { MobileSettingsMenu } from "./mobileSettingsMenu";
 
 interface HeaderProps {
   width: number;
@@ -11,6 +13,8 @@ interface HeaderProps {
   settingsButtonRef: RefObject<HTMLButtonElement | null>;
   onOpenSettings: () => void;
   settingsOpen: boolean;
+  aspect: AspectRatio;
+  onAspectChange: (aspect: AspectRatio) => void;
 }
 
 const FPSValue = memo(function FPSValue() {
@@ -82,23 +86,17 @@ const MobileStats = memo(function MobileStats({
   height: number;
 }) {
   return (
-    <div className="pointer-events-auto flex h-11 min-w-0 flex-1 items-center gap-2 rounded-full border border-line/80 bg-ink-2/85 px-2.5 backdrop-blur-xl">
-      <span className="relative grid size-7 shrink-0 place-items-center rounded-full border border-signal/25 bg-signal/10">
-        <img
-          src="/assets/logo.png"
-          alt=""
-          width={22}
-          height={22}
-          draggable={false}
-          className="size-[22px] object-contain drop-shadow-[0_0_7px_rgba(56,243,112,0.55)]"
-        />
-        <span
-          aria-hidden="true"
-          className="recording-dot absolute -top-0.5 -right-0.5 size-1.5 rounded-full bg-signal"
-        />
-      </span>
+    <div className="pointer-events-auto flex h-11 min-w-0 items-center gap-2.5 rounded-full border border-line/80 bg-ink-2/85 px-3 backdrop-blur-xl">
+      <img
+        src="/assets/logo.png"
+        alt=""
+        width={20}
+        height={20}
+        draggable={false}
+        className="size-5 shrink-0 object-contain"
+      />
 
-      <div className="flex min-w-0 flex-1 items-center justify-between gap-1.5 font-mono text-[10px] text-faint tabular-nums">
+      <div className="flex min-w-0 items-center gap-2 overflow-hidden font-mono text-[10px] text-faint tabular-nums">
         <span aria-label="Live frame rate" className="whitespace-nowrap">
           <span className="mr-1 text-[9px] tracking-wide text-faint">FPS</span>
           <span className="text-paper">
@@ -108,8 +106,7 @@ const MobileStats = memo(function MobileStats({
 
         <Divider />
 
-        <span className="whitespace-nowrap">
-          <span className="mr-0.5 text-[9px] text-faint">render</span>
+        <span aria-label="Render time" className="whitespace-nowrap">
           <span className="text-paper">
             <RenderTimeValue />
             ms
@@ -118,8 +115,7 @@ const MobileStats = memo(function MobileStats({
 
         <Divider />
 
-        <span className="whitespace-nowrap">
-          <span className="mr-0.5 text-[9px] text-faint">frame</span>
+        <span aria-label="Frame size" className="whitespace-nowrap">
           <span className="text-paper">
             {width}×{height}
           </span>
@@ -150,7 +146,7 @@ const StudioLink = memo(function StudioLink({
         aria-hidden="true"
         className={compact ? "text-signal" : ""}
       />
-      <span className={compact ? "hidden min-[380px]:inline" : ""}>Studio</span>
+      <span>Studio</span>
     </Link>
   );
 });
@@ -161,12 +157,18 @@ function Header({
   settingsButtonRef,
   onOpenSettings,
   settingsOpen,
+  aspect,
+  onAspectChange,
 }: HeaderProps) {
   return (
-    <header className="pointer-events-none fixed inset-x-0 top-0 z-30 flex items-center justify-between gap-2 pt-[max(0.75rem,env(safe-area-inset-top))] pr-[max(0.75rem,env(safe-area-inset-right))] pl-[max(0.75rem,env(safe-area-inset-left))] select-none">
-      <div className="flex w-full items-center gap-2 sm:hidden">
+    <header className="pointer-events-none fixed inset-x-0 top-0 z-30 flex items-start justify-between gap-2 pt-[max(0.75rem,env(safe-area-inset-top))] pr-[max(0.75rem,env(safe-area-inset-right))] pl-[max(0.75rem,env(safe-area-inset-left))] select-none">
+      <div className="flex w-full items-start justify-between gap-2 sm:hidden">
         <MobileStats width={width} height={height} />
-        <StudioLink compact />
+
+        <div className="pointer-events-auto relative flex shrink-0 flex-col items-start gap-1.5">
+          <StudioLink compact />
+          <MobileSettingsMenu aspect={aspect} onAspectChange={onAspectChange} />
+        </div>
       </div>
 
       <div className="hidden w-full items-center justify-between gap-2 sm:flex">

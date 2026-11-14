@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
+import { SettingsControlsProvider } from "@/shared/components/settings/common/SettingsControlsProvider";
 import { Button } from "@/shared/ui/buttons";
 import { Toaster } from "@/shared/ui/toaster";
 import { saveImage } from "@/shared/utils/saveImage";
@@ -10,13 +11,15 @@ import Header from "./components/header";
 import Settings from "./components/settings";
 import type { ViewportHandle } from "./components/viewport";
 import Viewport from "./components/viewport";
-import type { CameraFacingMode } from "./types";
+import { useSettingsControlsValue } from "./hooks/useSettingsControlsValue";
+import type { AspectRatio, CameraFacingMode } from "./types";
 import { getSupportedMediaRecorderMimeType } from "./utils/mediaRecorder";
 import { saveVideo } from "./utils/saveVideo";
 
 function Cam() {
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [facingMode, setFacingMode] = useState<CameraFacingMode>("user");
+  const [aspect, setAspect] = useState<AspectRatio>("portrait");
   const [isRecording, setIsRecording] = useState(false);
   const [windowSize, setWindowSize] = useState({
     width: window.innerWidth,
@@ -32,6 +35,7 @@ function Cam() {
   const [cameraAttempt, setCameraAttempt] = useState(0);
   const [settingsOpen, setSettingsOpen] = useState(false);
 
+  const controls = useSettingsControlsValue();
   const viewportRef = useRef<ViewportHandle>(null);
   const desktopSettingsRef = useRef<HTMLButtonElement>(null);
   const mobileSettingsRef = useRef<HTMLButtonElement>(null);
@@ -217,118 +221,123 @@ function Cam() {
     <div className="h-screen w-screen overflow-hidden bg-ink">
       <Toaster />
 
-      <Header
-        width={frameSize.width}
-        height={frameSize.height}
-        settingsButtonRef={desktopSettingsRef}
-        onOpenSettings={openSettings}
-        settingsOpen={settingsOpen}
-      />
-      <Settings
-        open={settingsOpen}
-        onClose={closeSettings}
-        triggerRef={mobileSettingsRef}
-        desktopTriggerRef={desktopSettingsRef}
-      />
+      <SettingsControlsProvider value={controls}>
+        <Header
+          width={frameSize.width}
+          height={frameSize.height}
+          settingsButtonRef={desktopSettingsRef}
+          onOpenSettings={openSettings}
+          settingsOpen={settingsOpen}
+          aspect={aspect}
+          onAspectChange={setAspect}
+        />
+        <Settings
+          open={settingsOpen}
+          onClose={closeSettings}
+          triggerRef={mobileSettingsRef}
+          desktopTriggerRef={desktopSettingsRef}
+        />
 
-      {flash && (
-        <div className="flash-layer pointer-events-none fixed inset-0 z-50 bg-paper" />
-      )}
+        {flash && (
+          <div className="flash-layer pointer-events-none fixed inset-0 z-50 bg-paper" />
+        )}
 
-      {isRecording && (
-        <div
-          role="status"
-          className="notice-enter fixed top-[calc(env(safe-area-inset-top)+4.75rem)] left-1/2 z-30 flex -translate-x-1/2 items-center gap-2 rounded-full border border-signal/40 bg-ink-2/90 px-3 py-1.5 font-mono text-[10px] backdrop-blur-xl"
-        >
-          <span
-            aria-hidden="true"
-            className="recording-dot size-1.5 rounded-full bg-signal"
-          />
-          <span className="tracking-[0.16em] text-signal">REC</span>
-          <span className="text-paper tabular-nums">
-            {formatTime(recordingTime)}
-          </span>
-        </div>
-      )}
-
-      <Viewport
-        ref={viewportRef}
-        stream={stream}
-        canvasSize={windowSize}
-        mirrored={facingMode === "user"}
-        onStageSize={handleStageSize}
-      />
-
-      {!stream && !cameraError && (
-        <div className="pointer-events-none fixed inset-0 z-10 flex items-center justify-center">
-          <div className="flex flex-col items-center gap-3">
+        {isRecording && (
+          <div
+            role="status"
+            className="notice-enter fixed top-[calc(env(safe-area-inset-top)+4.75rem)] left-1/2 z-30 flex -translate-x-1/2 items-center gap-2 rounded-full border border-signal/40 bg-ink-2/90 px-3 py-1.5 font-mono text-[10px] backdrop-blur-xl"
+          >
             <span
               aria-hidden="true"
-              className="relative h-px w-40 overflow-hidden bg-line"
-            >
-              <span className="request-line absolute inset-y-0 w-1/3 bg-signal" />
+              className="recording-dot size-1.5 rounded-full bg-signal"
+            />
+            <span className="tracking-[0.16em] text-signal">REC</span>
+            <span className="text-paper tabular-nums">
+              {formatTime(recordingTime)}
             </span>
-            <p className="font-mono text-[10px] tracking-[0.24em] text-faint uppercase">
-              Initialising camera
-            </p>
           </div>
-        </div>
-      )}
+        )}
 
-      {cameraError && (
-        <div className="fixed inset-0 z-40 flex items-center justify-center bg-ink/85 p-6 backdrop-blur-md">
-          <div
-            role="alertdialog"
-            aria-labelledby="camera-error-title"
-            aria-describedby="camera-error-copy"
-            className="notice-enter w-full max-w-sm rounded-2xl border border-line bg-ink-2 p-6"
-          >
-            <p className="font-mono text-[10px] tracking-[0.2em] text-alert uppercase">
-              Camera offline
-            </p>
-            <h1
-              id="camera-error-title"
-              className="mt-2 text-lg font-medium text-paper"
-            >
-              No camera signal
-            </h1>
-            <p
-              id="camera-error-copy"
-              className="mt-2 text-xs leading-relaxed text-muted"
-            >
-              {cameraError}
-            </p>
+        <Viewport
+          ref={viewportRef}
+          stream={stream}
+          canvasSize={windowSize}
+          aspect={aspect}
+          mirrored={facingMode === "user"}
+          onStageSize={handleStageSize}
+        />
 
-            <div className="mt-5 flex gap-2">
-              <Button
-                variant="primary"
-                onClick={() => {
-                  setCameraError(null);
-                  setCameraAttempt((n) => n + 1);
-                }}
+        {!stream && !cameraError && (
+          <div className="pointer-events-none fixed inset-0 z-10 flex items-center justify-center">
+            <div className="flex flex-col items-center gap-3">
+              <span
+                aria-hidden="true"
+                className="relative h-px w-40 overflow-hidden bg-line"
               >
-                Try again
-              </Button>
-              <Button variant="ghost" onClick={() => setCameraError(null)}>
-                Dismiss
-              </Button>
+                <span className="request-line absolute inset-y-0 w-1/3 bg-signal" />
+              </span>
+              <p className="font-mono text-[10px] tracking-[0.24em] text-faint uppercase">
+                Initialising camera
+              </p>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      <CameraControls
-        onFlip={toggleCamera}
-        onShot={takeSnapshot}
-        onCopy={copyToClipboard}
-        onToggleRecording={toggleRecording}
-        onOpenSettings={openSettings}
-        isRecording={isRecording}
-        formatTime={formatTime}
-        recordingTime={recordingTime}
-        settingsOpen={settingsOpen}
-        settingsButtonRef={mobileSettingsRef}
-      />
+        {cameraError && (
+          <div className="fixed inset-0 z-40 flex items-center justify-center bg-ink/85 p-6 backdrop-blur-md">
+            <div
+              role="alertdialog"
+              aria-labelledby="camera-error-title"
+              aria-describedby="camera-error-copy"
+              className="notice-enter w-full max-w-sm rounded-2xl border border-line bg-ink-2 p-6"
+            >
+              <p className="font-mono text-[10px] tracking-[0.2em] text-alert uppercase">
+                Camera offline
+              </p>
+              <h1
+                id="camera-error-title"
+                className="mt-2 text-lg font-medium text-paper"
+              >
+                No camera signal
+              </h1>
+              <p
+                id="camera-error-copy"
+                className="mt-2 text-xs leading-relaxed text-muted"
+              >
+                {cameraError}
+              </p>
+
+              <div className="mt-5 flex gap-2">
+                <Button
+                  variant="primary"
+                  onClick={() => {
+                    setCameraError(null);
+                    setCameraAttempt((n) => n + 1);
+                  }}
+                >
+                  Try again
+                </Button>
+                <Button variant="ghost" onClick={() => setCameraError(null)}>
+                  Dismiss
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <CameraControls
+          onFlip={toggleCamera}
+          onShot={takeSnapshot}
+          onCopy={copyToClipboard}
+          onToggleRecording={toggleRecording}
+          onOpenSettings={openSettings}
+          isRecording={isRecording}
+          formatTime={formatTime}
+          recordingTime={recordingTime}
+          settingsOpen={settingsOpen}
+          settingsButtonRef={mobileSettingsRef}
+        />
+      </SettingsControlsProvider>
     </div>
   );
 }

@@ -126,9 +126,9 @@ export const ControlBar = ({
           />
         </div>
 
-        <div className="flex justify-center gap-2">
-          <div className="w-14">
-            {renderMode === "ascii" ? (
+        <div className="mx-auto grid w-[120px] grid-cols-2 gap-2">
+          {renderMode === "ascii" && (
+            <div className="w-14">
               <MobileAction
                 ariaLabel="Copy ASCII text"
                 caption={isCopied ? "Copied" : "Copy"}
@@ -151,10 +151,8 @@ export const ControlBar = ({
                   />
                 )}
               </MobileAction>
-            ) : (
-              <span aria-hidden="true" />
-            )}
-          </div>
+            </div>
+          )}
 
           <div className="w-14">
             <MobileAction

@@ -180,26 +180,14 @@ function MobileEditor({
             <h2 className="text-[10px] font-medium tracking-[0.2em] text-signal uppercase">
               {shown?.label}
             </h2>
-            <div className="flex items-center">
-              {onClose && (
-                <button
-                  type="button"
-                  onClick={onClose}
-                  aria-label="Close editor"
-                  className="press flex size-11 items-center justify-center rounded-full text-faint hover:bg-ink-3 hover:text-paper"
-                >
-                  <LuX size={18} aria-hidden="true" />
-                </button>
-              )}
-              <button
-                type="button"
-                onClick={collapse}
-                aria-label="Collapse panel"
-                className="press -mr-2 flex size-11 items-center justify-center rounded-full text-faint hover:bg-ink-3 hover:text-paper"
-              >
-                <LuChevronDown size={17} aria-hidden="true" />
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={collapse}
+              aria-label="Collapse panel"
+              className="press -mr-2 flex size-11 items-center justify-center rounded-full text-faint hover:bg-ink-3 hover:text-paper"
+            >
+              <LuChevronDown size={17} aria-hidden="true" />
+            </button>
           </div>
 
           <div
@@ -213,6 +201,17 @@ function MobileEditor({
       </Collapse>
 
       <div className="flex items-stretch border-t border-line/60">
+        {onClose && (
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close editor"
+            className="press m-1 flex w-12 shrink-0 items-center justify-center rounded-xl text-faint hover:bg-ink-3 hover:text-paper"
+          >
+            <LuX size={18} aria-hidden="true" />
+          </button>
+        )}
+
         <div
           role="tablist"
           aria-label="Editing tools"
