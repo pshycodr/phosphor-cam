@@ -18,7 +18,7 @@ import {
   LuX,
 } from "react-icons/lu";
 
-import { useSheetDrag } from "@/shared/hooks/useSheetDrag";
+import { Drawer } from "vaul";
 
 import Collapse from "../common/Collapse";
 import { useSettingsSelector } from "../common/useSettingsControls";
@@ -116,8 +116,6 @@ function MobileEditor({
     []
   );
 
-  const { panelRef, handlers } = useSheetDrag(collapse);
-
   const [dockEl, setDockEl] = useState<HTMLDivElement | null>(null);
   useEffect(() => {
     if (!visible || !dockEl) return;
@@ -152,33 +150,11 @@ function MobileEditor({
 
   const panelId = `${uid}-panel`;
 
-  return (
-    <div
-      ref={setDockEl}
-      role="region"
-      aria-label="Editing tools"
-      aria-hidden={!visible}
-      data-open={visible}
-      onKeyDown={onKeyDown}
-      className={`sheet-shell translucent fixed inset-x-0 bottom-0 z-40 rounded-t-[22px] border-t border-line/80 bg-ink-2/95 pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] shadow-[0_-20px_50px_rgba(0,0,0,0.5)] backdrop-blur-2xl select-none ${
-        visible ? "translate-y-0" : "pointer-events-none translate-y-full"
-      }`}
-    >
+  const body = (
+    <>
       <Collapse open={panelOpen} id={panelId}>
-        <div
-          ref={panelRef}
-          style={{ willChange: "transform" }}
-          className="bg-ink-2/60"
-        >
-          <div
-            {...handlers}
-            aria-hidden="true"
-            className="flex cursor-grab touch-none justify-center pt-2.5 pb-1 active:cursor-grabbing"
-          >
-            <div className="h-1 w-10 rounded-full bg-line-strong" />
-          </div>
-
-          <div className="flex items-center justify-between px-4">
+        <div data-vaul-no-drag className="bg-ink-2/60">
+          <div className="flex items-center justify-between px-4 pt-1">
             <h2 className="text-[10px] font-medium tracking-[0.2em] text-signal uppercase">
               {shown?.label}
             </h2>
@@ -254,7 +230,57 @@ function MobileEditor({
           })}
         </div>
       </div>
-    </div>
+    </>
+  );
+
+  if (persistent) {
+    return (
+      <div
+        ref={setDockEl}
+        role="region"
+        aria-label="Editing tools"
+        data-open="true"
+        onKeyDown={onKeyDown}
+        className="sheet-shell translucent fixed inset-x-0 bottom-0 z-40 rounded-t-[22px] border-t border-line/80 bg-ink-2/95 pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] shadow-[0_-20px_50px_rgba(0,0,0,0.5)] backdrop-blur-2xl select-none"
+      >
+        {body}
+      </div>
+    );
+  }
+
+  return (
+    <Drawer.Root
+      open={open}
+      onOpenChange={(next) => {
+        if (!next) onClose?.();
+      }}
+      modal={false}
+      dismissible={!!onClose}
+      noBodyStyles
+      autoFocus={false}
+      closeThreshold={0.3}
+    >
+      <Drawer.Portal>
+        <Drawer.Content
+          ref={setDockEl}
+          role="region"
+          aria-label="Editing tools"
+          style={{ touchAction: "pan-y" }}
+          className="translucent fixed inset-x-0 bottom-0 z-40 flex flex-col rounded-t-[22px] border-t border-line/80 bg-ink-2/95 pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] shadow-[0_-20px_50px_rgba(0,0,0,0.5)] backdrop-blur-2xl outline-none select-none"
+        >
+          <Drawer.Title className="sr-only">Editing tools</Drawer.Title>
+
+          <div
+            aria-hidden="true"
+            className="flex shrink-0 cursor-grab justify-center pt-2.5 pb-1 active:cursor-grabbing"
+          >
+            <span className="h-1 w-10 rounded-full bg-line-strong" />
+          </div>
+
+          {body}
+        </Drawer.Content>
+      </Drawer.Portal>
+    </Drawer.Root>
   );
 }
 
