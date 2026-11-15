@@ -88,7 +88,7 @@ export const ControlBar = ({
   const isVideo = mode === "video";
 
   return (
-    <div className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-4 pr-[max(0.75rem,env(safe-area-inset-right))] pb-[calc(2rem+env(safe-area-inset-bottom))] pl-[max(0.75rem,env(safe-area-inset-left))] sm:gap-3 sm:pb-[calc(1.25rem+env(safe-area-inset-bottom))]">
+    <div className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-4 pr-[max(0.75rem,env(safe-area-inset-right))] pb-[calc(3rem+env(safe-area-inset-bottom))] pl-[max(0.75rem,env(safe-area-inset-left))] sm:gap-3 sm:pb-[calc(1.75rem+env(safe-area-inset-bottom))]">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-0 bottom-0 h-48 bg-linear-to-t from-ink/90 via-ink/35 to-transparent"
