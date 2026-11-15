@@ -25,6 +25,8 @@
   </a>
 </div>
 
+![phosphor-cam — your camera feed rendered live as ASCII, dither, halftone, voxels and lines](https://raw.githubusercontent.com/yasirwhite/opendemo-media/main/pshycodr-phosphor-cam/phosphor-cam-demo.gif)
+
 ---
 
 ## Overview
