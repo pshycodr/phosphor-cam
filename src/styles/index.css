@@ -197,8 +197,47 @@
 
   .modal-panel {
     transition:
-      opacity 180ms var(--ease-out),
+      opacity 160ms var(--ease-out),
       transform 200ms var(--ease-out);
+  }
+
+  .modal-shell {
+    transition: opacity 160ms var(--ease-out);
+  }
+
+  .modal-shell[data-state="open"],
+  .modal-shell[data-state="open"] .modal-panel {
+    opacity: 1;
+  }
+
+  .modal-shell[data-state="open"] .modal-panel {
+    transform: translateY(0) scale(1);
+  }
+
+  .modal-shell[data-state="closed"],
+  .modal-shell[data-state="closed"] .modal-panel {
+    opacity: 0;
+  }
+
+  .modal-shell[data-state="closed"] .modal-panel {
+    transform: translateY(10px) scale(0.97);
+  }
+
+  .popover-panel {
+    transform-origin: top right;
+    transition:
+      opacity 140ms var(--ease-out),
+      transform 160ms var(--ease-out);
+  }
+
+  .popover-panel[data-state="open"] {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  .popover-panel[data-state="closed"] {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.97);
   }
 
   .ratio-tween {
@@ -349,28 +388,6 @@
   }
 }
 
-@keyframes popover-in {
-  from {
-    opacity: 0;
-    transform: translateY(-6px) scale(0.97);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes modal-in {
-  from {
-    opacity: 0;
-    transform: translateY(10px) scale(0.97);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
 @keyframes rail-in {
   from {
     opacity: 0;
@@ -412,15 +429,6 @@
   animation: fade-up 180ms var(--ease-out) both;
 }
 
-.popover-enter {
-  transform-origin: top right;
-  animation: popover-in 160ms var(--ease-out) backwards;
-}
-
-.modal-enter {
-  animation: modal-in 200ms var(--ease-out) backwards;
-}
-
 .rail-enter {
   animation: rail-in 260ms var(--ease-out) backwards;
 }
@@ -450,7 +458,9 @@
 
   .rail-panel,
   .sheet-panel,
-  .modal-panel {
+  .modal-panel,
+  .modal-shell,
+  .popover-panel {
     transition-property:
       opacity, background-color, color, border-color, visibility !important;
   }

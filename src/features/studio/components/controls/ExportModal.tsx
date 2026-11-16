@@ -5,6 +5,7 @@ import { Check, Clipboard, Download, FileText, Loader2, X } from "lucide-react";
 
 import { RENDERERS } from "@/core/renderers/registry";
 import { SliderField } from "@/shared/components/settings/common/EditorSlider";
+import { usePresence } from "@/shared/hooks/usePresence";
 import type { Codecs } from "@/shared/types";
 import { Button, IconButton } from "@/shared/ui/buttons";
 import { Segmented } from "@/shared/ui/controls";
@@ -34,6 +35,7 @@ function ExportModal() {
   const settings = useStudioStore((s) => s.settings);
   const updateSettings = useStudioStore((s) => s.updateSettings);
   const commitHistory = useStudioStore((s) => s.commitHistory);
+  const mounted = usePresence(isOpen, 180);
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [copiedAscii, setCopiedAscii] = useState(false);
@@ -95,7 +97,7 @@ function ExportModal() {
     };
   }, [isOpen, setIsOpen]);
 
-  if (!isOpen || !image) return null;
+  if (!mounted || !image) return null;
 
   const currentScale = clampScale(settings.captureScale || 4);
   const currentCodec = settings.captureCodec || "png";
@@ -241,7 +243,11 @@ function ExportModal() {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-ink/80 p-4 backdrop-blur-sm"
+      data-state={isOpen ? "open" : "closed"}
+      aria-hidden={!isOpen}
+      className={`modal-shell fixed inset-0 z-50 flex items-center justify-center bg-ink/80 p-4 backdrop-blur-sm ${
+        isOpen ? "" : "pointer-events-none"
+      }`}
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) setIsOpen(false);
       }}
@@ -252,7 +258,7 @@ function ExportModal() {
         aria-modal="true"
         aria-labelledby="export-title"
         aria-describedby="export-desc"
-        className="modal-enter w-full max-w-[400px] overflow-hidden rounded-2xl border border-line bg-ink-2 shadow-[0_30px_80px_rgba(0,0,0,0.65)]"
+        className="modal-panel w-full max-w-[400px] overflow-hidden rounded-2xl border border-line bg-ink-2 shadow-[0_30px_80px_rgba(0,0,0,0.65)]"
       >
         <header className="flex h-14 items-center justify-between border-b border-line/80 pr-4 pl-5">
           <div className="flex items-center gap-2.5">
