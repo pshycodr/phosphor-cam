@@ -2,11 +2,14 @@ import { memo, useEffect, useRef, useState } from "react";
 
 import { ZoomIn, ZoomOut } from "lucide-react";
 
+import { RENDER_MODES } from "@/shared/constants/settings";
+
 import { useStudioStore } from "../store/studioStore";
 import { StudioWorkerController } from "../worker/StudioWorkerController";
 
 const MIN_ZOOM = 0.5;
 const MAX_ZOOM = 4;
+const SWIPE_DISTANCE = 56;
 const clampZoom = (z: number) => Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, z));
 
 const touchDistance = (t: React.TouchList) =>
@@ -37,6 +40,34 @@ function StudioViewport() {
   const [isPanning, setIsPanning] = useState(false);
   const panStart = useRef<PanStart | null>(null);
   const pinchStart = useRef<{ dist: number; zoom: number } | null>(null);
+  const swipeStart = useRef<{ x: number; y: number; time: number } | null>(
+    null
+  );
+  const [hint, setHint] = useState<{ text: string; id: number } | null>(null);
+  const hintTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined
+  );
+
+  useEffect(() => () => clearTimeout(hintTimer.current), []);
+
+  const showHint = (text: string) => {
+    setHint((prev) => ({ text, id: (prev?.id ?? 0) + 1 }));
+    clearTimeout(hintTimer.current);
+    hintTimer.current = setTimeout(() => setHint(null), 1100);
+  };
+
+  const stepRenderer = (direction: 1 | -1) => {
+    const { settings, updateSettings } = useStudioStore.getState();
+    const index = RENDER_MODES.findIndex(
+      (mode) => mode.key === settings.renderMode
+    );
+    const next =
+      RENDER_MODES[
+        (index + direction + RENDER_MODES.length) % RENDER_MODES.length
+      ];
+    updateSettings({ renderMode: next.key });
+    showHint(next.label);
+  };
 
   useEffect(() => {
     const mount = canvasMountRef.current;
@@ -124,7 +155,13 @@ function StudioViewport() {
   const onTouchStart = (e: React.TouchEvent) => {
     if (e.touches.length === 2) {
       pinchStart.current = { dist: touchDistance(e.touches), zoom };
+      swipeStart.current = null;
     } else if (e.touches.length === 1) {
+      swipeStart.current = {
+        x: e.touches[0].clientX,
+        y: e.touches[0].clientY,
+        time: e.timeStamp,
+      };
       beginPan(e.touches[0].clientX, e.touches[0].clientY);
     }
   };
@@ -138,9 +175,21 @@ function StudioViewport() {
     }
   };
 
-  const onTouchEnd = () => {
+  const onTouchEnd = (e: React.TouchEvent) => {
+    const start = swipeStart.current;
+    const touch = e.changedTouches[0];
+    swipeStart.current = null;
     pinchStart.current = null;
     endPan();
+
+    if (!start || !touch || zoom > 1) return;
+
+    const dx = touch.clientX - start.x;
+    const dy = touch.clientY - start.y;
+
+    if (Math.abs(dx) >= SWIPE_DISTANCE && Math.abs(dx) > Math.abs(dy) * 1.2) {
+      stepRenderer(dx < 0 ? 1 : -1);
+    }
   };
 
   const cursor =
@@ -194,6 +243,21 @@ function StudioViewport() {
           Original
         </span>
       )}
+
+      <div
+        aria-live="polite"
+        aria-atomic="true"
+        className="pointer-events-none absolute top-4 right-4 z-20"
+      >
+        {hint && (
+          <span
+            key={hint.id}
+            className="pop-in inline-flex rounded-full border border-line/80 bg-ink-2/90 px-3 py-1.5 font-mono text-[10px] font-medium tracking-[0.18em] text-signal uppercase shadow-[0_12px_30px_rgba(0,0,0,0.4)] backdrop-blur-md"
+          >
+            {hint.text}
+          </span>
+        )}
+      </div>
 
       <div
         className="absolute left-4 z-20 flex items-center rounded-full border border-line/80 bg-ink-2/85 text-muted backdrop-blur-md"

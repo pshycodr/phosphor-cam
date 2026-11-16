@@ -19,6 +19,7 @@ import { saveVideo } from "./utils/saveVideo";
 function Cam() {
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [facingMode, setFacingMode] = useState<CameraFacingMode>("user");
+  const [flipTurns, setFlipTurns] = useState(0);
   const [isRecording, setIsRecording] = useState(false);
   const [windowSize, setWindowSize] = useState({
     width: window.innerWidth,
@@ -98,6 +99,7 @@ function Cam() {
   );
 
   const toggleCamera = useCallback(() => {
+    setFlipTurns((turns) => turns + 1);
     setFacingMode((prev) => (prev === "user" ? "environment" : "user"));
   }, []);
 
@@ -261,7 +263,10 @@ function Cam() {
           canvasSize={windowSize}
           mirrored={facingMode === "user"}
           onFlip={toggleCamera}
-          gesturesDisabled={isRecording || settingsOpen}
+          gesturesDisabled={isRecording}
+          editorOpen={settingsOpen}
+          onOpenEditor={openSettings}
+          onCloseEditor={closeSettings}
           onStageSize={handleStageSize}
         />
 
@@ -325,6 +330,7 @@ function Cam() {
 
         <CameraControls
           onFlip={toggleCamera}
+          flipTurns={flipTurns}
           onShot={takeSnapshot}
           onCopy={copyToClipboard}
           onToggleRecording={toggleRecording}

@@ -10,6 +10,7 @@ import {
 } from "react";
 
 import { useMediaQuery } from "@/shared/components/settings/common/useMediaQuery";
+import { RENDER_MODES } from "@/shared/constants/settings";
 
 import { useCameraSource } from "../hooks/useCameraSource";
 import { useViewfinderGestures } from "../hooks/useViewfinderGestures";
@@ -29,6 +30,9 @@ interface ViewportProps {
   mirrored?: boolean;
   onFlip?: () => void;
   gesturesDisabled?: boolean;
+  editorOpen?: boolean;
+  onOpenEditor?: () => void;
+  onCloseEditor?: () => void;
   onStageSize?: (size: { width: number; height: number }) => void;
 }
 
@@ -41,6 +45,12 @@ const RATIOS: Record<AspectRatio, number | null> = {
 
 const ASPECT_ORDER: readonly AspectRatio[] = ["1:1", "3:4", "full"];
 
+const ASPECT_LABELS: Record<AspectRatio, string> = {
+  "1:1": "1:1",
+  "3:4": "3:4",
+  full: "Full screen",
+};
+
 const Viewport = forwardRef<ViewportHandle, ViewportProps>(
   (
     {
@@ -49,6 +59,9 @@ const Viewport = forwardRef<ViewportHandle, ViewportProps>(
       mirrored = false,
       onFlip,
       gesturesDisabled = false,
+      editorOpen = false,
+      onOpenEditor,
+      onCloseEditor,
       onStageSize,
     },
     ref
@@ -67,19 +80,58 @@ const Viewport = forwardRef<ViewportHandle, ViewportProps>(
     // takes the whole screen there and the chrome overlays it.
     const fillScreen = !isMobile || aspect === "full" || isLandscape;
 
-    const cycleAspect = useCallback((direction: 1 | -1) => {
-      const { settings, updateSettings } = useSettingsStore.getState();
-      const index = ASPECT_ORDER.indexOf(settings.aspectRatio);
-      const next =
-        ASPECT_ORDER[
-          (index + direction + ASPECT_ORDER.length) % ASPECT_ORDER.length
-        ];
-      updateSettings({ aspectRatio: next });
+    const [hint, setHint] = useState<{ text: string; id: number } | null>(null);
+    const hintTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
+      undefined
+    );
+
+    useEffect(() => () => clearTimeout(hintTimer.current), []);
+
+    const showHint = useCallback((text: string) => {
+      setHint((prev) => ({ text, id: (prev?.id ?? 0) + 1 }));
+      clearTimeout(hintTimer.current);
+      hintTimer.current = setTimeout(() => setHint(null), 1100);
     }, []);
+
+    const stepAspect = useCallback(
+      (direction: 1 | -1) => {
+        const { settings, updateSettings } = useSettingsStore.getState();
+        const index = ASPECT_ORDER.indexOf(settings.aspectRatio);
+        const next =
+          ASPECT_ORDER[
+            Math.min(ASPECT_ORDER.length - 1, Math.max(0, index + direction))
+          ];
+        if (next !== settings.aspectRatio) {
+          updateSettings({ aspectRatio: next });
+        }
+        showHint(ASPECT_LABELS[next]);
+      },
+      [showHint]
+    );
+
+    const stepRenderer = useCallback(
+      (direction: 1 | -1) => {
+        const { settings, updateSettings } = useSettingsStore.getState();
+        const index = RENDER_MODES.findIndex(
+          (mode) => mode.key === settings.renderMode
+        );
+        const next =
+          RENDER_MODES[
+            (index + direction + RENDER_MODES.length) % RENDER_MODES.length
+          ];
+        updateSettings({ renderMode: next.key });
+        showHint(next.label);
+      },
+      [showHint]
+    );
 
     const gestures = useViewfinderGestures({
       onFlip: onFlip ?? (() => {}),
-      onCycleAspect: cycleAspect,
+      onStepAspect: stepAspect,
+      onStepRenderer: stepRenderer,
+      onOpenEditor: onOpenEditor ?? (() => {}),
+      onCloseEditor: onCloseEditor ?? (() => {}),
+      editorOpen,
       enabled: isMobile && !gesturesDisabled && !!onFlip,
     });
 
@@ -232,8 +284,8 @@ const Viewport = forwardRef<ViewportHandle, ViewportProps>(
         {...gestures}
         className={
           fillScreen
-            ? "fixed inset-0 flex touch-pan-y items-center justify-center overflow-hidden bg-ink"
-            : "fixed inset-0 flex touch-pan-y items-center justify-center overflow-hidden bg-ink max-sm:top-[calc(env(safe-area-inset-top)+7rem)] max-sm:right-[max(0.5rem,env(safe-area-inset-right))] max-sm:bottom-[calc(env(safe-area-inset-bottom)+12rem)] max-sm:left-[max(0.5rem,env(safe-area-inset-left))] max-sm:bg-transparent"
+            ? "fixed inset-0 flex touch-none items-center justify-center overflow-hidden bg-ink"
+            : "fixed inset-0 flex touch-none items-center justify-center overflow-hidden bg-ink max-sm:top-[calc(env(safe-area-inset-top)+7rem)] max-sm:right-[max(0.5rem,env(safe-area-inset-right))] max-sm:bottom-[calc(env(safe-area-inset-bottom)+13rem)] max-sm:left-[max(0.5rem,env(safe-area-inset-left))] max-sm:bg-transparent"
         }
         style={
           fillScreen && isMobile
@@ -262,6 +314,21 @@ const Viewport = forwardRef<ViewportHandle, ViewportProps>(
           />
           {/* Canvas is injected by the effect above */}
           <div ref={containerRef} className="contents" />
+        </div>
+
+        <div
+          aria-live="polite"
+          aria-atomic="true"
+          className="pointer-events-none absolute inset-0 z-10 grid place-items-center"
+        >
+          {hint && (
+            <span
+              key={hint.id}
+              className="pop-in rounded-full border border-line/70 bg-ink/75 px-4 py-2 font-mono text-[11px] font-medium tracking-[0.22em] text-signal uppercase shadow-[0_12px_30px_rgba(0,0,0,0.45)] backdrop-blur-md"
+            >
+              {hint.text}
+            </span>
+          )}
         </div>
       </div>
     );

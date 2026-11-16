@@ -9,6 +9,7 @@ import type { CameraControlsProps, CaptureMode } from "./types";
 
 const CameraControls = ({
   onFlip,
+  flipTurns,
   onShot,
   onCopy,
   onToggleRecording,
@@ -20,7 +21,6 @@ const CameraControls = ({
   settingsButtonRef,
 }: CameraControlsProps) => {
   const [mode, setMode] = useState<CaptureMode>("photo");
-  const [flipTurns, setFlipTurns] = useState(0);
   const [isCopied, setIsCopied] = useState(false);
   const isLarge = useMediaQuery("(min-width: 1024px)");
   const copyTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
@@ -29,11 +29,6 @@ const CameraControls = ({
   const renderMode = useSettingsStore((s) => s.settings.renderMode);
 
   useEffect(() => () => clearTimeout(copyTimer.current), []);
-
-  const handleFlip = useCallback(() => {
-    setFlipTurns((t) => t + 1);
-    onFlip();
-  }, [onFlip]);
 
   const handleCopy = useCallback(() => {
     setIsCopied(true);
@@ -57,7 +52,7 @@ const CameraControls = ({
           flipTurns={flipTurns}
           renderMode={renderMode}
           timeLabel={timeLabel}
-          onFlip={handleFlip}
+          onFlip={onFlip}
           onShot={onShot}
           onCopy={handleCopy}
           onToggleRecording={onToggleRecording}
@@ -74,7 +69,7 @@ const CameraControls = ({
           flipTurns={flipTurns}
           isRecording={isRecording}
           timeLabel={timeLabel}
-          onFlip={handleFlip}
+          onFlip={onFlip}
           onShot={onShot}
           onToggleRecording={onToggleRecording}
         />
