@@ -240,6 +240,22 @@
     transform: translateY(-6px) scale(0.97);
   }
 
+  @starting-style {
+    .modal-shell[data-state="open"] {
+      opacity: 0;
+    }
+
+    .modal-shell[data-state="open"] .modal-panel {
+      opacity: 0;
+      transform: translateY(10px) scale(0.97);
+    }
+
+    .popover-panel[data-state="open"] {
+      opacity: 0;
+      transform: translateY(-6px) scale(0.97);
+    }
+  }
+
   .ratio-tween {
     transition:
       width 240ms var(--ease-out),
