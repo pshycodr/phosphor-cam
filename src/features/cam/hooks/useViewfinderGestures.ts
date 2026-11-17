@@ -118,10 +118,10 @@ export function useViewfinderGestures({
 
       if (ratio <= 1 / PINCH_STEP) {
         gesture.fired = true;
-        onStepAspect(1);
+        onStepAspect(-1);
       } else if (ratio >= PINCH_STEP) {
         gesture.fired = true;
-        onStepAspect(-1);
+        onStepAspect(1);
       }
       return;
     }

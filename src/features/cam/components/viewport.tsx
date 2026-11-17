@@ -284,8 +284,8 @@ const Viewport = forwardRef<ViewportHandle, ViewportProps>(
         {...gestures}
         className={
           fillScreen
-            ? "fixed inset-0 flex touch-none items-center justify-center overflow-hidden bg-ink"
-            : "fixed inset-0 flex touch-none items-center justify-center overflow-hidden bg-ink max-sm:top-[calc(env(safe-area-inset-top)+7rem)] max-sm:right-[max(0.5rem,env(safe-area-inset-right))] max-sm:bottom-[calc(env(safe-area-inset-bottom)+13rem)] max-sm:left-[max(0.5rem,env(safe-area-inset-left))] max-sm:bg-transparent"
+            ? "pointer-events-auto fixed inset-0 flex touch-none items-center justify-center overflow-hidden bg-ink"
+            : "pointer-events-auto fixed inset-0 flex touch-none items-center justify-center overflow-hidden bg-ink max-sm:top-[calc(env(safe-area-inset-top)+7rem)] max-sm:right-[max(0.5rem,env(safe-area-inset-right))] max-sm:bottom-[calc(env(safe-area-inset-bottom)+13rem)] max-sm:left-[max(0.5rem,env(safe-area-inset-left))] max-sm:bg-transparent"
         }
         style={
           fillScreen && isMobile

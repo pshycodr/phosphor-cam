@@ -153,7 +153,7 @@ function MobileEditor({
   const body = (
     <>
       <Collapse open={panelOpen} id={panelId}>
-        <div data-vaul-no-drag className="bg-ink-2/60">
+        <div className="bg-ink-2/60">
           <div className="flex items-center justify-between px-4 pt-1">
             <h2 className="text-[10px] font-medium tracking-[0.2em] text-signal uppercase">
               {shown?.label}
