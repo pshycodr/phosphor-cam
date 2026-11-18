@@ -27,3 +27,8 @@ dist-ssr
 archive
 *.jks
 *.keystore
+
+opencode.json
+skills-lock.json
+.agents
+.playwright-mcp
