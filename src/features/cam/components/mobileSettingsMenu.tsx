@@ -9,6 +9,7 @@ import {
 import { X } from "lucide-react";
 
 import CaptureTool from "@/shared/components/settings/mobile/tools/CaptureTool";
+import { useBackHandler } from "@/shared/hooks/useBackHandler";
 import { usePresence } from "@/shared/hooks/usePresence";
 import { Segmented } from "@/shared/ui/controls";
 
@@ -83,6 +84,8 @@ export function MobileSettingsMenu({
     },
     [onClose, triggerRef]
   );
+
+  useBackHandler(open, () => close(true));
 
   useEffect(() => {
     if (!open) return;

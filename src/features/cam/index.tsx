@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
 import { SettingsControlsProvider } from "@/shared/components/settings/common/SettingsControlsProvider";
+import { useBackHandler } from "@/shared/hooks/useBackHandler";
 import { Button } from "@/shared/ui/buttons";
 import { Toaster } from "@/shared/ui/toaster";
 import { saveImage } from "@/shared/utils/saveImage";
@@ -105,6 +106,9 @@ function Cam() {
 
   const openSettings = useCallback(() => setSettingsOpen(true), []);
   const closeSettings = useCallback(() => setSettingsOpen(false), []);
+
+  useBackHandler(cameraError !== null, () => setCameraError(null));
+  useBackHandler(isRecording, () => toast("Stop recording first"));
 
   const handleStageSize = useCallback(
     (size: { width: number; height: number }) => {

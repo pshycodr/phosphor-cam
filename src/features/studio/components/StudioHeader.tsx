@@ -1,5 +1,5 @@
 import { memo, type ReactNode, useEffect } from "react";
-import { Link } from "react-router";
+import { useNavigate } from "react-router";
 
 import {
   ChevronLeft,
@@ -42,6 +42,7 @@ function Action({ label, onClick, disabled, danger, children }: ActionProps) {
 }
 
 function StudioHeader({ onOpenFilePicker }: StudioHeaderProps) {
+  const navigate = useNavigate();
   const image = useStudioStore((s) => s.image);
   const undo = useStudioStore((s) => s.undo);
   const redo = useStudioStore((s) => s.redo);
@@ -88,18 +89,28 @@ function StudioHeader({ onOpenFilePicker }: StudioHeaderProps) {
 
   const stopCompare = () => setIsComparing(false);
 
+  const goToCamera = () => {
+    if ((window.history.state?.idx ?? 0) > 0) {
+      navigate(-1);
+      return;
+    }
+
+    navigate("/", { replace: true });
+  };
+
   return (
     <header className="relative z-30 flex shrink-0 flex-col border-b border-line/80 bg-ink/90 pt-[env(safe-area-inset-top)] backdrop-blur-xl select-none">
       <div className="relative flex h-14 items-center justify-between gap-2 pr-[max(0.75rem,env(safe-area-inset-right))] pl-[max(0.75rem,env(safe-area-inset-left))] md:pr-[max(1.25rem,env(safe-area-inset-right))] md:pl-[max(1.25rem,env(safe-area-inset-left))]">
         <div className="flex min-w-0 items-center gap-2.5">
-          <Link
-            to="/"
+          <button
+            type="button"
+            onClick={goToCamera}
             title="Return to camera"
             className="press flex h-11 min-w-11 items-center justify-center gap-1 rounded-full pr-2 pl-1.5 text-[10px] font-medium tracking-[0.12em] text-muted uppercase hover:bg-ink-3 hover:text-paper"
           >
             <ChevronLeft size={15} aria-hidden="true" />
             <span className={image ? "hidden sm:inline" : ""}>Camera</span>
-          </Link>
+          </button>
 
           <span aria-hidden="true" className="h-4 w-px bg-line" />
 

@@ -5,6 +5,7 @@ import { Check, Clipboard, Download, FileText, Loader2, X } from "lucide-react";
 
 import { RENDERERS } from "@/core/renderers/registry";
 import { SliderField } from "@/shared/components/settings/common/EditorSlider";
+import { useBackHandler } from "@/shared/hooks/useBackHandler";
 import { usePresence } from "@/shared/hooks/usePresence";
 import type { Codecs } from "@/shared/types";
 import { Button, IconButton } from "@/shared/ui/buttons";
@@ -36,6 +37,8 @@ function ExportModal() {
   const updateSettings = useStudioStore((s) => s.updateSettings);
   const commitHistory = useStudioStore((s) => s.commitHistory);
   const mounted = usePresence(isOpen, 180);
+
+  useBackHandler(isOpen, () => setIsOpen(false));
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [copiedAscii, setCopiedAscii] = useState(false);

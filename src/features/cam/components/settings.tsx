@@ -5,6 +5,7 @@ import { SlidersHorizontal, X } from "lucide-react";
 import { useMediaQuery } from "@/shared/components/settings/common/useMediaQuery";
 import SettingsSections from "@/shared/components/settings/desktop/SettingsSections";
 import MobileEditor from "@/shared/components/settings/mobile/MobileEditor";
+import { useBackHandler } from "@/shared/hooks/useBackHandler";
 import { IconButton } from "@/shared/ui/buttons";
 
 import { AboutCard } from "./AboutCard";
@@ -26,6 +27,8 @@ function Settings({
 
   const closeRef = useRef<HTMLButtonElement>(null);
   const wasOpen = useRef(open);
+
+  useBackHandler(isDesktop && open, onClose);
 
   useEffect(() => {
     if (!open || !isDesktop) return;

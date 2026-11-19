@@ -11,6 +11,7 @@ import {
 } from "react-icons/lu";
 
 import { COLOR_PRESETS } from "@/shared/constants/colorPresets";
+import { useBackHandler } from "@/shared/hooks/useBackHandler";
 
 import { randomPair, sameColor } from "../../common/colorMath";
 import ColorSliders from "../../common/ColorSliders";
@@ -90,6 +91,8 @@ const PaletteTool = () => {
   // Bumped when colors change from outside the sliders (random / swap /
   // preset) so the sliders remount and re-read the value.
   const [syncKey, setSyncKey] = useState(0);
+
+  useBackHandler(picker !== null, () => setPicker(null));
 
   const handleChange = useCallback(
     (key: PickerKey, value: string) =>

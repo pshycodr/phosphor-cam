@@ -20,6 +20,8 @@ import {
 
 import { Drawer } from "vaul";
 
+import { useBackHandler } from "@/shared/hooks/useBackHandler";
+
 import Collapse from "../common/Collapse";
 import { useSettingsSelector } from "../common/useSettingsControls";
 import AdjustTool from "./tools/AdjustTool";
@@ -115,6 +117,8 @@ function MobileEditor({
     (id: string) => setActiveId((cur) => (cur === id ? null : id)),
     []
   );
+
+  useBackHandler(!persistent && open, () => onClose?.());
 
   const [dockEl, setDockEl] = useState<HTMLDivElement | null>(null);
   useEffect(() => {
