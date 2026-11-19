@@ -19,7 +19,7 @@ export interface LoadedImage {
   aspectRatio: number;
 }
 
-interface StudioState {
+export interface StudioState {
   image: LoadedImage | null;
   settings: AsciiSettings;
   history: AsciiSettings[];
@@ -28,6 +28,7 @@ interface StudioState {
   pan: { x: number; y: number };
   isComparing: boolean;
   isExportModalOpen: boolean;
+  isExporting: boolean;
   workerController: StudioWorkerController | null;
 
   // Actions
@@ -64,6 +65,9 @@ interface StudioState {
   resetZoomAndPan: () => void;
   setIsComparing: (comparing: boolean) => void;
   setIsExportModalOpen: (open: boolean) => void;
+  setIsExporting: (exporting: boolean) => void;
+  /** Drops the loaded image, its undo history and the current worker session. */
+  discardSession: () => void;
 }
 
 const MAX_HISTORY = 30;
@@ -85,6 +89,7 @@ export const useStudioStore = create<StudioState>((set, get) => ({
   pan: { x: 0, y: 0 },
   isComparing: false,
   isExportModalOpen: false,
+  isExporting: false,
   workerController: null,
 
   setWorkerController: (c) => set({ workerController: c }),
@@ -95,6 +100,10 @@ export const useStudioStore = create<StudioState>((set, get) => ({
       URL.revokeObjectURL(previous.url);
     }
 
+    // A new image starts a new edit session, so its history begins at the
+    // settings it loaded with.
+    const settings = get().settings;
+
     set({
       image: {
         file,
@@ -104,8 +113,14 @@ export const useStudioStore = create<StudioState>((set, get) => ({
         height,
         aspectRatio: width / height,
       },
+      settings,
+      history: [cloneSettings(settings)],
+      historyIndex: 0,
       zoom: 1,
       pan: { x: 0, y: 0 },
+      isComparing: false,
+      isExportModalOpen: false,
+      isExporting: false,
     });
   },
 
@@ -190,6 +205,8 @@ export const useStudioStore = create<StudioState>((set, get) => ({
       },
     };
 
+    if (settingsEqual(prev, next)) return;
+
     const { history, historyIndex } = get();
     const truncatedHistory = history.slice(0, historyIndex + 1);
     const newHistory = [...truncatedHistory, cloneSettings(next)].slice(
@@ -253,4 +270,31 @@ export const useStudioStore = create<StudioState>((set, get) => ({
   setIsComparing: (comparing) => set({ isComparing: comparing }),
 
   setIsExportModalOpen: (open) => set({ isExportModalOpen: open }),
+
+  setIsExporting: (exporting) => set({ isExporting: exporting }),
+
+  discardSession: () => {
+    const current = get().image;
+    if (current?.url.startsWith("blob:")) {
+      URL.revokeObjectURL(current.url);
+    }
+
+    const settings = createDefaultSettings();
+
+    set({
+      image: null,
+      settings,
+      history: [cloneSettings(settings)],
+      historyIndex: 0,
+      zoom: 1,
+      pan: { x: 0, y: 0 },
+      isComparing: false,
+      isExportModalOpen: false,
+      isExporting: false,
+      workerController: null,
+    });
+  },
 }));
+
+/** True once a setting changed in the current edit session. */
+export const selectIsDirty = (state: StudioState) => state.historyIndex > 0;
