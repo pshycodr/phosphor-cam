@@ -36,11 +36,19 @@ function ExportModal() {
   const settings = useStudioStore((s) => s.settings);
   const updateSettings = useStudioStore((s) => s.updateSettings);
   const commitHistory = useStudioStore((s) => s.commitHistory);
+  const isExporting = useStudioStore((s) => s.isExporting);
+  const setIsExporting = useStudioStore((s) => s.setIsExporting);
   const mounted = usePresence(isOpen, 180);
 
-  useBackHandler(isOpen, () => setIsOpen(false));
+  useBackHandler(isOpen, () => {
+    if (isExporting) {
+      toast("Export in progress");
+      return;
+    }
 
-  const [isProcessing, setIsProcessing] = useState(false);
+    setIsOpen(false);
+  });
+
   const [copiedAscii, setCopiedAscii] = useState(false);
   const [copiedImage, setCopiedImage] = useState(false);
 
@@ -58,6 +66,10 @@ function ExportModal() {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         e.preventDefault();
+        if (useStudioStore.getState().isExporting) {
+          toast("Export in progress");
+          return;
+        }
         setIsOpen(false);
         return;
       }
@@ -138,7 +150,7 @@ function ExportModal() {
   };
 
   const handleSaveImage = async () => {
-    setIsProcessing(true);
+    setIsExporting(true);
     try {
       const blob = await generateExportBlob();
       const reader = new FileReader();
@@ -168,12 +180,12 @@ function ExportModal() {
         err instanceof Error ? err.message : "Failed to export image"
       );
     } finally {
-      setIsProcessing(false);
+      setIsExporting(false);
     }
   };
 
   const handleCopyImageToClipboard = async () => {
-    setIsProcessing(true);
+    setIsExporting(true);
     try {
       const img = new Image();
       img.crossOrigin = "anonymous";
@@ -205,7 +217,7 @@ function ExportModal() {
       console.error("Copy image error", err);
       toast.error("Could not copy image to clipboard");
     } finally {
-      setIsProcessing(false);
+      setIsExporting(false);
     }
   };
 
@@ -252,13 +264,19 @@ function ExportModal() {
         isOpen ? "" : "pointer-events-none"
       }`}
       onMouseDown={(e) => {
-        if (e.target === e.currentTarget) setIsOpen(false);
+        if (e.target !== e.currentTarget) return;
+        if (useStudioStore.getState().isExporting) {
+          toast("Export in progress");
+          return;
+        }
+        setIsOpen(false);
       }}
     >
       <div
         ref={panelRef}
         role="dialog"
         aria-modal="true"
+        aria-busy={isExporting}
         aria-labelledby="export-title"
         aria-describedby="export-desc"
         className="modal-panel w-full max-w-[400px] overflow-hidden rounded-2xl border border-line bg-ink-2 shadow-[0_30px_80px_rgba(0,0,0,0.65)]"
@@ -282,6 +300,7 @@ function ExportModal() {
             ref={closeRef}
             label="Close export"
             size="md"
+            disabled={isExporting}
             onClick={() => setIsOpen(false)}
           >
             <X size={17} strokeWidth={1.75} aria-hidden="true" />
@@ -337,9 +356,9 @@ function ExportModal() {
             variant="primary"
             className="w-full"
             onClick={handleSaveImage}
-            disabled={isProcessing}
+            disabled={isExporting}
           >
-            {isProcessing ? (
+            {isExporting ? (
               <Loader2
                 size={16}
                 aria-hidden="true"
@@ -355,7 +374,7 @@ function ExportModal() {
             <Button
               variant="outline"
               onClick={handleCopyImageToClipboard}
-              disabled={isProcessing}
+              disabled={isExporting}
             >
               {copiedImage ? (
                 <Check size={13} aria-hidden="true" className="text-signal" />
@@ -369,7 +388,7 @@ function ExportModal() {
               <Button
                 variant="outline"
                 onClick={handleCopyAsciiText}
-                disabled={isProcessing}
+                disabled={isExporting}
               >
                 {copiedAscii ? (
                   <Check size={13} aria-hidden="true" className="text-signal" />
@@ -379,7 +398,11 @@ function ExportModal() {
                 {copiedAscii ? "Copied" : "Copy ASCII"}
               </Button>
             ) : (
-              <Button variant="ghost" onClick={() => setIsOpen(false)}>
+              <Button
+                variant="ghost"
+                disabled={isExporting}
+                onClick={() => setIsOpen(false)}
+              >
                 Cancel
               </Button>
             )}

@@ -15,7 +15,9 @@ import { IconButton } from "@/shared/ui/buttons";
 import { useStudioStore } from "../store/studioStore";
 
 interface StudioHeaderProps {
-  onOpenFilePicker: () => void;
+  editing?: boolean;
+  onBack?: () => void;
+  onOpenFilePicker?: () => void;
 }
 
 interface ActionProps {
@@ -41,7 +43,11 @@ function Action({ label, onClick, disabled, danger, children }: ActionProps) {
   );
 }
 
-function StudioHeader({ onOpenFilePicker }: StudioHeaderProps) {
+function StudioHeader({
+  editing = false,
+  onBack,
+  onOpenFilePicker,
+}: StudioHeaderProps) {
   const navigate = useNavigate();
   const image = useStudioStore((s) => s.image);
   const undo = useStudioStore((s) => s.undo);
@@ -54,6 +60,8 @@ function StudioHeader({ onOpenFilePicker }: StudioHeaderProps) {
   const canRedo = useStudioStore((s) => s.historyIndex < s.history.length - 1);
 
   useEffect(() => {
+    if (!editing) return;
+
     const isTextEntry = (target: EventTarget | null) => {
       if (!(target instanceof HTMLElement)) return false;
       if (target.isContentEditable) return true;
@@ -85,7 +93,7 @@ function StudioHeader({ onOpenFilePicker }: StudioHeaderProps) {
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [undo, redo]);
+  }, [editing, undo, redo]);
 
   const stopCompare = () => setIsComparing(false);
 
@@ -98,18 +106,30 @@ function StudioHeader({ onOpenFilePicker }: StudioHeaderProps) {
     navigate("/", { replace: true });
   };
 
+  const handleBack = () => {
+    if (editing) {
+      onBack?.();
+      return;
+    }
+
+    goToCamera();
+  };
+
   return (
     <header className="relative z-30 flex shrink-0 flex-col border-b border-line/80 bg-ink/90 pt-[env(safe-area-inset-top)] backdrop-blur-xl select-none">
       <div className="relative flex h-14 items-center justify-between gap-2 pr-[max(0.75rem,env(safe-area-inset-right))] pl-[max(0.75rem,env(safe-area-inset-left))] md:pr-[max(1.25rem,env(safe-area-inset-right))] md:pl-[max(1.25rem,env(safe-area-inset-left))]">
         <div className="flex min-w-0 items-center gap-2.5">
           <button
             type="button"
-            onClick={goToCamera}
-            title="Return to camera"
+            onClick={handleBack}
+            title={editing ? "Back to Studio" : "Return to camera"}
+            aria-label={editing ? "Back to Studio" : "Return to camera"}
             className="press flex h-11 min-w-11 items-center justify-center gap-1 rounded-full pr-2 pl-1.5 text-[10px] font-medium tracking-[0.12em] text-muted uppercase hover:bg-ink-3 hover:text-paper"
           >
             <ChevronLeft size={15} aria-hidden="true" />
-            <span className={image ? "hidden sm:inline" : ""}>Camera</span>
+            <span className={editing ? "hidden sm:inline" : ""}>
+              {editing ? "Studio" : "Camera"}
+            </span>
           </button>
 
           <span aria-hidden="true" className="h-4 w-px bg-line" />
@@ -121,14 +141,14 @@ function StudioHeader({ onOpenFilePicker }: StudioHeaderProps) {
           />
           <span
             className={`${
-              image ? "hidden min-[430px]:inline" : ""
+              editing ? "hidden min-[430px]:inline" : ""
             } text-[11px] font-semibold tracking-[0.18em] text-paper uppercase`}
           >
             Studio
           </span>
         </div>
 
-        {image && (
+        {editing && image && (
           <div className="pointer-events-none absolute left-1/2 hidden -translate-x-1/2 items-center gap-2 font-mono text-[10px] text-faint tabular-nums lg:flex">
             <span
               className="max-w-[180px] truncate text-muted"
@@ -142,7 +162,7 @@ function StudioHeader({ onOpenFilePicker }: StudioHeaderProps) {
             </span>
             <button
               type="button"
-              onClick={onOpenFilePicker}
+              onClick={() => onOpenFilePicker?.()}
               className="pointer-events-auto text-paper underline decoration-line-strong underline-offset-4 hover:decoration-signal"
             >
               Change
@@ -150,7 +170,7 @@ function StudioHeader({ onOpenFilePicker }: StudioHeaderProps) {
           </div>
         )}
 
-        {image && (
+        {editing && image && (
           <div className="flex items-center gap-0.5 sm:gap-1">
             <Action label="Undo (Ctrl+Z)" onClick={undo} disabled={!canUndo}>
               <Undo2 size={15} aria-hidden="true" />

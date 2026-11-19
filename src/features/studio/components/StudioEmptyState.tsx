@@ -11,6 +11,7 @@ import { loadBoundedStudioImage } from "../utils/imageSource";
 interface StudioEmptyStateProps {
   onOpenFilePicker: () => void;
   onFileSelected: (file: File) => void;
+  onSampleLoaded: () => void;
 }
 
 const SAMPLES = [
@@ -22,6 +23,7 @@ const SAMPLES = [
 function StudioEmptyState({
   onOpenFilePicker,
   onFileSelected,
+  onSampleLoaded,
 }: StudioEmptyStateProps) {
   const loadImage = useStudioStore((s) => s.loadImage);
   const [isDragging, setIsDragging] = useState(false);
@@ -91,6 +93,7 @@ function StudioEmptyState({
     try {
       const source = await loadBoundedStudioImage(url);
       loadImage(null, source.url, `${title}.png`, source.width, source.height);
+      onSampleLoaded();
     } catch {
       toast.error("Could not load sample image");
     }
