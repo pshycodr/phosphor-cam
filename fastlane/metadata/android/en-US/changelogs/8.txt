@@ -1,0 +1,10 @@
+Version: v1.4.0
+
+- New mono design: JetBrains Mono and signal-green accents
+- Redesigned phone camera with stats bar, gear menu and raised dock
+- Aspect ratios 1:1, 3:4 and Full with center-cropped previews
+- Swipe for renderers, pinch for ratio, double-tap to flip
+- Rebuilt settings popover and drag-to-dismiss drawer
+- Clearer color presets, synced sliders, bigger touch targets
+- Animated panel, popover and dialog entrances/exits
+- Back now closes panels and returns from Studio first
