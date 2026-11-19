@@ -26,16 +26,16 @@ const CharsTool = () => {
               onClick={() =>
                 updateSettings({ characterSet: set } as Partial<AsciiSettings>)
               }
-              className={`w-28 shrink-0 snap-start rounded-xl border px-3 py-2.5 text-left transition-colors outline-none focus-visible:ring-2 focus-visible:ring-green-400/70 ${
+              className={`w-28 shrink-0 snap-start rounded-xl border px-3 py-2.5 text-left transition-colors ${
                 active
-                  ? "border-green-400 bg-green-500 text-black"
-                  : "border-green-500/30 bg-black/40 text-green-400 active:bg-green-900/40"
+                  ? "border-signal/60 bg-signal/10 text-signal"
+                  : "border-line/80 bg-ink-3/40 text-muted active:bg-ink-3"
               }`}
             >
-              <span className="mb-1 block truncate text-[11px] font-bold uppercase">
+              <span className="mb-1 block truncate text-[10px] font-medium tracking-[0.12em] uppercase">
                 {set}
               </span>
-              <span className="block truncate font-mono text-sm leading-tight opacity-80">
+              <span className="block truncate font-mono text-[11px] leading-tight opacity-70">
                 {CHAR_SETS[set].slice(0, 10)}
               </span>
             </button>
@@ -43,11 +43,11 @@ const CharsTool = () => {
         })}
       </ScrollRow>
 
-      <div className="rounded-xl border border-green-500/20 bg-black/30 px-3 py-2">
-        <p className="mb-0.5 text-[10px] font-semibold tracking-wide text-green-500/60 uppercase">
+      <div className="rounded-xl border border-line/80 bg-ink-3/40 px-3 py-2">
+        <p className="mb-0.5 font-mono text-[9px] tracking-[0.16em] text-faint uppercase">
           Characters
         </p>
-        <p className="line-clamp-2 font-mono text-xs leading-snug break-all text-green-300">
+        <p className="line-clamp-2 font-mono text-[11px] leading-snug break-all text-muted">
           {CHAR_SETS[characterSet]}
         </p>
       </div>

@@ -3,6 +3,8 @@ import toast from "react-hot-toast";
 
 import { Clipboard, Upload } from "lucide-react";
 
+import { Button } from "@/shared/ui/buttons";
+
 import { useStudioStore } from "../store/studioStore";
 import { loadBoundedStudioImage } from "../utils/imageSource";
 
@@ -17,9 +19,6 @@ const SAMPLES = [
   { title: "People sitting", url: "/studio/img3.jpg" },
 ];
 
-const focusRing =
-  "focus-visible:ring-2 focus-visible:ring-green-400/70 focus-visible:outline-none";
-
 function StudioEmptyState({
   onOpenFilePicker,
   onFileSelected,
@@ -28,7 +27,6 @@ function StudioEmptyState({
   const [isDragging, setIsDragging] = useState(false);
   const dragDepth = useRef(0);
 
-  // Accepts images only; videos aren't supported yet.
   const acceptFile = (file: File | undefined | null) => {
     if (!file) return false;
     if (file.type.startsWith("image/")) {
@@ -80,7 +78,6 @@ function StudioEmptyState({
     }
   };
 
-  // Ctrl/Cmd+V anywhere on the page
   useEffect(() => {
     const onPaste = (e: ClipboardEvent) => {
       const file = e.clipboardData?.files?.[0];
@@ -105,56 +102,79 @@ function StudioEmptyState({
       onDragLeave={handleDragLeave}
       onDragOver={(e) => e.preventDefault()}
       onDrop={handleDrop}
-      className={`flex h-full w-full flex-col items-center justify-center overflow-y-auto px-4 py-8 select-none ${
-        isDragging
-          ? "bg-green-950/20 outline-2 -outline-offset-8 outline-green-400 outline-dashed"
-          : "bg-black"
-      }`}
+      className="flex h-full w-full items-center justify-center overflow-y-auto px-4 py-10 select-none"
     >
-      <div className="flex max-w-md flex-col items-center text-center">
-        <h2 className="mb-2 text-2xl font-bold text-white">
-          Phosphor <span className="text-green-400">Studio</span>
-        </h2>
-        <p className="mb-6 text-sm text-zinc-400">
-          Drop a photo here to turn it into ASCII, dithering, halftone, lines or
-          3D voxels.
-        </p>
-
-        <div className="flex flex-wrap justify-center gap-2">
-          <button
-            type="button"
-            onClick={onOpenFilePicker}
-            className={`flex items-center gap-2 rounded-lg bg-green-500 px-4 py-2.5 text-sm font-semibold text-black transition-colors hover:bg-green-400 ${focusRing}`}
-          >
-            <Upload size={16} />
-            Select image
-          </button>
-          <button
-            type="button"
-            onClick={handlePasteButton}
-            className={`flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm text-zinc-300 transition-colors hover:bg-zinc-800 hover:text-white ${focusRing}`}
-          >
-            <Clipboard size={16} />
-            Paste
-          </button>
+      <div className="w-full max-w-md">
+        <div className="mb-6 text-center">
+          <p className="font-mono text-[9px] tracking-[0.24em] text-faint uppercase">
+            Phosphor Cam · Studio
+          </p>
+          <h2 className="mt-3 text-xl font-medium tracking-tight text-paper">
+            Open an image to begin
+          </h2>
+          <p className="mx-auto mt-2 max-w-xs text-[11px] leading-relaxed text-muted">
+            ASCII, dither, halftone, lines, and voxel renders, tuned live.
+          </p>
         </div>
 
-        <div className="mt-10 w-full border-t border-zinc-900 pt-6">
-          <p className="mb-3 text-xs text-zinc-500">Or try a demo image</p>
-          <div className="grid grid-cols-3 gap-2">
+        <div
+          className={`rounded-2xl border border-dashed px-6 py-8 text-center transition-colors ${
+            isDragging
+              ? "border-signal/60 bg-signal/5"
+              : "border-line-strong bg-ink-2/40"
+          }`}
+        >
+          <span
+            className={`mx-auto flex size-11 items-center justify-center rounded-full border ${
+              isDragging
+                ? "border-signal/50 bg-signal/10 text-signal"
+                : "border-line/80 bg-ink-3/60 text-muted"
+            }`}
+          >
+            <Upload size={18} aria-hidden="true" />
+          </span>
+
+          <p className="mt-3 text-xs text-paper">
+            {isDragging ? "Release to load" : "Drop an image here"}
+          </p>
+          <p className="mt-0.5 font-mono text-[10px] text-faint">
+            PNG · JPEG · WEBP
+          </p>
+
+          <div className="mt-5 flex flex-wrap justify-center gap-2">
+            <Button variant="primary" size="sm" onClick={onOpenFilePicker}>
+              <Upload size={14} aria-hidden="true" />
+              Select image
+            </Button>
+            <Button variant="outline" size="sm" onClick={handlePasteButton}>
+              <Clipboard size={14} aria-hidden="true" />
+              Paste
+            </Button>
+          </div>
+        </div>
+
+        <div className="mt-8">
+          <div className="flex items-center gap-3">
+            <span className="font-mono text-[9px] tracking-[0.18em] text-faint uppercase">
+              Sample frames
+            </span>
+            <span aria-hidden="true" className="h-px flex-1 bg-line/70" />
+          </div>
+
+          <div className="mt-3 grid grid-cols-3 gap-2">
             {SAMPLES.map(({ title, url }) => (
               <button
                 key={url}
                 type="button"
                 onClick={() => loadSample(url, title)}
-                className={`group flex flex-col items-center gap-2 rounded-lg p-2 transition-colors hover:bg-zinc-900 ${focusRing}`}
+                className="press group overflow-hidden rounded-lg border border-line/80 bg-ink-2/60 p-1 text-left hover:border-line-strong"
               >
                 <img
                   src={url}
-                  alt={title}
-                  className="h-20 w-full rounded bg-zinc-950 object-contain p-1"
+                  alt=""
+                  className="h-16 w-full rounded object-cover opacity-70 transition-opacity group-hover:opacity-100"
                 />
-                <span className="text-xs text-zinc-400 group-hover:text-white">
+                <span className="mt-1.5 block truncate px-0.5 text-[9px] text-faint group-hover:text-muted">
                   {title}
                 </span>
               </button>

@@ -1,5 +1,5 @@
 import { memo, type ReactNode, useEffect } from "react";
-import { Link } from "react-router";
+import { useNavigate } from "react-router";
 
 import {
   ChevronLeft,
@@ -10,16 +10,15 @@ import {
   Undo2,
 } from "lucide-react";
 
+import { IconButton } from "@/shared/ui/buttons";
+
 import { useStudioStore } from "../store/studioStore";
 
 interface StudioHeaderProps {
   onOpenFilePicker: () => void;
 }
 
-const focusRing =
-  "focus-visible:ring-2 focus-visible:ring-green-400/70 focus-visible:outline-none";
-
-interface IconButtonProps {
+interface ActionProps {
   label: string;
   onClick: () => void;
   disabled?: boolean;
@@ -27,30 +26,23 @@ interface IconButtonProps {
   children: ReactNode;
 }
 
-function IconButton({
-  label,
-  onClick,
-  disabled,
-  danger,
-  children,
-}: IconButtonProps) {
+function Action({ label, onClick, disabled, danger, children }: ActionProps) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
+    <IconButton
+      label={label}
+      size="md"
+      variant="ghost"
       disabled={disabled}
-      title={label}
-      aria-label={label}
-      className={`flex size-8 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-zinc-800 disabled:pointer-events-none disabled:opacity-30 ${
-        danger ? "hover:text-red-400" : "hover:text-white"
-      } ${focusRing}`}
+      onClick={onClick}
+      className={danger ? "hover:text-alert" : undefined}
     >
       {children}
-    </button>
+    </IconButton>
   );
 }
 
 function StudioHeader({ onOpenFilePicker }: StudioHeaderProps) {
+  const navigate = useNavigate();
   const image = useStudioStore((s) => s.image);
   const undo = useStudioStore((s) => s.undo);
   const redo = useStudioStore((s) => s.redo);
@@ -61,8 +53,6 @@ function StudioHeader({ onOpenFilePicker }: StudioHeaderProps) {
   const canUndo = useStudioStore((s) => s.historyIndex > 0);
   const canRedo = useStudioStore((s) => s.historyIndex < s.history.length - 1);
 
-  // Undo / redo shortcuts: Ctrl/Cmd+Z, Ctrl/Cmd+Shift+Z, Ctrl+Y.
-  // Ignore real text fields so native editing undo keeps working.
   useEffect(() => {
     const isTextEntry = (target: EventTarget | null) => {
       if (!(target instanceof HTMLElement)) return false;
@@ -97,100 +87,123 @@ function StudioHeader({ onOpenFilePicker }: StudioHeaderProps) {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [undo, redo]);
 
-  return (
-    <header className="relative top-[max(1rem,env(safe-area-inset-top))] z-30 flex h-14 shrink-0 items-center justify-between border-b border-green-500/20 bg-black/90 px-3 backdrop-blur-md select-none md:px-5">
-      {/* Left: back + brand */}
-      <div className="flex items-center gap-3">
-        <Link
-          to="/"
-          title="Return to Camera"
-          className={`flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-semibold text-green-400 transition-colors hover:bg-green-900/40 ${focusRing}`}
-        >
-          <ChevronLeft size={16} />
-          <span className="hidden sm:inline">Camera</span>
-        </Link>
+  const stopCompare = () => setIsComparing(false);
 
-        <div className="flex items-center gap-2">
+  const goToCamera = () => {
+    if ((window.history.state?.idx ?? 0) > 0) {
+      navigate(-1);
+      return;
+    }
+
+    navigate("/", { replace: true });
+  };
+
+  return (
+    <header className="relative z-30 flex shrink-0 flex-col border-b border-line/80 bg-ink/90 pt-[env(safe-area-inset-top)] backdrop-blur-xl select-none">
+      <div className="relative flex h-14 items-center justify-between gap-2 pr-[max(0.75rem,env(safe-area-inset-right))] pl-[max(0.75rem,env(safe-area-inset-left))] md:pr-[max(1.25rem,env(safe-area-inset-right))] md:pl-[max(1.25rem,env(safe-area-inset-left))]">
+        <div className="flex min-w-0 items-center gap-2.5">
+          <button
+            type="button"
+            onClick={goToCamera}
+            title="Return to camera"
+            className="press flex h-11 min-w-11 items-center justify-center gap-1 rounded-full pr-2 pl-1.5 text-[10px] font-medium tracking-[0.12em] text-muted uppercase hover:bg-ink-3 hover:text-paper"
+          >
+            <ChevronLeft size={15} aria-hidden="true" />
+            <span className={image ? "hidden sm:inline" : ""}>Camera</span>
+          </button>
+
+          <span aria-hidden="true" className="h-4 w-px bg-line" />
+
           <img
             src="/assets/logo.png"
-            alt="Phosphor"
-            className="size-6 object-contain"
+            alt=""
+            className="size-5 object-contain"
           />
-          <span className="text-sm font-medium text-white/80">STUDIO</span>
-        </div>
-      </div>
-
-      {/* Center: current image */}
-      {image && (
-        <div className="hidden items-center gap-2 font-mono text-[11px] text-zinc-400 md:flex">
           <span
-            className="max-w-[160px] truncate text-white"
-            title={image.name}
+            className={`${
+              image ? "hidden min-[430px]:inline" : ""
+            } text-[11px] font-semibold tracking-[0.18em] text-paper uppercase`}
           >
-            {image.name}
+            Studio
           </span>
-          <span className="tabular-nums">
-            {image.width}×{image.height}
-          </span>
-          <button
-            type="button"
-            onClick={onOpenFilePicker}
-            className={`text-green-400 hover:underline ${focusRing}`}
-          >
-            Change
-          </button>
         </div>
-      )}
 
-      {/* Right: actions */}
-      {image && (
-        <div className="flex items-center gap-1.5">
-          <IconButton label="Undo (Ctrl+Z)" onClick={undo} disabled={!canUndo}>
-            <Undo2 size={16} />
-          </IconButton>
-          <IconButton
-            label="Redo (Ctrl+Shift+Z / Ctrl+Y)"
-            onClick={redo}
-            disabled={!canRedo}
-          >
-            <Redo2 size={16} />
-          </IconButton>
-          <IconButton
-            label="Reset all adjustments"
-            onClick={resetSettings}
-            danger
-          >
-            <RotateCcw size={16} />
-          </IconButton>
+        {image && (
+          <div className="pointer-events-none absolute left-1/2 hidden -translate-x-1/2 items-center gap-2 font-mono text-[10px] text-faint tabular-nums lg:flex">
+            <span
+              className="max-w-[180px] truncate text-muted"
+              title={image.name}
+            >
+              {image.name}
+            </span>
+            <span aria-hidden="true" className="h-3 w-px bg-line" />
+            <span>
+              {image.width}×{image.height}
+            </span>
+            <button
+              type="button"
+              onClick={onOpenFilePicker}
+              className="pointer-events-auto text-paper underline decoration-line-strong underline-offset-4 hover:decoration-signal"
+            >
+              Change
+            </button>
+          </div>
+        )}
 
-          <button
-            type="button"
-            title="Hold to compare with original"
-            onMouseDown={() => setIsComparing(true)}
-            onMouseUp={() => setIsComparing(false)}
-            onMouseLeave={() => setIsComparing(false)}
-            onTouchStart={() => setIsComparing(true)}
-            onTouchEnd={() => setIsComparing(false)}
-            className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors ${
-              isComparing
-                ? "bg-green-500/20 text-green-300"
-                : "text-zinc-300 hover:bg-zinc-800 hover:text-white"
-            } ${focusRing}`}
-          >
-            <Eye size={15} />
-            <span className="hidden sm:inline">Compare</span>
-          </button>
+        {image && (
+          <div className="flex items-center gap-0.5 sm:gap-1">
+            <Action label="Undo (Ctrl+Z)" onClick={undo} disabled={!canUndo}>
+              <Undo2 size={15} aria-hidden="true" />
+            </Action>
+            <Action
+              label="Redo (Ctrl+Shift+Z / Ctrl+Y)"
+              onClick={redo}
+              disabled={!canRedo}
+            >
+              <Redo2 size={15} aria-hidden="true" />
+            </Action>
+            <Action
+              label="Reset all adjustments"
+              onClick={resetSettings}
+              danger
+            >
+              <RotateCcw size={15} aria-hidden="true" />
+            </Action>
 
-          <button
-            type="button"
-            onClick={() => setIsExportModalOpen(true)}
-            className={`flex items-center gap-1.5 rounded-lg bg-green-600 px-3 py-1.5 text-xs font-bold text-black transition-colors hover:bg-green-500 ${focusRing}`}
-          >
-            <Download size={15} strokeWidth={2.5} />
-            Export
-          </button>
-        </div>
-      )}
+            <span aria-hidden="true" className="mx-1 h-4 w-px bg-line" />
+
+            <button
+              type="button"
+              title="Hold to compare with the original"
+              aria-pressed={isComparing}
+              onMouseDown={() => setIsComparing(true)}
+              onMouseUp={stopCompare}
+              onMouseLeave={stopCompare}
+              onTouchStart={() => setIsComparing(true)}
+              onTouchEnd={stopCompare}
+              onTouchCancel={stopCompare}
+              className={`press flex h-11 min-w-11 items-center justify-center gap-1.5 rounded-full border px-3 text-[10px] font-medium tracking-[0.12em] uppercase ${
+                isComparing
+                  ? "border-signal/50 bg-signal/10 text-signal"
+                  : "border-transparent text-muted hover:bg-ink-3 hover:text-paper"
+              }`}
+            >
+              <Eye size={14} aria-hidden="true" />
+              <span className="hidden sm:inline">Compare</span>
+            </button>
+
+            <button
+              type="button"
+              aria-label="Export"
+              onClick={() => setIsExportModalOpen(true)}
+              className="press ml-0.5 flex h-11 items-center gap-2 rounded-full bg-paper px-3.5 text-[10px] font-semibold tracking-[0.12em] text-ink uppercase hover:bg-white"
+            >
+              <Download size={14} strokeWidth={2} aria-hidden="true" />
+              <span className="hidden sm:inline">Export</span>
+            </button>
+          </div>
+        )}
+      </div>
     </header>
   );
 }

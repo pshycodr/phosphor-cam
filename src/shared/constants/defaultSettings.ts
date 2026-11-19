@@ -25,6 +25,7 @@ export const createDefaultSettings = (): AsciiSettings => ({
   },
   voxel3d: true,
   captureScale: 4,
+  aspectRatio: "3:4",
   lineDirection: "horizontal",
   effects: createDefaultEffects(),
   captureCodec: "png",

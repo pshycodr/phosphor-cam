@@ -47,9 +47,9 @@ const AdjustChip = memo(function AdjustChip({
   const Icon = ICONS[settingKey];
   return (
     <Chip active={active} pressed={active} onClick={() => onSelect(settingKey)}>
-      <Icon size={15} aria-hidden="true" />
+      <Icon size={14} aria-hidden="true" />
       {CHIP_LABELS[settingKey]}
-      <span className={active ? "opacity-70" : "text-green-500/70"}>
+      <span className={active ? "opacity-70" : "text-faint"}>
         {formatValue(settingKey, value)}
       </span>
     </Chip>

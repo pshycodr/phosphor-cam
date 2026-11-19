@@ -15,22 +15,20 @@ import { STUDIO_PRESETS } from "../constants/presets";
 import { useStudioStore } from "../store/studioStore";
 import PresetsPanel from "./controls/PresetsPanel";
 
-// Desktop sidebar accordion section.
 const PRESETS_SECTION: ExtraSettingsSection = {
   id: "presets",
-  icon: <Sparkles size={16} />,
+  icon: <Sparkles size={15} />,
   title: "Presets",
-  badge: <>{STUDIO_PRESETS.length} looks</>,
+  badge: <>{STUDIO_PRESETS.length}</>,
   content: <PresetsPanel />,
 };
 
 const LEADING_SECTIONS = [PRESETS_SECTION];
 
-// Mobile dock tab. Module-level so the tool list stays referentially stable.
 const PRESETS_TOOL: EditorTool = {
   id: "presets",
   label: "Presets",
-  icon: <Sparkles size={22} />,
+  icon: <Sparkles size={20} />,
   content: <PresetsPanel />,
 };
 
@@ -61,22 +59,36 @@ function StudioInspector() {
       {isDesktop ? (
         <aside
           aria-label="Editing controls"
-          className="flex h-full w-84 shrink-0 flex-col border-l border-zinc-800 bg-zinc-950 select-none"
+          className="rail-enter flex h-full w-[344px] shrink-0 flex-col border-l border-line/80 bg-ink-2/50 select-none"
         >
-          <header className="flex h-14 shrink-0 items-center gap-2 border-b border-zinc-800 px-4 text-sm font-semibold text-green-400">
-            <SlidersHorizontal size={16} />
-            Inspector
+          <header className="flex h-14 shrink-0 items-center gap-2.5 border-b border-line/80 px-5">
+            <SlidersHorizontal
+              size={15}
+              strokeWidth={1.75}
+              aria-hidden="true"
+              className="text-signal"
+            />
+            <h2 className="text-[11px] font-semibold tracking-[0.2em] text-paper uppercase">
+              Inspector
+            </h2>
           </header>
 
-          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-3">
+          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pt-1 pb-4">
             <SettingsSections
               idPrefix="studio-desktop"
               leadingSections={LEADING_SECTIONS}
+              defaultOpenSection="presets"
+              showCapture={false}
             />
           </div>
         </aside>
       ) : (
-        <MobileEditor persistent leadingTools={LEADING_TOOLS} />
+        <MobileEditor
+          persistent
+          defaultTool="presets"
+          leadingTools={LEADING_TOOLS}
+          showCapture={false}
+        />
       )}
     </SettingsControlsProvider>
   );

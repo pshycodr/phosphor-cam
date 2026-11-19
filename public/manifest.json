@@ -5,8 +5,8 @@
   "description": "Real-time ASCII art camera with Matrix effects",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#00ff00",
+  "background_color": "#080908",
+  "theme_color": "#080908",
   "orientation": "any",
   "icons": [
     {

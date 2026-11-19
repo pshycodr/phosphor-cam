@@ -4,6 +4,7 @@ export type CaptureMode = "photo" | "video";
 
 export type CameraControlsProps = {
   onFlip: () => void;
+  flipTurns: number;
   onShot: () => void;
   onCopy: () => void;
   onToggleRecording: () => void;

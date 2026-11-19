@@ -26,13 +26,14 @@ function PresetsPanel() {
   }, []);
 
   return (
-    <div className="flex flex-col gap-5 text-xs">
+    <div className="flex flex-col gap-5 pb-1">
       {categories.map(([category, presets]) => (
         <div key={category} className="flex flex-col gap-2">
-          <span className="text-[10px] font-bold tracking-wider text-zinc-500 uppercase">
+          <span className="font-mono text-[9px] tracking-[0.18em] text-faint uppercase">
             {category}
           </span>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-1">
+
+          <div className="grid grid-cols-2 gap-1.5">
             {presets.map((preset) => {
               const isMatch =
                 renderMode === preset.settings.renderMode &&
@@ -45,39 +46,40 @@ function PresetsPanel() {
                   key={preset.id}
                   type="button"
                   onClick={() => applyPreset(preset.settings)}
-                  className={`group flex items-start gap-2.5 rounded-xl border p-2.5 text-left transition-all focus-visible:ring-2 focus-visible:ring-green-400/80 focus-visible:outline-none ${
+                  aria-pressed={isMatch}
+                  className={`press group flex items-start gap-2 rounded-lg border p-2 text-left ${
                     isMatch
-                      ? "border-green-500/60 bg-green-950/30 text-white shadow-sm"
-                      : "border-zinc-800/80 bg-zinc-900/60 text-zinc-300 hover:border-zinc-700 hover:bg-zinc-800/80 hover:text-white"
+                      ? "border-signal/50 bg-signal/5"
+                      : "border-line/80 bg-ink-3/40 hover:border-line-strong"
                   }`}
                 >
-                  {/* Preset swatch */}
                   <span
-                    className="mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full border border-white/20 shadow-xs"
+                    className="mt-0.5 size-3.5 shrink-0 rounded-full border border-line-strong"
                     style={{ backgroundColor: preset.accentColor }}
-                  >
-                    {isMatch && (
-                      <Check
-                        size={10}
-                        strokeWidth={3}
-                        className={
-                          preset.accentColor === "#f5f5f0" ||
-                          preset.accentColor === "#ffea00"
-                            ? "text-black"
-                            : "text-white"
-                        }
-                      />
-                    )}
-                  </span>
+                  />
 
-                  <div className="flex flex-1 flex-col overflow-hidden leading-tight">
-                    <span className="font-bold text-white group-hover:text-green-400">
-                      {preset.name}
+                  <span className="flex min-w-0 flex-1 flex-col leading-tight">
+                    <span className="flex items-center justify-between gap-1">
+                      <span
+                        className={`truncate text-[11px] font-medium ${
+                          isMatch ? "text-signal" : "text-paper"
+                        }`}
+                      >
+                        {preset.name}
+                      </span>
+                      {isMatch && (
+                        <Check
+                          size={11}
+                          strokeWidth={2.5}
+                          aria-hidden="true"
+                          className="shrink-0 text-signal"
+                        />
+                      )}
                     </span>
-                    <span className="line-clamp-1 text-[10px] text-zinc-400">
+                    <span className="mt-0.5 line-clamp-2 text-[9px] leading-snug text-faint">
                       {preset.description}
                     </span>
-                  </div>
+                  </span>
                 </button>
               );
             })}

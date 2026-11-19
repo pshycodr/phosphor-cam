@@ -20,19 +20,7 @@ const CODECS = [
   { key: "webp", label: "WEBP" },
 ] as const satisfies readonly { key: Codecs; label: string }[];
 
-const GREEN = [34, 197, 94] as const;
-const RED = [239, 68, 68] as const;
-
 const clamp = (v: number) => Math.min(MAX, Math.max(MIN, Math.round(v)));
-
-function scaleColor(value: number) {
-  const t =
-    value <= WARN_THRESHOLD
-      ? 0
-      : (value - WARN_THRESHOLD) / (MAX - WARN_THRESHOLD);
-  const [r, g, b] = GREEN.map((c, i) => Math.round(c + (RED[i] - c) * t));
-  return `rgb(${r}, ${g}, ${b})`;
-}
 
 const CaptureTool = () => {
   const codec = useSettingsSelector((s) => s.captureCodec);
@@ -59,7 +47,7 @@ const CaptureTool = () => {
         max={MAX}
         step={1}
         value={value}
-        accent={scaleColor(value)}
+        accent={isHigh ? "#ff6b5a" : "#38f370"}
         marks={[WARN_THRESHOLD]}
         onChange={(v) =>
           updateSettings({ captureScale: clamp(v) }, { history: false })
@@ -70,11 +58,11 @@ const CaptureTool = () => {
       {isHigh && (
         <div
           role="status"
-          className="flex items-start gap-2 rounded-xl border border-red-500/30 bg-red-950/30 px-3 py-2 text-xs text-red-400"
+          className="flex items-start gap-2 rounded-xl border border-alert/25 bg-alert/5 px-3 py-2 text-[11px] leading-relaxed text-alert"
         >
           <IoWarningOutline
             className="mt-0.5 shrink-0"
-            size={14}
+            size={13}
             aria-hidden="true"
           />
           <span>

@@ -1,7 +1,7 @@
 import { useCallback, useRef } from "react";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 
-import { isNative } from "@/shared/utils/isNative";
+import { Toaster } from "@/shared/ui/toaster";
 
 import ExportModal from "./components/controls/ExportModal";
 import StudioEmptyState from "./components/StudioEmptyState";
@@ -15,7 +15,6 @@ export default function StudioPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const image = useStudioStore((s) => s.image);
   const loadImage = useStudioStore((s) => s.loadImage);
-  const native = isNative();
 
   const handleOpenFilePicker = useCallback(() => {
     fileInputRef.current?.click();
@@ -55,30 +54,15 @@ export default function StudioPage() {
       if (file) {
         handleFileProcess(file);
       }
-      // Reset input value so re-selecting same file triggers change
       e.target.value = "";
     },
     [handleFileProcess]
   );
 
   return (
-    <div className="flex h-screen w-screen flex-col overflow-hidden bg-black text-white select-none">
-      <Toaster
-        position="top-center"
-        containerStyle={{
-          top: native ? "calc(env(safe-area-inset-top, 0px) + 16px)" : 20,
-        }}
-        toastOptions={{
-          duration: 2500,
-          className: "border border-green-500 font-bold text-green-400",
-          style: {
-            background: "#000000",
-            color: "#05df72",
-          },
-        }}
-      />
+    <div className="flex h-screen w-screen flex-col overflow-hidden bg-ink text-paper select-none">
+      <Toaster duration={2400} />
 
-      {/* Hidden file input */}
       <input
         ref={fileInputRef}
         type="file"
@@ -87,14 +71,12 @@ export default function StudioPage() {
         className="hidden"
       />
 
-      {/* Top Header */}
       <StudioHeader onOpenFilePicker={handleOpenFilePicker} />
 
-      {/* Main Workspace */}
-      <main className="relative flex flex-1 overflow-hidden">
+      <main className="relative flex min-h-0 flex-1 overflow-hidden">
         {image ? (
           <>
-            <div className="relative flex flex-1 flex-col overflow-hidden">
+            <div className="relative flex min-w-0 flex-1 flex-col overflow-hidden">
               <StudioViewport />
             </div>
             <StudioInspector />
@@ -107,7 +89,6 @@ export default function StudioPage() {
         )}
       </main>
 
-      {/* Export & Save Modal */}
       <ExportModal />
     </div>
   );

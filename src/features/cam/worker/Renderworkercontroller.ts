@@ -81,6 +81,11 @@ export class RenderWorkerController {
     return this.ready;
   }
 
+  /** True when a new frame can be accepted without piling up work. */
+  isIdle() {
+    return this.ready && !this.busy;
+  }
+
   /** Calls every animation frame. Drops the frame when the worker is busy. */
   sendFrame(frame: ImageBitmapSource) {
     if (this.destroyed || !this.ready || this.busy) return;

@@ -18,7 +18,9 @@ import {
   LuX,
 } from "react-icons/lu";
 
-import { useSheetDrag } from "@/shared/hooks/useSheetDrag";
+import { Drawer } from "vaul";
+
+import { useBackHandler } from "@/shared/hooks/useBackHandler";
 
 import Collapse from "../common/Collapse";
 import { useSettingsSelector } from "../common/useSettingsControls";
@@ -31,22 +33,16 @@ import StyleTool from "./tools/StyleTool";
 import { type EditorTool, DOCK_HEIGHT_VAR } from "./types";
 
 interface MobileEditorProps {
-  /**
-   * true: the tab bar is always on screen (studio).
-   * false: the dock only exists while `open` is true (camera).
-   */
   persistent?: boolean;
   open?: boolean;
-  /** Shows an X at the left of the tab bar that closes the whole dock. */
   onClose?: () => void;
-  /** Tool selected on first mount. null starts with only the tab bar. */
   defaultTool?: string | null;
   leadingTools?: EditorTool[];
   trailingTools?: EditorTool[];
   showCapture?: boolean;
 }
 
-const ICON = 22;
+const ICON = 20;
 
 function MobileEditor({
   persistent = false,
@@ -62,7 +58,6 @@ function MobileEditor({
   const visible = persistent || open;
 
   const [activeId, setActiveId] = useState<string | null>(defaultTool);
-  // Remember the last tool so the panel keeps its content while it slides shut.
   const [lastId, setLastId] = useState<string | null>(defaultTool);
   if (activeId && activeId !== lastId) setLastId(activeId);
 
@@ -113,7 +108,6 @@ function MobileEditor({
     );
   }, [leadingTools, trailingTools, renderMode, showCapture]);
 
-  // A tool can disappear (Chars outside ASCII mode); treat that as collapsed.
   const active = tools.find((t) => t.id === activeId) ?? null;
   const shown = active ?? tools.find((t) => t.id === lastId) ?? null;
   const panelOpen = active !== null;
@@ -124,9 +118,8 @@ function MobileEditor({
     []
   );
 
-  const { offset, handlers } = useSheetDrag(collapse);
+  useBackHandler(!persistent && open, () => onClose?.());
 
-  // Publish the dock height so the preview can keep clear of it.
   const [dockEl, setDockEl] = useState<HTMLDivElement | null>(null);
   useEffect(() => {
     if (!visible || !dockEl) return;
@@ -145,7 +138,6 @@ function MobileEditor({
     };
   }, [visible, dockEl]);
 
-  // Keep the selected tab in view when the tab bar scrolls.
   useEffect(() => {
     if (!activeId) return;
     document
@@ -160,42 +152,23 @@ function MobileEditor({
     }
   };
 
-  if (!visible) return null;
-
   const panelId = `${uid}-panel`;
 
-  return (
-    <div
-      ref={setDockEl}
-      role="region"
-      aria-label="Editing tools"
-      onKeyDown={onKeyDown}
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-green-500/20 bg-black/85 pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] text-gray-200 shadow-[0_-8px_30px_rgba(0,0,0,0.5)] backdrop-blur-xl select-none"
-    >
+  const body = (
+    <>
       <Collapse open={panelOpen} id={panelId}>
-        <div
-          style={offset ? { transform: `translateY(${offset}px)` } : undefined}
-          className={offset ? "" : "transition-transform duration-200"}
-        >
-          <div
-            {...handlers}
-            aria-hidden="true"
-            className="flex cursor-grab touch-none justify-center pt-2.5 pb-1.5"
-          >
-            <div className="h-1 w-9 rounded-full bg-green-500/40" />
-          </div>
-
-          <div className="flex items-center justify-between px-4">
-            <h2 className="text-[11px] font-bold tracking-widest text-green-500/80 uppercase">
+        <div className="bg-ink-2/60">
+          <div className="flex items-center justify-between px-4 pt-1">
+            <h2 className="text-[10px] font-medium tracking-[0.2em] text-signal uppercase">
               {shown?.label}
             </h2>
             <button
               type="button"
               onClick={collapse}
               aria-label="Collapse panel"
-              className="-mr-2 flex size-9 items-center justify-center rounded-full text-green-500/70 transition-colors outline-none hover:text-green-300 focus-visible:ring-2 focus-visible:ring-green-400/70"
+              className="press -mr-2 flex size-11 items-center justify-center rounded-full text-faint hover:bg-ink-3 hover:text-paper"
             >
-              <LuChevronDown size={18} aria-hidden="true" />
+              <LuChevronDown size={17} aria-hidden="true" />
             </button>
           </div>
 
@@ -209,15 +182,15 @@ function MobileEditor({
         </div>
       </Collapse>
 
-      <div className="flex items-stretch">
+      <div className="flex items-stretch border-t border-line/60">
         {onClose && (
           <button
             type="button"
             onClick={onClose}
             aria-label="Close editor"
-            className="flex w-12 shrink-0 items-center justify-center border-r border-green-500/15 text-green-500/70 transition-colors outline-none hover:text-green-300 focus-visible:ring-2 focus-visible:ring-green-400/70 focus-visible:ring-inset"
+            className="press m-1 flex w-12 shrink-0 items-center justify-center rounded-xl text-faint hover:bg-ink-3 hover:text-paper"
           >
-            <LuX size={20} aria-hidden="true" />
+            <LuX size={18} aria-hidden="true" />
           </button>
         )}
 
@@ -237,23 +210,23 @@ function MobileEditor({
                 aria-selected={selected}
                 aria-controls={panelId}
                 onClick={() => toggle(tool.id)}
-                className={`relative flex h-14 shrink-0 grow basis-14 snap-start flex-col items-center justify-center gap-1 rounded-xl px-2 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-green-400/70 focus-visible:ring-inset ${
+                className={`relative flex h-14 shrink-0 grow basis-[50px] snap-start flex-col items-center justify-center gap-1 rounded-xl px-0.5 transition-colors ${
                   selected
-                    ? "bg-green-500/10 text-green-400"
-                    : "text-green-500/60 active:bg-green-900/30"
+                    ? "text-signal"
+                    : "text-faint hover:text-muted active:bg-ink-3"
                 }`}
               >
                 {selected && (
                   <span
                     aria-hidden="true"
-                    className="absolute top-0 h-0.5 w-6 rounded-full bg-green-400"
+                    className="absolute top-0 h-0.5 w-6 rounded-full bg-signal"
                   />
                 )}
                 <span className="relative">
                   {tool.icon}
                   {tool.badge}
                 </span>
-                <span className="text-[10px] font-semibold tracking-wide">
+                <span className="text-[9px] font-medium tracking-[0.12em] uppercase">
                   {tool.label}
                 </span>
               </button>
@@ -261,7 +234,57 @@ function MobileEditor({
           })}
         </div>
       </div>
-    </div>
+    </>
+  );
+
+  if (persistent) {
+    return (
+      <div
+        ref={setDockEl}
+        role="region"
+        aria-label="Editing tools"
+        data-open="true"
+        onKeyDown={onKeyDown}
+        className="sheet-shell translucent fixed inset-x-0 bottom-0 z-40 rounded-t-[22px] border-t border-line/80 bg-ink-2/95 pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] shadow-[0_-20px_50px_rgba(0,0,0,0.5)] backdrop-blur-2xl select-none"
+      >
+        {body}
+      </div>
+    );
+  }
+
+  return (
+    <Drawer.Root
+      open={open}
+      onOpenChange={(next) => {
+        if (!next) onClose?.();
+      }}
+      modal={false}
+      dismissible={!!onClose}
+      noBodyStyles
+      autoFocus={false}
+      closeThreshold={0.3}
+    >
+      <Drawer.Portal>
+        <Drawer.Content
+          ref={setDockEl}
+          role="region"
+          aria-label="Editing tools"
+          style={{ touchAction: "pan-y" }}
+          className="translucent fixed inset-x-0 bottom-0 z-40 flex flex-col rounded-t-[22px] border-t border-line/80 bg-ink-2/95 pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] shadow-[0_-20px_50px_rgba(0,0,0,0.5)] backdrop-blur-2xl outline-none select-none"
+        >
+          <Drawer.Title className="sr-only">Editing tools</Drawer.Title>
+
+          <div
+            aria-hidden="true"
+            className="flex shrink-0 cursor-grab justify-center pt-2.5 pb-1 active:cursor-grabbing"
+          >
+            <span className="h-1 w-10 rounded-full bg-line-strong" />
+          </div>
+
+          {body}
+        </Drawer.Content>
+      </Drawer.Portal>
+    </Drawer.Root>
   );
 }
 

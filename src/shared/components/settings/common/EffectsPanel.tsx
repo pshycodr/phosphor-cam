@@ -1,6 +1,7 @@
 import { type ChangeEvent, memo, useCallback } from "react";
 
 import type { EffectKey } from "@/shared/types";
+import { Range } from "@/shared/ui/controls";
 
 import { EFFECT_GROUPS } from "./effectGroups";
 import ToggleRow from "./ToggleRow";
@@ -48,9 +49,8 @@ const EffectRow = ({ effectKey, label, description }: EffectRowProps) => {
       />
 
       {enabled && (
-        <div className="mt-2 flex items-center gap-3">
-          <input
-            type="range"
+        <div className="mt-1 flex items-center gap-3">
+          <Range
             min={0}
             max={1}
             step={0.05}
@@ -60,9 +60,8 @@ const EffectRow = ({ effectKey, label, description }: EffectRowProps) => {
             onKeyUp={commit}
             onBlur={commit}
             aria-label={`${label} intensity`}
-            className="settings-slider w-full"
           />
-          <span className="w-9 shrink-0 text-right text-[11px] text-gray-400 tabular-nums">
+          <span className="w-8 shrink-0 text-right font-mono text-[10px] text-faint tabular-nums">
             {Math.round(intensity * 100)}%
           </span>
         </div>
@@ -75,10 +74,10 @@ const EffectsPanel = () => (
   <div role="group" aria-label="Post effects" className="space-y-4">
     {EFFECT_GROUPS.map((group) => (
       <div key={group.label}>
-        <h4 className="mb-1 text-[10px] font-semibold tracking-wide text-green-500/50 uppercase">
+        <h4 className="mb-1 font-mono text-[9px] tracking-[0.16em] text-faint uppercase">
           {group.label}
         </h4>
-        <div className="divide-y divide-green-500/10">
+        <div className="divide-y divide-line/60">
           {group.items.map(({ key, label, description }) => (
             <EffectRow
               key={key}

@@ -2,6 +2,7 @@ import { memo, useCallback, useState } from "react";
 import { LuArrowLeftRight, LuDices } from "react-icons/lu";
 
 import { COLOR_PRESETS } from "@/shared/constants/colorPresets";
+import { Button } from "@/shared/ui/buttons";
 
 import { randomPair, sameColor } from "../common/colorMath";
 import ToggleRow from "../common/ToggleRow";
@@ -11,12 +12,7 @@ import {
 } from "../common/useSettingsControls";
 import ColorSwitch from "./ColorSwitch";
 
-const SMALL_ACTION =
-  "flex min-h-10 items-center gap-1.5 rounded-md border border-green-500/40 px-3 text-xs font-medium text-green-400 outline-none transition-colors hover:bg-green-900/20 focus-visible:ring-2 focus-visible:ring-green-400/70";
-
 type PickerKey = "foreground" | "background";
-
-/* ------------------------------- component ------------------------------ */
 
 export const AppearanceMode = () => {
   const colorMode = useSettingsSelector((settings) => settings.colorMode);
@@ -31,7 +27,6 @@ export const AppearanceMode = () => {
     []
   );
 
-  // Live drags update without history; the picker commits once on release.
   const handleColorChange = useCallback(
     (key: PickerKey, value: string) => {
       updateSettings({ color: { ...color, [key]: value } }, { history: false });
@@ -83,40 +78,40 @@ export const AppearanceMode = () => {
       <div>
         <div className="flex flex-wrap items-center justify-between gap-2">
           <span
-            className={`text-xs font-medium text-green-400 ${
-              colorMode ? "opacity-40" : ""
-            }`}
+            className={`text-[11px] text-muted ${colorMode ? "opacity-40" : ""}`}
           >
             Custom colors
           </span>
 
           {!colorMode && (
             <div className="flex items-center gap-1.5">
-              <button
-                type="button"
+              <Button
+                size="sm"
+                variant="outline"
                 onClick={randomizeColors}
-                className={SMALL_ACTION}
                 title="Random foreground + background"
+                className="h-8 px-2.5 text-[10px]"
               >
-                <LuDices size={13} aria-hidden="true" />
+                <LuDices size={12} aria-hidden="true" />
                 Random
-              </button>
+              </Button>
 
-              <button
-                type="button"
+              <Button
+                size="sm"
+                variant="outline"
                 onClick={swapColors}
-                className={SMALL_ACTION}
                 title="Swap foreground and background"
+                className="h-8 px-2.5 text-[10px]"
               >
-                <LuArrowLeftRight size={13} aria-hidden="true" />
+                <LuArrowLeftRight size={12} aria-hidden="true" />
                 Swap
-              </button>
+              </Button>
             </div>
           )}
         </div>
 
         {colorMode ? (
-          <p className="mt-2 text-xs leading-relaxed text-green-500/70">
+          <p className="mt-2 text-[11px] leading-relaxed text-faint">
             Turn off Color mode above to choose your own foreground and
             background.
           </p>
@@ -141,7 +136,7 @@ export const AppearanceMode = () => {
               />
             </div>
 
-            <div className="mt-3 flex flex-wrap gap-2.5">
+            <div className="mt-3 flex flex-wrap gap-2">
               {COLOR_PRESETS.map((preset) => {
                 const active =
                   sameColor(preset.foreground, color.foreground) &&
@@ -156,10 +151,10 @@ export const AppearanceMode = () => {
                     title={preset.name}
                     aria-label={`${preset.name} color preset`}
                     aria-pressed={active}
-                    className={`relative size-10 shrink-0 overflow-hidden rounded-full border-2 transition-all outline-none hover:scale-110 focus-visible:ring-2 focus-visible:ring-green-400/70 ${
+                    className={`relative size-8 shrink-0 overflow-hidden rounded-full border transition-all hover:scale-105 ${
                       active
-                        ? "border-green-400 ring-2 ring-green-400/40"
-                        : "border-green-500/30 hover:border-green-400"
+                        ? "border-signal ring-2 ring-signal/25"
+                        : "border-line-strong"
                     }`}
                     style={{ backgroundColor: preset.background }}
                   >

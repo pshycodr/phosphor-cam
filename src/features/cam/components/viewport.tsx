@@ -1,8 +1,22 @@
-import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+
+import { useMediaQuery } from "@/shared/components/settings/common/useMediaQuery";
+import { RENDER_MODES } from "@/shared/constants/settings";
 
 import { useCameraSource } from "../hooks/useCameraSource";
+import { useViewfinderGestures } from "../hooks/useViewfinderGestures";
 import { useSettingsStore } from "../store/settingsStore";
 import { useStatsStore } from "../store/statsStore";
+import type { AspectRatio } from "../types";
 import { RenderWorkerController } from "../worker/Renderworkercontroller";
 
 export interface ViewportHandle {
@@ -14,16 +28,123 @@ interface ViewportProps {
   stream: MediaStream | null;
   canvasSize: { width: number; height: number };
   mirrored?: boolean;
+  onFlip?: () => void;
+  gesturesDisabled?: boolean;
+  editorOpen?: boolean;
+  onOpenEditor?: () => void;
+  onCloseEditor?: () => void;
+  onStageSize?: (size: { width: number; height: number }) => void;
 }
 
+/** null means "fill whatever space the frame was given". */
+const RATIOS: Record<AspectRatio, number | null> = {
+  "1:1": 1,
+  "3:4": 3 / 4,
+  full: null,
+};
+
+const ASPECT_ORDER: readonly AspectRatio[] = ["1:1", "3:4", "full"];
+
+const ASPECT_LABELS: Record<AspectRatio, string> = {
+  "1:1": "1:1",
+  "3:4": "3:4",
+  full: "Full screen",
+};
+
 const Viewport = forwardRef<ViewportHandle, ViewportProps>(
-  ({ stream, canvasSize, mirrored = false }, ref) => {
+  (
+    {
+      stream,
+      canvasSize,
+      mirrored = false,
+      onFlip,
+      gesturesDisabled = false,
+      editorOpen = false,
+      onOpenEditor,
+      onCloseEditor,
+      onStageSize,
+    },
+    ref
+  ) => {
+    const wrapperRef = useRef<HTMLDivElement>(null);
+    const stageRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const controllerRef = useRef<RenderWorkerController | null>(null);
+    const [stageSize, setStageSize] = useState(canvasSize);
+    const isMobile = useMediaQuery("(max-width: 639px)");
+    const isLandscape = useMediaQuery("(orientation: landscape)");
+    const aspect = useSettingsStore((s) => s.settings.aspectRatio);
+    // A rotated phone has no vertical room for an inset card, so the frame
+    // takes the whole screen there and the chrome overlays it.
+    const fillScreen = !isMobile || aspect === "full" || isLandscape;
 
-    const source = useCameraSource(stream, videoRef);
+    const [hint, setHint] = useState<{ text: string; id: number } | null>(null);
+    const hintTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
+      undefined
+    );
+
+    useEffect(() => () => clearTimeout(hintTimer.current), []);
+
+    const showHint = useCallback((text: string) => {
+      setHint((prev) => ({ text, id: (prev?.id ?? 0) + 1 }));
+      clearTimeout(hintTimer.current);
+      hintTimer.current = setTimeout(() => setHint(null), 1100);
+    }, []);
+
+    const stepAspect = useCallback(
+      (direction: 1 | -1) => {
+        const { settings, updateSettings } = useSettingsStore.getState();
+        const index = ASPECT_ORDER.indexOf(settings.aspectRatio);
+        const next =
+          ASPECT_ORDER[
+            Math.min(ASPECT_ORDER.length - 1, Math.max(0, index + direction))
+          ];
+        if (next !== settings.aspectRatio) {
+          updateSettings({ aspectRatio: next });
+        }
+        showHint(ASPECT_LABELS[next]);
+      },
+      [showHint]
+    );
+
+    const stepRenderer = useCallback(
+      (direction: 1 | -1) => {
+        const { settings, updateSettings } = useSettingsStore.getState();
+        const index = RENDER_MODES.findIndex(
+          (mode) => mode.key === settings.renderMode
+        );
+        const next =
+          RENDER_MODES[
+            (index + direction + RENDER_MODES.length) % RENDER_MODES.length
+          ];
+        updateSettings({ renderMode: next.key });
+        showHint(next.label);
+      },
+      [showHint]
+    );
+
+    const gestures = useViewfinderGestures({
+      onFlip: onFlip ?? (() => {}),
+      onStepAspect: stepAspect,
+      onStepRenderer: stepRenderer,
+      onOpenEditor: onOpenEditor ?? (() => {}),
+      onCloseEditor: onCloseEditor ?? (() => {}),
+      editorOpen,
+      enabled: isMobile && !gesturesDisabled && !!onFlip,
+    });
+
+    const box = useMemo(
+      () => ({
+        width: stageSize.width,
+        height: stageSize.height,
+        mirrored,
+      }),
+      [stageSize.width, stageSize.height, mirrored]
+    );
+
+    const source = useCameraSource(stream, videoRef, box);
 
     const sourceRef = useRef(source);
 
@@ -33,8 +154,50 @@ const Viewport = forwardRef<ViewportHandle, ViewportProps>(
     }, [source]);
 
     useEffect(() => {
-      sizeRef.current = canvasSize;
-    }, [canvasSize]);
+      sizeRef.current = stageSize;
+    }, [stageSize]);
+
+    useEffect(() => {
+      onStageSize?.(stageSize);
+    }, [onStageSize, stageSize]);
+
+    useLayoutEffect(() => {
+      const wrapper = wrapperRef.current;
+
+      if (!wrapper) return;
+
+      const ratio = isMobile ? RATIOS[aspect] : null;
+
+      const update = () => {
+        const rect = wrapper.getBoundingClientRect();
+
+        if (rect.width < 2 || rect.height < 2) return;
+
+        let width = rect.width;
+        let height = rect.height;
+
+        if (ratio) {
+          // Fit the ratio inside the available box, shrinking both sides.
+          width = Math.min(rect.width, rect.height * ratio);
+          height = width / ratio;
+        }
+
+        const next = { width: Math.round(width), height: Math.round(height) };
+        setStageSize((prev) =>
+          prev.width === next.width && prev.height === next.height ? prev : next
+        );
+      };
+
+      update();
+      const observer = new ResizeObserver(update);
+      observer.observe(wrapper);
+      window.addEventListener("orientationchange", update);
+
+      return () => {
+        observer.disconnect();
+        window.removeEventListener("orientationchange", update);
+      };
+    }, [aspect, isMobile]);
 
     useEffect(() => {
       const container = containerRef.current;
@@ -44,9 +207,9 @@ const Viewport = forwardRef<ViewportHandle, ViewportProps>(
       const canvas = document.createElement("canvas");
       canvas.width = sizeRef.current.width;
       canvas.height = sizeRef.current.height;
-      canvas.className = "-z-10 max-h-full max-w-full bg-transparent";
+      canvas.className = "h-full w-full object-cover";
       canvas.setAttribute("role", "img");
-      canvas.setAttribute("aria-label", "Live ASCII camera preview");
+      canvas.setAttribute("aria-label", "Live Phosphor camera preview");
       container.appendChild(canvas);
       canvasRef.current = canvas;
 
@@ -68,11 +231,11 @@ const Viewport = forwardRef<ViewportHandle, ViewportProps>(
         canvas.remove();
         canvasRef.current = null;
       };
-    }, [canvasSize]);
+    }, []);
 
     useEffect(() => {
-      controllerRef.current?.resize(canvasSize.width, canvasSize.height);
-    }, [canvasSize.width, canvasSize.height]);
+      controllerRef.current?.resize(stageSize.width, stageSize.height);
+    }, [stageSize.width, stageSize.height]);
 
     useEffect(() => {
       let raf = 0;
@@ -82,7 +245,7 @@ const Viewport = forwardRef<ViewportHandle, ViewportProps>(
         const controller = controllerRef.current;
         const src = sourceRef.current;
 
-        if (!controller || !src.isReady()) return;
+        if (!controller || !controller.isIdle() || !src.isReady()) return;
 
         const frame = src.getFrame();
 
@@ -117,22 +280,56 @@ const Viewport = forwardRef<ViewportHandle, ViewportProps>(
 
     return (
       <div
-        className="fixed inset-0 flex items-center justify-center overflow-hidden bg-black"
-        style={{
-          transform: mirrored ? "scaleX(-1)" : undefined,
-          // Keeps the preview clear of the mobile editor dock (0px when closed).
-          paddingBottom: "var(--editor-dock-h, 0px)",
-        }}
+        ref={wrapperRef}
+        {...gestures}
+        className={
+          fillScreen
+            ? "pointer-events-auto fixed inset-0 flex touch-none items-center justify-center overflow-hidden bg-ink"
+            : "pointer-events-auto fixed inset-0 flex touch-none items-center justify-center overflow-hidden bg-ink max-sm:top-[calc(env(safe-area-inset-top)+7rem)] max-sm:right-[max(0.5rem,env(safe-area-inset-right))] max-sm:bottom-[calc(env(safe-area-inset-bottom)+13rem)] max-sm:left-[max(0.5rem,env(safe-area-inset-left))] max-sm:bg-transparent"
+        }
+        style={
+          fillScreen && isMobile
+            ? { width: "100vw", height: "100dvh" }
+            : undefined
+        }
       >
-        <video
-          ref={videoRef}
-          style={{ display: "none" }}
-          playsInline
-          muted
-          aria-hidden="true"
-        />
-        {/* Canvas is injected by the effect above */}
-        <div ref={containerRef} className="contents" />
+        <div
+          ref={stageRef}
+          className={`ratio-tween frame-in relative flex items-center justify-center overflow-hidden bg-ink motion-reduce:transition-none ${
+            fillScreen
+              ? ""
+              : "max-sm:rounded-[26px] max-sm:border max-sm:border-signal/15 max-sm:shadow-[0_0_50px_-18px_rgba(56,243,112,0.45)]"
+          }`}
+          style={{
+            width: stageSize.width,
+            height: stageSize.height,
+          }}
+        >
+          <video
+            ref={videoRef}
+            style={{ display: "none" }}
+            playsInline
+            muted
+            aria-hidden="true"
+          />
+          {/* Canvas is injected by the effect above */}
+          <div ref={containerRef} className="contents" />
+        </div>
+
+        <div
+          aria-live="polite"
+          aria-atomic="true"
+          className="pointer-events-none absolute inset-0 z-10 grid place-items-center"
+        >
+          {hint && (
+            <span
+              key={hint.id}
+              className="pop-in rounded-full border border-line/70 bg-ink/75 px-4 py-2 font-mono text-[11px] font-medium tracking-[0.22em] text-signal uppercase shadow-[0_12px_30px_rgba(0,0,0,0.45)] backdrop-blur-md"
+            >
+              {hint.text}
+            </span>
+          )}
+        </div>
       </div>
     );
   }

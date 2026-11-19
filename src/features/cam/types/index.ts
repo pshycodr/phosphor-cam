@@ -9,6 +9,8 @@ export type RenderModeConfig = {
 
 export type CameraFacingMode = "user" | "environment";
 
+export type { AspectRatio } from "@/shared/types";
+
 export type ProcessingStats = {
   fps: number;
   renderTime: number;
