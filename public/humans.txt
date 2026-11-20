@@ -1,0 +1,20 @@
+/* TEAM */
+
+Author: Anish Roy (Pshycodr)
+Role: Developer and maintainer
+Email: hello@anishroy.dev
+GitHub: https://github.com/pshycodr
+Twitter: @the_aroy
+Website: https://phosphor.aroy.site
+
+/* SITE */
+
+Last update: 2026-11-20
+Language: English
+Doctype: HTML5
+Standards: HTML5, CSS3, JavaScript, TypeScript
+Software: React 19, TypeScript, Vite, Tailwind CSS v4, Zustand, React Router, Canvas 2D, Web Workers, Capacitor
+Project: Phosphor Cam
+Version: 1.4.0
+License: MIT
+Source: https://github.com/pshycodr/phosphor-cam

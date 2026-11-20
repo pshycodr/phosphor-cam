@@ -1,0 +1,59 @@
+# Phosphor Cam
+
+> Phosphor Cam is a free, client-side camera and photo studio that renders a live webcam feed or a still image as ASCII art, dither, halftone, voxel, or line art in real time. Camera frames and photos are processed on the device and are never uploaded.
+
+Phosphor Cam is created by Anish Roy (Pshycodr) and released under the MIT License. It runs as a web app and installable PWA at https://phosphor.aroy.site/, and as a native Android app built from the same source.
+
+## Product
+
+- [Phosphor Cam](https://phosphor.aroy.site/): Live camera with five render engines, seven effects, photo capture, and video recording.
+- [Phosphor Studio](https://phosphor.aroy.site/studio): Photo editor with the same engines and controls, ten presets, compare, undo/redo, and export.
+
+## Render engines
+
+- **ASCII** — maps pixel luminance to characters from one of 22 sets, with optional true-color output and copyable plain text.
+- **Dither** — Floyd–Steinberg error diffusion, in a monochrome foreground/background palette or per-channel color.
+- **Halftone** — maps brightness to a brick-pattern grid of dots, in solid or source color.
+- **Voxel** — quantized color blocks with an optional raised 3D cube mode.
+- **Lines** — horizontal or vertical ribbons whose thickness follows luminance, with smooth spline edges.
+
+## Features
+
+- Real-time, worker-based rendering with live FPS, render time, and frame-size readouts.
+- Character size 2–30 px, contrast 0.5–3.0×, brightness −100 to +100, color mode, invert, and custom foreground/background colors.
+- Six color presets, H/S/B color sliders, hex input, random colors, and foreground/background swap.
+- Seven effects: glow, bloom, halation, chromatic aberration, vignette, scanlines, and grain, each with an on/off state and intensity.
+- Camera: front/back switching, mirrored front preview, photo capture, and video recording of the rendered output.
+- On phones, camera framing can be 1:1, 3:4, or full screen.
+- Studio: file picker, drag and drop, clipboard paste, built-in samples, zoom/pan/pinch, hold-to-compare, undo/redo, reset, and export.
+- Capture and export: PNG, JPEG, or WEBP at 1×–20× scale, plus clipboard copy of rendered images or ASCII text.
+- Installable PWA and a native Android app that works offline after install.
+
+## Technology
+
+- React 19, TypeScript, Vite, Tailwind CSS v4, Zustand, and React Router.
+- Canvas 2D and Web Workers for rendering; OffscreenCanvas for off-thread work.
+- MediaStream API for camera access and MediaRecorder for video capture.
+- Capacitor for the Android build.
+- Static, client-side app with no media upload endpoint or server-side media processing.
+
+## Website structure
+
+- `/` — live camera and the main Phosphor Cam interface.
+- `/studio` — Phosphor Studio empty state for loading an image.
+- The editor is reached from `/studio` after an image is loaded; opening `/studio/edit` directly redirects to `/studio`.
+
+## Source and downloads
+
+- [Source code](https://github.com/pshycodr/phosphor-cam)
+- [README](https://github.com/pshycodr/phosphor-cam/blob/main/README.md)
+- [Latest Android release](https://github.com/pshycodr/phosphor-cam/releases/latest)
+- [F-Droid listing](https://f-droid.org/packages/site.aroy.phosphor/)
+
+## Privacy
+
+Camera frames, photos, and renders stay on the device. The app has no account system and no upload path for media.
+
+## License
+
+MIT License. Copyright (c) 2025 Anish Roy.
