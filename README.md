@@ -52,7 +52,7 @@ Phosphor Cam is available as a web app, a PWA, and a native Android app. The And
 The link above always points to the latest release. Grab the `.apk` from the Assets section and install it directly — no Play Store, no account, no internet required after install.
 
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/2a65e638-02ca-4e85-801d-8f720e254a6a" alt="Phosphor Cam Android app" width="70%">
+  <img src="https://raw.githubusercontent.com/pshycodr/phosphor-cam/refs/heads/main/fastlane/metadata/android/en-US/images/featureGraphic.png" alt="Phosphor Cam Android app" width="70%">
 </div>
 
 ---
